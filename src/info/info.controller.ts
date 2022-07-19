@@ -10,6 +10,7 @@ import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
 import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler'
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
+import { ethers } from 'ethers';
 
 function getProviderBabyjub() {
   return {
@@ -58,8 +59,9 @@ export class InfoController {
       provider
     ] = await nevermined.accounts.list();
 
-    //const provider_key_file = process.env['PROVIDER_KEYFILE'] || ''
-    //const provider_password = process.env['PROVIDER_PASSWORD'] || ''
+    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
+    const provider_password = process.env['PROVIDER_PASSWORD'] || ''
+    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password, a => console.log(a))
 
     const baby = getProviderBabyjub()
 
@@ -74,7 +76,7 @@ export class InfoController {
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion("DIDRegistry"),
       'provider-address': provider.getId(),
-      'ecdsa-public-key': '',
+      'ecdsa-public-key': wallet.publicKey,
       'babyjub-public-key': {
         x: baby.x,
         y: baby.y,
