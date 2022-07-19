@@ -6,4 +6,4 @@ import { EncryptController } from './encrypt.controller';
   controllers: [EncryptController],
   exports: [],
 })
-export class InfoModule {}
+export class EncryptModule {}
