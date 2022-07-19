@@ -24,4 +24,12 @@ export class GetInfoDto {
     require_tld: false,
   })
   docs: string;
+  network: string;
+  'keeper-url': string;
+  contracts: any;
+  'external-contracts': any;
+  'keeper-version': string;
+  'provider-address': string;
+  'ecdsa-public-key': string;
+  'babyjub-public-key': {x: string, y:string};
 }

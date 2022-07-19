@@ -6,6 +6,18 @@ import { ElasticService } from '../shared/elasticsearch/elastic.service';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
+import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
+import { config } from '../config'
+import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler'
+import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
+
+function getProviderBabyjub() {
+  return {
+    x: process.env['PROVIDER_BABYJUB_PUBLIC1'] || '',
+    y: process.env['PROVIDER_BABYJUB_PUBLIC2'] || '',
+    secret: process.env['PROVIDER_BABYJUB_SECRET'] || '',
+  }
+}
 
 @ApiTags('Info')
 @Controller()
@@ -24,6 +36,12 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
+    const nevermined = await Nevermined.getInstance(config)
+    const instanceConfig = {
+      ...generateIntantiableConfigFromConfig(config),
+      nevermined
+    }
+    const contractHandler = new ContractHandler(instanceConfig)
     const pathEndpoint = `${req.protocol}://${req.hostname}${req.client.localPort ? `:${req.client.localPort}` : ''}${
       req.url
     }`;
@@ -33,11 +51,34 @@ export class InfoController {
 
     const elsInfo = await this.elasticService.getInfo();
 
+    const [
+      //templateManagerOwner,
+      //publisher,
+      //consumer,
+      provider
+    ] = await nevermined.accounts.list();
+
+    //const provider_key_file = process.env['PROVIDER_KEYFILE'] || ''
+    //const provider_password = process.env['PROVIDER_PASSWORD'] || ''
+
+    const baby = getProviderBabyjub()
+
     return {
       APIversion: packageJson.version,
       // prettier-ignore
       elasticsearchVersion: (elsInfo.body as { version: { "number": string } }).version.number,
       docs: `${pathEndpoint}api/v1/docs`,
+      network: await nevermined.keeper.getNetworkName(),
+      'keeper-url': config.nodeUri,
+      contracts: [],
+      'external-contracts': [],
+      'keeper-version': await contractHandler.getVersion("DIDRegistry"),
+      'provider-address': provider.getId(),
+      'ecdsa-public-key': '',
+      'babyjub-public-key': {
+        x: baby.x,
+        y: baby.y,
+      },
     };
   }
 }
