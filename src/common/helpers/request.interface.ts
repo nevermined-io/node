@@ -4,12 +4,7 @@ interface AuthUser {
   userId: string;
   address: string;
   roles: AuthRoles[];
-}
-
-interface AuthData {
-  client_id: string;
   did: string;
-  sub: string;
 }
 
 export interface Request<G> {
@@ -21,5 +16,4 @@ export interface Request<G> {
   protocol: string;
   url: string;
   user?: AuthUser;
-  authData?: AuthData
 }

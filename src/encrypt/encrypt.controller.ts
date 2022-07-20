@@ -4,6 +4,7 @@ import { IsString } from "class-validator";
 import { ethers } from "ethers";
 import { readFileSync } from "fs";
 import path from "path";
+import { encrypt } from "src/common/helpers/utils";
 import { Public } from '../common/decorators/auth.decorator';
 
 export class EncryptResult {
@@ -45,12 +46,9 @@ export class EncryptController {
     if (encryptData.method !== 'PSK-ECDSA') {
         throw new BadRequestException('Only ECDSA encryption allowed')
     }
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
-    const provider_password = process.env['PROVIDER_PASSWORD'] || ''
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
-    const result = await wallet.encrypt(encryptData.message)
+    const { result, publicKey } = await encrypt(encryptData.message)
     return {
-        'public-key': wallet.publicKey,
+        'public-key': publicKey,
         'method': encryptData.method,
         'hash': result,
     }
