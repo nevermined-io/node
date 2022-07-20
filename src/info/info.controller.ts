@@ -61,7 +61,7 @@ export class InfoController {
 
     const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password, a => console.log(a))
+    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
 
     const baby = getProviderBabyjub()
 

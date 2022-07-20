@@ -53,6 +53,8 @@ export class AuthService {
 
       const permission = await this.getPermission(userProfile.userId, address);
 
+      console.log('making new token')
+
       return {
         access_token: this.jwtService.sign({
           iss: address,

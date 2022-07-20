@@ -6,6 +6,12 @@ interface AuthUser {
   roles: AuthRoles[];
 }
 
+interface AuthData {
+  client_id: string;
+  did: string;
+  sub: string;
+}
+
 export interface Request<G> {
   hostname: string;
   body?: G;
@@ -15,4 +21,5 @@ export interface Request<G> {
   protocol: string;
   url: string;
   user?: AuthUser;
+  authData?: AuthData
 }

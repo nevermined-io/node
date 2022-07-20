@@ -10,6 +10,8 @@ import { AssetModule } from './assets/asset.module';
 import { UserProfileModule } from './user-profiles/user-profile.module';
 import { HttpsRedirectMiddleware } from './common/middlewares/https-redirection/https-redirection.middleware';
 import { AuthModule } from './auth/auth.module';
+import { EncryptModule } from './encrypt/encrypt.module';
+import { AccessModule } from './access/access.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { AuthModule } from './auth/auth.module';
     LoggerModule,
     ConfigModule,
     InfoModule,
+    EncryptModule,
+    AccessModule,
     BookmarkModule,
     UserProfileModule,
     AuthModule,
