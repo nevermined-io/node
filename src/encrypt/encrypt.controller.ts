@@ -1,10 +1,7 @@
 import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
 import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { ethers } from "ethers";
-import { readFileSync } from "fs";
-import path from "path";
-import { encrypt } from "src/common/helpers/utils";
+import { encrypt } from "../common/helpers/utils";
 import { Public } from '../common/decorators/auth.decorator';
 
 export class EncryptResult {
@@ -28,7 +25,7 @@ export class EncryptDto {
     message: string;
 }
 
-@ApiTags('Info')
+@ApiTags('Encrypt')
 @Controller()
 export class EncryptController {
   @Post()
@@ -43,10 +40,10 @@ export class EncryptController {
   })
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {
-    if (encryptData.method !== 'PSK-ECDSA') {
+    if (encryptData.method !== 'PSK-ECDSA' && encryptData.method !== 'PSK-RSA') {
         throw new BadRequestException('Only ECDSA encryption allowed')
     }
-    const { result, publicKey } = await encrypt(encryptData.message)
+    const { result, publicKey } = await encrypt(encryptData.message, encryptData.method)
     return {
         'public-key': publicKey,
         'method': encryptData.method,

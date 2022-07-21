@@ -10,7 +10,7 @@ import { ClientAssertionDto } from './dto/clientAssertion.dto';
 import { State } from '../common/type';
 import { Permission } from '../permissions/permission.entity';
 import { ConditionState, Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from 'src/config';
+import { config } from '../config';
 import { ConditionInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/conditions';
 
 const BASE_URL = '/api/v1/gateway/services/'

@@ -1,11 +1,11 @@
 import { BadRequestException, Body, Controller, Get, Req, Response, StreamableFile } from "@nestjs/common";
-import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IsString } from "class-validator";
-import { Public } from '../common/decorators/auth.decorator';
+// import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
-import { decrypt } from "src/common/helpers/utils";
+import { decrypt } from "../common/helpers/utils";
 import download from 'download';
 
 export class AccessResult {
@@ -41,7 +41,7 @@ export class AccessController {
     description: 'Return the url of asset',
     type: AccessResult,
   })
-  @Public()
+  @ApiBearerAuth('Authorization')
   async doAccess(@Body() _accessData: AccessDto, @Req() req: Request<unknown>, @Response({ passthrough: true }) res): Promise<StreamableFile> {
     // const consumer_address = req.user.address
     // const agreement_id = req.user.userId

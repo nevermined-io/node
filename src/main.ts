@@ -9,12 +9,15 @@ import { JwtAuthGuard } from './common/guards/auth/jwt-auth.guard';
 import { RolesGuard } from './common/guards/auth/roles.guards';
 import { ConfigService } from './shared/config/config.service';
 import { Logger } from './shared/logger/logger.service';
+
+/*
 import { BookmarkService } from './bookmarks/bookmark.service';
 import { UserProfileService } from './user-profiles/user-profile.service';
 import { PermissionService } from './permissions/permission.service';
 import { AssetService } from './assets/asset.service';
 import { ServiceDDOService } from './assets/ddo-service.service';
 import { DDOStatusService } from './assets/ddo-status.service';
+*/
 
 const createIndexes = (app: NestExpressApplication) => {
   let connectionTries = 0;
@@ -23,7 +26,7 @@ const createIndexes = (app: NestExpressApplication) => {
   const tryConnectionInterval = setInterval(async () => {
     try {
       await Promise.all(
-        [PermissionService, UserProfileService, BookmarkService, AssetService, ServiceDDOService, DDOStatusService].map(
+        [].map(
           async (service) => {
             const serviceInstance = app.get(service);
             const serviceIndexExits = await serviceInstance.checkIndex();
