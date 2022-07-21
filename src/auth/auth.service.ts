@@ -9,6 +9,11 @@ import { PermissionService } from '../permissions/permission.service';
 import { ClientAssertionDto } from './dto/clientAssertion.dto';
 import { State } from '../common/type';
 import { Permission } from '../permissions/permission.entity';
+import { ConditionState, Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { config } from 'src/config';
+import { ConditionInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/conditions';
+
+const BASE_URL = '/api/v1/gateway/services/'
 
 @Injectable()
 export class AuthService {
@@ -17,6 +22,55 @@ export class AuthService {
     private userProfileService: UserProfileService,
     private permissionService: PermissionService
   ) {}
+
+  async validateAccess(agreement_id: string, did: string, consumer_address: string): Promise<LoginDto> {
+    const nevermined = await Nevermined.getInstance(config)
+    const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(consumer_address, did)
+    if (!granted) {
+      // Check that condition id seeds match with DDO
+      const ddo = await nevermined.assets.resolve(did)
+      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
+      const agreementData = await nevermined.keeper.templates.accessTemplate.instanceFromDDO(
+        agreement.agreementIdSeed,
+        ddo,
+        agreement.creator,
+        {
+          consumerId: consumer_address,
+          creator: agreement.creator,
+          serviceType: 'access'
+        }
+      )
+      if (agreementData.agreementId !== agreement_id) {
+        throw new UnauthorizedException(`Agreement doesn't match ${agreement_id} should be ${agreementData.agreementId}`)
+      }
+      // Check that lock condition is fulfilled
+      const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[1].id)
+      if (lock_state.state !== ConditionState.Fulfilled) {
+        throw new UnauthorizedException(`In agreement ${agreement_id}, lock condition ${agreementData.instances[1].id} is not fulfilled`)
+      }
+      // Fulfill access and escrow conditions
+      const accessInstance = agreementData.instances[0] as ConditionInstance<{}>
+      const escrowInstance = agreementData.instances[2] as ConditionInstance<{}>
+      const [from] = await nevermined.accounts.list()
+      await nevermined.keeper.conditions.accessCondition.fulfillInstance(accessInstance, {}, from)
+      await nevermined.keeper.conditions.escrowPaymentCondition.fulfillInstance(escrowInstance, {}, from)
+      const access_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[0].id)
+      const escrow_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[2].id)
+      if (access_state.state !== ConditionState.Fulfilled) {
+        throw new UnauthorizedException(`In agreement ${agreement_id}, access condition ${agreementData.instances[0].id} is not fulfilled`)
+      }
+      if (escrow_state.state !== ConditionState.Fulfilled) {
+        throw new UnauthorizedException(`In agreement ${agreement_id}, escrow condition ${agreementData.instances[2].id} is not fulfilled`)
+      }
+    }
+    return {
+      access_token: this.jwtService.sign({
+        iss: consumer_address,
+        sub: agreement_id,
+        did: did,
+      }),
+    };
+  }
 
   /**
    * RFC-7523 Client Authentication https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
@@ -38,6 +92,10 @@ export class AuthService {
       payload = jwtEthVerify(clientAssertion);
       const address = payload.iss;
 
+      if (payload.aud === BASE_URL + 'access') {
+        return this.validateAccess(payload.sub, payload.did as string, payload.iss)
+      }
+
       const userProfileSource = await this.userProfileService.findOneByAddress(address);
 
       if (!userProfileSource) {
@@ -53,7 +111,7 @@ export class AuthService {
 
       const permission = await this.getPermission(userProfile.userId, address);
 
-      console.log('making new token')
+      console.log('making new token', payload)
 
       return {
         access_token: this.jwtService.sign({

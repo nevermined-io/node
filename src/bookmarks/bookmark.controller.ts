@@ -54,7 +54,7 @@ export class BookmarkController {
     @Body() createBookmark: CreateBookmarkDto,
     @Req() req: Request<unknown>
   ): Promise<GetBookmarkDto> {
-    console.log('create', req)
+    console.log('create', req.user)
     const { userId, roles } = req.user;
 
     if (!createBookmark.userId) {
