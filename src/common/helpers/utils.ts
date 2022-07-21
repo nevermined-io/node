@@ -21,6 +21,7 @@ const get_aes_private_key = (passphrase: string) => {
 }
 
 const BLOCK_SIZE = 16
+const AES_BLOCK_SIZE = 16
 
 function mod(a: number, n: number) {
   return a - (n * Math.floor(a/n));
@@ -38,7 +39,6 @@ const unpad = (s:string) => {
 
 const aes_encryption = (data, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
-  const AES_BLOCK_SIZE = 16
   const iv = crypto.randomBytes(AES_BLOCK_SIZE)
   const cipher = crypto.createCipheriv('aes-256-cbc', private_key, iv)
   cipher.update(pad(data), 'binary', 'binary')
@@ -47,11 +47,10 @@ const aes_encryption = (data, passphrase) => {
 
 const aes_decryption = (data64, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
-  const AES_BLOCK_SIZE = 16
   const data = Buffer.from(data64, 'base64')
-  const iv = data.slice(0, 16)
+  const iv = data.slice(0, AES_BLOCK_SIZE)
   const cipher = crypto.createCipheriv('aes-256-cbc', private_key, iv)
-  cipher.update(data.slice(16).toString('binary'), 'binary', 'binary')
+  cipher.update(data.slice(AES_BLOCK_SIZE).toString('binary'), 'binary', 'binary')
   return unpad(cipher.final().toString('binary'))
 }
 

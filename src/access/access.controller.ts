@@ -55,7 +55,7 @@ export class AccessController {
     const content_type = file_attributes.contentType
     const auth_method = asset.findServiceByType('authorization').service
     if (auth_method === 'RSAES-OAEP') {
-      let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles))
+      let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
       // download url or what?
       let url: string = filelist[index].url
       let filename = url.split("/").slice(-1)
