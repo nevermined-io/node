@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Req } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Req, Response, StreamableFile } from "@nestjs/common";
 import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { IsString } from "class-validator";
 import { Public } from '../common/decorators/auth.decorator';
@@ -6,6 +6,7 @@ import { Request } from '../common/helpers/request.interface';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
 import { decrypt } from "src/common/helpers/utils";
+import download from 'download';
 
 export class AccessResult {
   res: string
@@ -41,10 +42,10 @@ export class AccessController {
     type: AccessResult,
   })
   @Public()
-  async doAccess(@Body() _accessData: AccessDto, @Req() req: Request<unknown>): Promise<AccessResult> {
-    const consumer_address = req.user.address
+  async doAccess(@Body() _accessData: AccessDto, @Req() req: Request<unknown>, @Response({ passthrough: true }) res): Promise<StreamableFile> {
+    // const consumer_address = req.user.address
+    // const agreement_id = req.user.userId
     const did = req.user.did
-    const agreement_id = req.user.userId
     const nevermined = await Nevermined.getInstance(config)
     // get url for DID
     const asset = await nevermined.assets.resolve(did)
@@ -56,10 +57,16 @@ export class AccessController {
     if (auth_method === 'RSAES-OAEP') {
       let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles))
       // download url or what?
-      let url = filelist[index].url
-      return { res: filelist[index].url }
+      let url: string = filelist[index].url
+      let filename = url.split("/").slice(-1)
+      let contents: Buffer = await download(url)
+      res.set({
+        'Content-Type': content_type,
+        'Content-Disposition': `attachment; filename="${filename}"`,
+      });
+      return new StreamableFile(contents)
     }
-    return { res: '' }
+    throw new BadRequestException()
   }
 }
 
