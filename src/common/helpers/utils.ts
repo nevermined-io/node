@@ -17,7 +17,6 @@ const get_aes_private_key = (passphrase: string) => {
     const salt = Buffer.from('this is a salt')
     const kdf = crypto.pbkdf2Sync(passphrase, salt, 48, 10000, 'sha256').toString('binary')
     const key = kdf.substring(0, 16)
-    console.log('key', key.length)
     return Buffer.from(key, 'binary')
 }
 
@@ -41,11 +40,9 @@ const unpad = (s:string) => {
 const aes_encryption = (data, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
   const iv = crypto.randomBytes(AES_BLOCK_SIZE)
-  console.log(private_key, iv)
   const cipher = crypto.createCipheriv('aes-128-cbc', private_key, iv)
   let res = cipher.update(pad(data), 'binary', 'binary')
   res += cipher.final('binary')
-  console.log('final', Buffer.from(pad(data), 'binary'), Buffer.from(res, 'binary'))
   return Buffer.from(iv.toString('binary') + res, 'binary').toString('base64')
 }
 
@@ -53,12 +50,9 @@ const aes_decryption = (data64, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
   const data = Buffer.from(data64, 'base64')
   const iv = data.slice(0, AES_BLOCK_SIZE)
-  console.log('iv', iv, private_key)
-  console.log(data.slice(AES_BLOCK_SIZE))
   const cipher = crypto.createDecipheriv('aes-128-cbc', private_key, iv)
   let res = cipher.update(data.slice(AES_BLOCK_SIZE).toString('binary'), 'binary', 'binary')
   res += cipher.final('binary')
-  console.log('final', Buffer.from(res, 'binary'))
   return unpad(res)
 }
 
@@ -68,20 +62,17 @@ export const encrypt = async (cipherText, method) => {
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
     let ecdh = crypto.createECDH('secp256k1');
-    console.log('what?', wallet.privateKey)
     ecdh.setPrivateKey(Buffer.from(wallet.privateKey.substring(2), 'hex'))
     const result = ec_encrypt(ecdh.getPublicKey(), Buffer.from(cipherText)).toString('binary')
     const res = {
       publicKey: wallet.publicKey,
       result
     }
-    console.log(res)
     return res
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['RSA_PUBKEY_FILE'] || '')).toString()
+    const provider_key_file = readFileSync(path.join(__dirname, '../../../..', process.env['RSA_PUBKEY_FILE'] || '')).toString()
     const key = new NodeRSA(provider_key_file)
     const aes_key = crypto.randomBytes(16)
-    console.log('aes', aes_key)
     const encrypted_data = aes_encryption(cipherText, aes_key)
     const encrypted_aes_key = key.encrypt(aes_key)
     return {
@@ -100,16 +91,15 @@ export const decrypt = async (cipherText, method) => {
     ecdh.setPrivateKey(Buffer.from(wallet.privateKey.substring(2), 'hex'))
     return ec_decrypt(ecdh.getPrivateKey(), Buffer.from(cipherText, 'binary')).toString()
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['RSA_PRIVKEY_FILE'] || '')).toString()
+    const provider_key_file = readFileSync(path.join(__dirname, '../../../..', process.env['RSA_PRIVKEY_FILE'] || '')).toString()
     const key = new NodeRSA(provider_key_file)
     const [data, encrypted_aes_key] = cipherText.split('|')
-    console.log('crypted aes key', encrypted_aes_key)
     const aes_key = key.decrypt(Buffer.from(encrypted_aes_key, 'hex'))
-    console.log('aes key', aes_key)
     return aes_decryption(Buffer.from(data, 'hex').toString(), aes_key)
   }
 };
 
+/*
 async function test() {
   const { result } = await encrypt('tervvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvfkvfmfdlkvmdlfkvmldfkmvldkfmvldkfmvldkfmvldkfmvlkdmfvlkdmflvkmdflvkmdlfkvmldfkvmldkmest', 'PSK-RSA')
   console.log(result)
@@ -117,3 +107,4 @@ async function test() {
 }
 
 test()
+*/
