@@ -8,12 +8,12 @@ export class ClientAssertionDto {
     example: CLIENT_ASSERTION_TYPE,
   })
   @Equals(CLIENT_ASSERTION_TYPE)
-  client_assertion_type: string;
+  grant_type: string;
 
   @ApiProperty({
     description: 'A single JWT',
     example: 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjIyIn0.eyJpc3Mi[...omitted for brevity...]',
   })
   @IsJWT()
-  client_assertion: string;
+  assertion: string;
 }

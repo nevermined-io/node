@@ -1,17 +1,17 @@
-import { Controller, Post, Body, Req } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Body } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '../common/decorators/auth.decorator';
 import { AuthService } from './auth.service';
 import { ClientAssertionDto } from './dto/clientAssertion.dto';
 import { LoginDto } from './dto/login.dto';
-import { Request } from '../common/helpers/request.interface';
+// import { Request } from '../common/helpers/request.interface';
 
 @ApiTags('Auth')
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('login')
+  @Post('token')
   @ApiOperation({
     description: 'Login using a JWT claim for client authentication',
     summary: 'Public',
@@ -26,10 +26,12 @@ export class AuthController {
     description: 'Unauthorized access',
   })
   @Public()
-  login(@Body() clientAssertion: ClientAssertionDto): Promise<LoginDto> {
-    return this.authService.validateClaim(clientAssertion.client_assertion_type, clientAssertion.client_assertion);
+  token(@Body() clientAssertion: ClientAssertionDto): Promise<LoginDto> {
+    console.log('got assertion', clientAssertion)
+    return this.authService.validateClaim(clientAssertion.grant_type, clientAssertion.assertion);
   }
 
+  /*
   @Post('address')
   @ApiBearerAuth('Authorization')
   @ApiOperation({
@@ -53,5 +55,5 @@ export class AuthController {
     @Req() req: Pick<Request<ClientAssertionDto>, 'user'>
   ) {
     return this.authService.validateNewAddressClaim(clientAssertionDto, req.user.userId);
-  }
+  }*/
 }

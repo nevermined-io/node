@@ -6,7 +6,7 @@ import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt
 import { UserProfileService } from '../user-profiles/user-profile.service';
 import { UserProfile } from '../user-profiles/user-profile.entity';
 import { PermissionService } from '../permissions/permission.service';
-import { ClientAssertionDto } from './dto/clientAssertion.dto';
+// import { ClientAssertionDto } from './dto/clientAssertion.dto';
 import { State } from '../common/type';
 import { Permission } from '../permissions/permission.entity';
 import { ConditionState, Nevermined } from '@nevermined-io/nevermined-sdk-js';
@@ -83,7 +83,7 @@ export class AuthService {
    **/
   async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
     if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
-      throw new UnauthorizedException('Invalid "client_assertion_type"');
+      throw new UnauthorizedException('Invalid "assertion_type"');
     }
 
     let payload: JWTPayload;
@@ -92,7 +92,9 @@ export class AuthService {
       payload = jwtEthVerify(clientAssertion);
       const address = payload.iss;
 
+      console.log('validate access', payload)
       if (payload.aud === BASE_URL + 'access') {
+        console.log('access url')
         return this.validateAccess(payload.sub, payload.did as string, payload.iss)
       }
 
@@ -125,6 +127,7 @@ export class AuthService {
     }
   }
 
+  /*
   async validateNewAddressClaim(clientAssertionDto: ClientAssertionDto, userId: string): Promise<LoginDto> {
     if (clientAssertionDto.client_assertion_type !== CLIENT_ASSERTION_TYPE) {
       throw new UnauthorizedException('Invalid "client_assertion_type"');
@@ -157,6 +160,7 @@ export class AuthService {
       throw new UnauthorizedException(`The 'client_assertion' is invalid: ${(error as Error).message}`);
     }
   }
+  */
 
   private async getPermission(userId: string, address: string): Promise<Permission> {
     return (

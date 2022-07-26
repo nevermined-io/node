@@ -8,7 +8,7 @@ import {
 } from 'jose';
 import { ethers } from 'ethers';
 
-export const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer';
+export const CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer';
 
 // TODO: Used only for testing and copied from the sdk
 //       expose from the SDK side
@@ -100,6 +100,8 @@ export const jwtEthVerify = (jwt: string) => {
   if (!parsedPayload.iss) {
     throw new Error('Payload: "iss" field is required');
   }
+
+  console.log('payload', parsedPayload)
 
   const isValidAddress = ethers.utils.isAddress(parsedPayload.iss);
   if (!isValidAddress) {
