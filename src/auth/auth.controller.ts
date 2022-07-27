@@ -27,33 +27,8 @@ export class AuthController {
   })
   @Public()
   token(@Body() clientAssertion: ClientAssertionDto): Promise<LoginDto> {
-    console.log('got assertion', clientAssertion)
+    // console.log('got assertion', clientAssertion)
     return this.authService.validateClaim(clientAssertion.grant_type, clientAssertion.assertion);
   }
 
-  /*
-  @Post('address')
-  @ApiBearerAuth('Authorization')
-  @ApiOperation({
-    description: 'Add address to existing user profile',
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'The access_token',
-    type: LoginDto,
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'Unauthorized access',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad Request',
-  })
-  authNewAddress(
-    @Body() clientAssertionDto: ClientAssertionDto,
-    @Req() req: Pick<Request<ClientAssertionDto>, 'user'>
-  ) {
-    return this.authService.validateNewAddressClaim(clientAssertionDto, req.user.userId);
-  }*/
 }

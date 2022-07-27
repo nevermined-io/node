@@ -55,6 +55,25 @@ export class AccessController {
     return await downloadAsset(req.user.did, index, res)
   }
 
+  @Get('nft-access/:agreement_id/:index')
+  @ApiOperation({
+    description: 'Access asset',
+    summary: 'Public',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the url of asset',
+    type: AccessResult,
+  })
+  @ApiBearerAuth('Authorization')
+  async doNftAccess(
+    @Req() req: Request<unknown>,
+    @Response({ passthrough: true }) res,
+    @Param('index') index: number,
+  ): Promise<StreamableFile> {
+    return await downloadAsset(req.user.did, index, res)
+  }
+
   @Get('download/:index')
   @ApiOperation({
     description: 'Download asset',
