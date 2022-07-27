@@ -3,12 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { UserProfileService } from '../user-profiles/user-profile.service';
-import { UserProfile } from '../user-profiles/user-profile.entity';
-import { PermissionService } from '../permissions/permission.service';
+// import { UserProfileService } from '../user-profiles/user-profile.service';
+// import { UserProfile } from '../user-profiles/user-profile.entity';
 // import { ClientAssertionDto } from './dto/clientAssertion.dto';
-import { State } from '../common/type';
-import { Permission } from '../permissions/permission.entity';
+// import { State } from '../common/type';
 import { Account, ConditionState, DDO, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { ConditionInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/conditions';
@@ -84,11 +82,27 @@ async function validateAgreement<T>({
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    private userProfileService: UserProfileService,
-    private permissionService: PermissionService
+    // private userProfileService: UserProfileService,
   ) {}
 
-  async validateAccess(agreement_id: string, did: string, consumer_address: string): Promise<LoginDto> {
+
+  async validateOwner(did: string, consumer_address: string): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config)
+    const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(consumer_address, did)
+    if (!granted) {
+      throw new UnauthorizedException(`Address ${consumer_address} has no permission to access ${did}`)
+    }
+    /*
+    return {
+      access_token: this.jwtService.sign({
+        iss: consumer_address,
+        sub: agreement_id,
+        did: did,
+      }),
+    };*/
+  }
+
+  async validateAccess(agreement_id: string, did: string, consumer_address: string): Promise<void> {
     const nevermined = await Nevermined.getInstance(config)
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(consumer_address, did)
     if (!granted) {
@@ -109,52 +123,16 @@ export class AuthService {
         template: nevermined.keeper.templates.accessTemplate,
         conditions,
       })
-      /*
-      // Check that condition id seeds match with DDO
-      const ddo = await nevermined.assets.resolve(did)
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
-      const agreementData = await nevermined.keeper.templates.accessTemplate.instanceFromDDO(
-        agreement.agreementIdSeed,
-        ddo,
-        agreement.creator,
-        {
-          consumerId: consumer_address,
-          creator: agreement.creator,
-          serviceType: 'access'
-        }
-      )
-      if (agreementData.agreementId !== agreement_id) {
-        throw new UnauthorizedException(`Agreement doesn't match ${agreement_id} should be ${agreementData.agreementId}`)
-      }
-      // Check that lock condition is fulfilled
-      const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[1].id)
-      if (lock_state.state !== ConditionState.Fulfilled) {
-        throw new UnauthorizedException(`In agreement ${agreement_id}, lock condition ${agreementData.instances[1].id} is not fulfilled`)
-      }
-      // Fulfill access and escrow conditions
-      const accessInstance = agreementData.instances[0] as ConditionInstance<{}>
-      const escrowInstance = agreementData.instances[2] as ConditionInstance<{}>
-      const [from] = await nevermined.accounts.list()
-      await nevermined.keeper.conditions.accessCondition.fulfillInstance(accessInstance, {}, from)
-      await nevermined.keeper.conditions.escrowPaymentCondition.fulfillInstance(escrowInstance, {}, from)
-      const access_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[0].id)
-      const escrow_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[2].id)
-      if (access_state.state !== ConditionState.Fulfilled) {
-        throw new UnauthorizedException(`In agreement ${agreement_id}, access condition ${agreementData.instances[0].id} is not fulfilled`)
-      }
-      if (escrow_state.state !== ConditionState.Fulfilled) {
-        throw new UnauthorizedException(`In agreement ${agreement_id}, escrow condition ${agreementData.instances[2].id} is not fulfilled`)
-      }
-      */
       console.log('fulfilled agreement')
     }
+    /*
     return {
       access_token: this.jwtService.sign({
         iss: consumer_address,
         sub: agreement_id,
         did: did,
       }),
-    };
+    };*/
   }
 
   /**
@@ -172,89 +150,29 @@ export class AuthService {
     }
 
     let payload: JWTPayload;
-    let userProfile: UserProfile;
+    // let userProfile: UserProfile;
     try {
       payload = jwtEthVerify(clientAssertion);
-      const address = payload.iss;
+      // const address = payload.iss;
 
       console.log('validate access', payload)
       if (payload.aud === BASE_URL + 'access') {
         console.log('access url')
-        return this.validateAccess(payload.sub, payload.did as string, payload.iss)
+        await this.validateAccess(payload.sub, payload.did as string, payload.iss)
+      } else if (payload.aud === BASE_URL + 'download') {
+        console.log('access url')
+        await this.validateOwner(payload.did as string, payload.iss)
       }
-
-      const userProfileSource = await this.userProfileService.findOneByAddress(address);
-
-      if (!userProfileSource) {
-        const userProfileEntity = new UserProfile();
-        userProfileEntity.nickname = address;
-        userProfileEntity.isListed = true;
-        userProfileEntity.addresses = [address];
-        userProfileEntity.state = State.Confirmed;
-        userProfile = await this.userProfileService.createOne(userProfileEntity);
-      } else {
-        userProfile = userProfileSource._source;
-      }
-
-      const permission = await this.getPermission(userProfile.userId, address);
 
       console.log('making new token', payload)
 
+      delete payload.exp
       return {
-        access_token: this.jwtService.sign({
-          iss: address,
-          sub: userProfile.userId,
-          roles: permission?.type || [],
-        }),
+        access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
       throw new UnauthorizedException(`The 'client_assertion' is invalid: ${(error as Error).message}`);
     }
   }
 
-  /*
-  async validateNewAddressClaim(clientAssertionDto: ClientAssertionDto, userId: string): Promise<LoginDto> {
-    if (clientAssertionDto.client_assertion_type !== CLIENT_ASSERTION_TYPE) {
-      throw new UnauthorizedException('Invalid "client_assertion_type"');
-    }
-
-    try {
-      const payload = jwtEthVerify(clientAssertionDto.client_assertion);
-      const address = payload.iss;
-
-      const userProfile = (await this.userProfileService.findOneById(userId))?._source;
-
-      if (userProfile.addresses.some((a) => a === address)) {
-        throw new UnauthorizedException(`The address ${address} already exists in ${userProfile.nickname} account`);
-      }
-
-      userProfile.addresses.push(address);
-
-      const userProfileUpdated = (await this.userProfileService.updateOneByEntryId(userId, userProfile))?._source;
-
-      const permission = await this.getPermission(userId, address);
-
-      return {
-        access_token: this.jwtService.sign({
-          iss: address,
-          sub: userProfileUpdated.userId,
-          roles: permission?.type || [],
-        }),
-      };
-    } catch (error) {
-      throw new UnauthorizedException(`The 'client_assertion' is invalid: ${(error as Error).message}`);
-    }
-  }
-  */
-
-  private async getPermission(userId: string, address: string): Promise<Permission> {
-    return (
-      await this.permissionService.findManyByUserIdAndType(userId, undefined, {
-        page: 1,
-        offset: 100,
-      })
-    ).hits
-      .map((p) => p._source)
-      .find((p) => p.holder === address);
-  }
 }
