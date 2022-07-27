@@ -86,6 +86,7 @@ export const jwtEthVerify = (jwt: string) => {
   let publicKey: string;
   try {
     publicKey = recoverPublicKey(protectedHeader, payload, signature);
+    console.log(protectedHeader, "sig", signature, "public", publicKey);
   } catch (error) {
     throw new Error(`Signature: Failed to validate signature (${(error as Error).message})`);
   }
@@ -113,7 +114,7 @@ export const jwtEthVerify = (jwt: string) => {
   }
 
   if (parsedPayload.iss !== publicKey) {
-    throw new Error('Payload: "iss" is not the signer of the payload');
+    throw new Error(`Payload: "iss" is not the signer of the payload ${publicKey}`);
   }
 
   return parsedPayload;

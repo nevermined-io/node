@@ -34,27 +34,21 @@ export class AccessController {
   ): Promise<StreamableFile> {
     // const consumer_address = req.user.address
     // const agreement_id = req.user.userId
-    console.log('what???')
     const did = req.user.did
     const nevermined = await Nevermined.getInstance(config)
     // get url for DID
     const asset = await nevermined.assets.resolve(did)
-    console.log('resolved', asset)
     // const index = 0
     const service = asset.findServiceByType('metadata')
     const file_attributes = service.attributes.main.files[index]
     const content_type = file_attributes.contentType
-    console.log('got metadata', service)
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
-    console.log('got auth', auth_method)
     if (auth_method === 'RSAES-OAEP') {
       let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
       // download url or what?
-      console.log('got file list', filelist)
       let url: string = filelist[index].url
       let filename = url.split("/").slice(-1)[0]
       let contents: Buffer = await download(url)
-      console.log('filename', filename)
       res.set({
         'Content-Type': content_type,
         'Content-Disposition': `attachment;filename=${filename}`,
