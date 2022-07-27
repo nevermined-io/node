@@ -8,7 +8,7 @@ import { AccessModule } from './access/access.module';
 export const routes: Routes = [
   { path: '/api/v1/gateway/services/encrypt', module: EncryptModule },
   { path: '/api/v1/gateway/services/oauth', module: AuthModule },
-  { path: '/api/v1/gateway/services/access', module: AccessModule },
+  { path: '/api/v1/gateway/services', module: AccessModule },
   { path: '/api/v1/permissions', module: PermissionModule },
   { path: '/', module: InfoModule },
 ];

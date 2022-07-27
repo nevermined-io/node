@@ -16,7 +16,7 @@ export class AccessResult {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
-  @Get(':agreement_id/:index')
+  @Get('access/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset',
     summary: 'Public',

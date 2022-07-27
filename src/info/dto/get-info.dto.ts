@@ -31,5 +31,6 @@ export class GetInfoDto {
   'keeper-version': string;
   'provider-address': string;
   'ecdsa-public-key': string;
+  'rsa-public-key': string;
   'babyjub-public-key': {x: string, y:string};
 }
