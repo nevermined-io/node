@@ -1,38 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Req, Response, StreamableFile } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, Response, StreamableFile } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
-import { decrypt } from "../common/helpers/utils";
-import download from 'download';
 import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { validateAgreement } from '../common/helpers/agreement';
+import { downloadAsset, validateAgreement } from '../common/helpers/agreement';
 export class AccessResult {
   res: string
-}
-
-async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
-  const nevermined = await Nevermined.getInstance(config)
-  // get url for DID
-  const asset = await nevermined.assets.resolve(did)
-  const service = asset.findServiceByType('metadata')
-  const file_attributes = service.attributes.main.files[index]
-  const content_type = file_attributes.contentType
-  const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
-  if (auth_method === 'RSAES-OAEP') {
-    let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
-    // download url or what?
-    let url: string = filelist[index].url
-    let filename = url.split("/").slice(-1)[0]
-    let contents: Buffer = await download(url)
-    res.set({
-      'Content-Type': content_type,
-      'Content-Disposition': `attachment;filename=${filename}`,
-    });
-    return new StreamableFile(contents)
-  }
-  throw new BadRequestException()
 }
 
 export class TransferDto {

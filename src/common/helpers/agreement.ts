@@ -1,9 +1,11 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, StreamableFile, UnauthorizedException } from '@nestjs/common';
 import { Account, ConditionState, DDO, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../../config';
 import { ConditionInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/conditions';
 import { AgreementInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/templates';
 import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/ContractBase';
+import { decrypt } from './utils';
+import download from 'download';
 
 export interface Template<T> {
   instanceFromDDO: (a: string, b: DDO, c: string, d: T) => Promise<AgreementInstance<T>>
@@ -76,4 +78,33 @@ export async function validateAgreement<T>({
       }
     }
   }
+}
+
+export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string}> {
+  const nevermined = await Nevermined.getInstance(config)
+  // get url for DID
+  const asset = await nevermined.assets.resolve(did)
+  const service = asset.findServiceByType('metadata')
+  const file_attributes = service.attributes.main.files[index]
+  const content_type = file_attributes.contentType
+  const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
+  if (auth_method === 'RSAES-OAEP') {
+    const filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
+    // download url or what?
+    const url: string = filelist[index].url
+    return { url, content_type }
+  }
+  throw new BadRequestException()
+}
+
+export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
+  const {url, content_type} = await getAssetUrl(did, index)
+  // get url for DID
+  const filename = url.split("/").slice(-1)[0]
+  const contents: Buffer = await download(url)
+  res.set({
+    'Content-Type': content_type,
+    'Content-Disposition': `attachment;filename=${filename}`,
+  });
+  return new StreamableFile(contents)
 }

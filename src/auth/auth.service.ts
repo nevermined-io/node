@@ -7,7 +7,7 @@ import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
-import Dtp from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
+import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 
 const BASE_URL = '/api/v1/gateway/services/'
 
@@ -58,10 +58,11 @@ export class AuthService {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
     }
-    const dtp = await Dtp.Dtp.getInstance(instanceConfig)
+    const dtp = await Dtp.getInstance(instanceConfig)
+    const consumer = await dtp.babyjubPublicAccount('0x'+consumer_address.substring(0,64), '0x'+consumer_address.substring(64,128))
     const params = {
       consumerId: consumer_address,
-      consumer: consumer_address,
+      consumer,
     }
     const conditions = [
       {name: 'access', fulfill: true, condition: dtp.accessProofCondition},
