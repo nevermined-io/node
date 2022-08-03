@@ -5,9 +5,12 @@ import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
-import { validateAgreement } from '../common/helpers/agreement';
+import { getAssetUrl, validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
+import { AccessProofConditionExtra } from '@nevermined-io/nevermined-sdk-dtp/dist/AccessProofCondition';
+import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
+import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 
 const BASE_URL = '/api/v1/gateway/services/'
 
@@ -52,23 +55,32 @@ export class AuthService {
     }
   }
 
-  async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: string): Promise<void> {
+  async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
     const nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
     }
     const dtp = await Dtp.getInstance(instanceConfig)
-    const consumer = await dtp.babyjubPublicAccount('0x'+consumer_address.substring(0,64), '0x'+consumer_address.substring(64,128))
+    const buyerPub = new BabyjubPublicKey('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128))
+    const consumer = await dtp.babyjubPublicAccount('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128))
     const params = {
       consumerId: consumer_address,
       consumer,
     }
+    const data = Buffer.from('0x' + getAssetUrl(did, 0), 'hex')
+    const extra : AccessProofConditionExtra = {
+      providerK: process.env.PROVIDER_BABYJUB_SECRET,
+      data
+    }
     const conditions = [
-      {name: 'access', fulfill: true, condition: dtp.accessProofCondition},
+      {name: 'access-proof', fulfill: true, condition: dtp.accessProofCondition, extra},
       {name: 'lock', fulfill: false},
       {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
     ]
+    if (await dtp.keytransfer.verifyBabyjub(buyerPub, consumer_address, babysig)) {
+
+    }
     await validateAgreement({
       agreement_id,
       did,
@@ -88,7 +100,7 @@ export class AuthService {
     if (!granted) {
       const ddo = await nevermined.assets.resolve(did)
       const service = ddo.findServiceByType('nft-access')
-      console.log('serive', JSON.stringify(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value))
+      // console.log('serive', JSON.stringify(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value))
       const numberNfts = parseInt(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value)
       if (agreement_id === '0x') {
         if (await nevermined.keeper.nftUpgradeable.balance(consumer_address, did) < numberNfts) {
@@ -136,6 +148,8 @@ export class AuthService {
       console.log('validate access', payload)
       if (payload.aud === BASE_URL + 'access') {
         await this.validateAccess(payload.sub, payload.did as string, payload.iss)
+      } else if (payload.aud === BASE_URL + 'access-proof') {
+        await this.validateAccessProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig)
       } else if (payload.aud === BASE_URL + 'download') {
         await this.validateOwner(payload.did as string, payload.iss)
       } else if (payload.aud === BASE_URL + 'nft-access') {

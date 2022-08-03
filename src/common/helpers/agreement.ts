@@ -12,7 +12,7 @@ export interface Template<T> {
 }
 
 export interface NormalCondition {
-  fulfillInstance: (a: ConditionInstance<{}>, b: {}, from: Account, params?: TxParameters, method?: string) => Promise<any>
+  fulfillInstance: (a: ConditionInstance<{}>, b: any, from: Account, params?: TxParameters, method?: string) => Promise<any>
   sendFrom: (name: string, args: any[], from: Account) => Promise<any>
 }
 
@@ -21,6 +21,7 @@ export interface ConditionInfo {
   condition?: NormalCondition,
   name: string,
   delegate?: boolean,
+  extra?: any,
 }
 
 export interface Params<T> {
@@ -71,7 +72,7 @@ export async function validateAgreement<T>({
         // console.log('fulfilling', a, idx)
       const condInstance = agreementData.instances[idx] as ConditionInstance<{}>
       const method = a.delegate ? 'fulfillForDelegate' : 'fulfill'
-      await a.condition.fulfillInstance(condInstance, {}, from, undefined, method)
+      await a.condition.fulfillInstance(condInstance, a.extra || {}, from, undefined, method)
       const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
       if (lock_state.state !== ConditionState.Fulfilled) {
         throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)

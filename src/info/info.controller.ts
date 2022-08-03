@@ -69,6 +69,7 @@ export class InfoController {
     const key = new NodeRSA(rsa_key_file)
 
     const baby = getProviderBabyjub()
+    const artifactDir = './node_modules/@nevermined-io/contracts/artifacts'
 
     return {
       APIversion: packageJson.version,
@@ -79,7 +80,7 @@ export class InfoController {
       'keeper-url': config.nodeUri,
       contracts: [],
       'external-contracts': [],
-      'keeper-version': await contractHandler.getVersion("DIDRegistry"),
+      'keeper-version': await contractHandler.getVersion("DIDRegistry", artifactDir),
       'provider-address': provider.getId(),
       'ecdsa-public-key': wallet.publicKey,
       'rsa-public-key': key.exportKey('public'),
