@@ -6,6 +6,8 @@ import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { validateAgreement } from '../common/helpers/agreement';
+import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
+import Dtp from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 
 const BASE_URL = '/api/v1/gateway/services/'
 
@@ -48,6 +50,32 @@ export class AuthService {
       })
       console.log('fulfilled agreement')
     }
+  }
+
+  async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: string): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config)
+    const instanceConfig = {
+      ...generateIntantiableConfigFromConfig(config),
+      nevermined
+    }
+    const dtp = await Dtp.Dtp.getInstance(instanceConfig)
+    const params = {
+      consumerId: consumer_address,
+      consumer: consumer_address,
+    }
+    const conditions = [
+      {name: 'access', fulfill: true, condition: dtp.accessProofCondition},
+      {name: 'lock', fulfill: false},
+      {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
+    ]
+    await validateAgreement({
+      agreement_id,
+      did,
+      params,
+      template: dtp.accessProofTemplate,
+      conditions,
+    })
+    console.log('fulfilled agreement')
   }
 
   async validateNftAccess(agreement_id: string, did: string, consumer_address: string): Promise<void> {

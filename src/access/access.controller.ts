@@ -87,6 +87,25 @@ export class AccessController {
     return await downloadAsset(req.user.did, index, res)
   }
 
+  @Get('access-proof/:agreement_id/:index')
+  @ApiOperation({
+    description: 'Access asset w/ DTP proof',
+    summary: 'Public',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the url of asset',
+    type: AccessResult,
+  })
+  @ApiBearerAuth('Authorization')
+  async doAccessProof(
+    @Req() req: Request<unknown>,
+    @Response({ passthrough: true }) res,
+    @Param('index') index: number,
+  ): Promise<StreamableFile> {
+    return await downloadAsset(req.user.did, index, res)
+  }
+
   @Get('nft-access/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset',
