@@ -69,7 +69,7 @@ export class InfoController {
     const key = new NodeRSA(rsa_key_file)
 
     const baby = getProviderBabyjub()
-    const artifactDir = './node_modules/@nevermined-io/contracts/artifacts'
+    const artifactDir = './artifacts'
 
     return {
       APIversion: packageJson.version,

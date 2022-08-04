@@ -45,6 +45,7 @@ export class AuthService {
         {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
       ]
       await validateAgreement({
+        nevermined,
         agreement_id,
         did,
         params,
@@ -56,6 +57,7 @@ export class AuthService {
   }
 
   async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
+    console.log('validate access w/ proof')
     const nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
@@ -68,9 +70,11 @@ export class AuthService {
       consumerId: consumer_address,
       consumer,
     }
-    const data = Buffer.from('0x' + getAssetUrl(did, 0), 'hex')
+    const { url } = await getAssetUrl(did, 0)
+    const data = Buffer.from(url, 'hex')
+    console.log('data', data, url)
     const extra : AccessProofConditionExtra = {
-      providerK: process.env.PROVIDER_BABYJUB_SECRET,
+      providerK: dtp.keytransfer.makeKey(process.env.PROVIDER_BABYJUB_SECRET),
       data
     }
     const conditions = [
@@ -78,11 +82,14 @@ export class AuthService {
       {name: 'lock', fulfill: false},
       {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
     ]
-    if (await dtp.keytransfer.verifyBabyjub(buyerPub, consumer_address, babysig)) {
-
+    console.log('going to verify', buyerPub, consumer_address, babysig)
+    if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
+      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`)
     }
+    // console.log('template', dtp.accessProofTemplate.address, nevermined.keeper.agreementStoreManager.templates)
     await validateAgreement({
       agreement_id,
+      nevermined,
       did,
       params,
       template: dtp.accessProofTemplate,
@@ -117,6 +124,7 @@ export class AuthService {
       await validateAgreement({
         agreement_id,
         did,
+        nevermined,
         params,
         template: nevermined.keeper.templates.nftAccessTemplate,
         conditions,

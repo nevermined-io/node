@@ -25,6 +25,7 @@ export interface ConditionInfo {
 }
 
 export interface Params<T> {
+  nevermined: Nevermined,
   agreement_id: string, 
   did: string, 
   template: Template<T>,
@@ -32,22 +33,27 @@ export interface Params<T> {
   conditions: ConditionInfo[]
 }
 
+export async function getNevermined() {
+  const nevermined = await Nevermined.getInstance(config)
+  return nevermined
+}
+
 export async function validateAgreement<T>({
+  nevermined,
   agreement_id, 
   did, 
   template,
   params,
   conditions,
 }: Params<T>) {
-  const nevermined = await Nevermined.getInstance(config)
+  // const nevermined = await Nevermined.getInstance(config)
   const ddo = await nevermined.assets.resolve(did)
-  /*
   const templateId: string = await nevermined.keeper.agreementStoreManager.call('getAgreementTemplate', [
     agreement_id
   ])
   console.log('template', templateId, 'for', agreement_id)
-  */
   const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
+  console.log('got agreement')
   const agreementData = await template.instanceFromDDO(
     agreement.agreementIdSeed,
     ddo,
