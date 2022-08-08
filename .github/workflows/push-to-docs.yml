@@ -2,9 +2,10 @@ name: Push documentation to docs repo
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - v*
+  # Disable until docs/ are updated and belongs to gateway-ts api: https://github.com/nevermined-io/docs/issues/62
+  # push:
+  #   tags:
+  #     - v*
 
 jobs:
   build-and-push-to-docs:
