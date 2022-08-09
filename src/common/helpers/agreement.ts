@@ -153,15 +153,16 @@ export async function uploadS3(file: Buffer, filename: string): Promise<string> 
   return uploaded.Location
 }
 
-export async function uploadFilecoin(file: Buffer, filename: string) {
+export async function uploadFilecoin(file: Buffer, filename: string): Promise<string> {
   const formData = new FormData()
   const blob = new Blob([file])
   formData.append('data', blob);
-  await fetch('https://api.estuary.tech/content/add', {
+  const res = await fetch('https://shuttle-4.estuary.tech/content/add', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${process.env.ESTUARY_TOKEN}`,
     },
     body: formData
   })
+  return 'cid://' + (await res.json() as any).cid
 }

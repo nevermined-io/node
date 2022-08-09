@@ -46,6 +46,17 @@ const aes_encryption = (data, passphrase) => {
   return Buffer.from(iv.toString('binary') + res, 'binary').toString('base64')
 }
 
+export const aes_encryption_256 = (data, passphrase) => {
+  const salt = crypto.randomBytes(BLOCK_SIZE - 'Salted__'.length)
+  const kdf = crypto.pbkdf2Sync(passphrase, salt, 48, 10000, 'sha256').toString('binary')
+  const private_key = kdf.substring(0, 32)
+  const iv = kdf.substring(32, AES_BLOCK_SIZE)
+  const cipher = crypto.createCipheriv('aes-128-cbc', private_key, iv)
+  let res = cipher.update(pad(data), 'binary', 'binary')
+  res += cipher.final('binary')
+  return Buffer.from('Salted__' + salt.toString('binary') + res, 'binary').toString('base64')
+}
+
 const aes_decryption = (data64, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
   const data = Buffer.from(data64, 'base64')

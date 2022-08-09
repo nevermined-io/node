@@ -1,13 +1,31 @@
-import { Body, Controller, Get, Param, Post, Req, Response, StreamableFile } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
-import { IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, getAssetUrl, validateAgreement } from '../common/helpers/agreement';
+import { downloadAsset, getAssetUrl, uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
+import { FileInterceptor } from "@nestjs/platform-express";
+import crypto from 'crypto';
+import { aes_encryption_256 } from "src/common/helpers/utils";
+
 export class AccessResult {
   res: string
+}
+
+export class UploadResult {
+  url: string
+  password?: string
+}
+
+export class UploadDto {
+  @ApiProperty({
+    description: 'Encrypt uploaded data',
+    example: 'false'
+  })
+  @IsBoolean()
+  encrypt: boolean;
 }
 
 export class TransferDto {
@@ -151,5 +169,33 @@ export class AccessController {
   ): Promise<StreamableFile> {
     return await downloadAsset(req.user.did, index, res)
   }
+
+  @Post('upload/:backend')
+  @ApiOperation({
+    description: 'Access asset',
+    summary: 'Public',
+  })
+  @Public()
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiResponse({
+    status: 200,
+    description: 'Return the url of asset',
+  })
+  async doUpload(@Body() uploadData: UploadDto, @Param('backend') backend: string, @UploadedFile() file: Express.Multer.File): Promise<UploadResult> {
+    let data = file.buffer
+    if (uploadData.encrypt) {
+      // generate password
+      const pass = crypto.randomBytes(32).toString('base64url')
+      data = Buffer.from(aes_encryption_256(data, pass))
+    }
+    if (backend === 's3') {
+      const url = await uploadS3(data, file.filename)
+      return { url }
+    } else if (backend === 'filecoin') {
+      const url = await uploadFilecoin(data, file.filename)
+      return { url }
+    }
+  }
+
 }
 
