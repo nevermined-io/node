@@ -395,4 +395,7 @@ development.env
 /config/local.js
 yarn.lock
 .vscode
-tsconfig.build.tsbuildinfo
+tsconfig.build.
+
+circuits
+*.tgz

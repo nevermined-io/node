@@ -6,7 +6,7 @@ module.exports = {
   JWT_SECRET_KEY: 'secret',
   JWT_EXPIRY_KEY: '60m',
   server: {
-    port: 3100,
+    port: 8030,
   },
   src: {
     root: 'src',
