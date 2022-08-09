@@ -12,6 +12,8 @@ export class AccessResult {
   res: string
 }
 
+const FILECOIN_GATEWAY = ''
+
 async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
   const nevermined = await Nevermined.getInstance(config)
   // get url for DID
@@ -24,6 +26,12 @@ async function downloadAsset(did: string, index: number, res: any): Promise<Stre
     let filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
     // download url or what?
     let url: string = filelist[index].url
+    // for filecoin, replace protocol with gateway
+    if (url.startsWith('cid://')) {
+      url = url.replace('cid://', FILECOIN_GATEWAY)
+    } else if (url.startsWith('ipfs://')) {
+      url = url.replace('ipfs://', FILECOIN_GATEWAY)
+    }
     let filename = url.split("/").slice(-1)[0]
     let contents: Buffer = await download(url)
     res.set({
