@@ -6,6 +6,8 @@ import { AgreementInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/ke
 import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/ContractBase';
 import { decrypt } from './utils';
 import download from 'download';
+import AWS from 'aws-sdk';
+import fetch, { FormData, File, fileFrom, Blob } from 'node-fetch';
 
 export interface Template<T> {
   instanceFromDDO: (a: string, b: DDO, c: string, d: T) => Promise<AgreementInstance<T>>
@@ -104,15 +106,30 @@ export async function getAssetUrl(did: string, index: number): Promise<{url: str
   throw new BadRequestException()
 }
 
-const FILECOIN_GATEWAY = ''
+const FILECOIN_GATEWAY = 'https://dweb.link/ipfs/:cid'
+
+/*
+Parses a url with the following formats:
+cid://USER_TOKEN:DEAL_ID@ESTUARY_TOKEN/CID_HASH
+cid://ESTUARY_TOKEN/CID_HASH
+cid://USER_TOKEN:DEAL_ID@CID_HASH
+cid://USER_TOKEN:@CID_HASH
+cid://:DEAL_ID@CID_HASH
+cid://CID_HASH
+:param url: the cid url
+:return: FilecoinUrl
+*/
+function parseUrl(url: string): string {
+  url = url.replace(/^cid:\/\//, '')
+  let parts = url.split(/[:@\/]/)
+  return parts.pop()
+}
 
 export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
   let {url, content_type} = await getAssetUrl(did, index)
   // get url for DID
   if (url.startsWith('cid://')) {
-    url = url.replace('cid://', FILECOIN_GATEWAY)
-  } else if (url.startsWith('ipfs://')) {
-    url = url.replace('ipfs://', FILECOIN_GATEWAY)
+    url = FILECOIN_GATEWAY.replace(':cid', parseUrl(url))
   }
   const filename = url.split("/").slice(-1)[0]
   const contents: Buffer = await download(url)
@@ -121,4 +138,30 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
     'Content-Disposition': `attachment;filename=${filename}`,
   });
   return new StreamableFile(contents)
+}
+
+export async function uploadS3(file: Buffer, filename: string): Promise<string> {
+  const s3 = new AWS.S3({
+    accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+  })
+  const uploaded = await s3.upload({
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: filename,
+    Body: file,
+  }).promise()
+  return uploaded.Location
+}
+
+export async function uploadFilecoin(file: Buffer, filename: string) {
+  const formData = new FormData()
+  const blob = new Blob([file])
+  formData.append('data', blob);
+  await fetch('https://api.estuary.tech/content/add', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.ESTUARY_TOKEN}`,
+    },
+    body: formData
+  })
 }
