@@ -8,7 +8,7 @@ import { Public } from "../common/decorators/auth.decorator";
 import { downloadAsset, getAssetUrl, uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
-import { aes_encryption_256 } from "src/common/helpers/utils";
+import { aes_encryption_256 } from "../common/helpers/utils";
 
 export class AccessResult {
   res: string
