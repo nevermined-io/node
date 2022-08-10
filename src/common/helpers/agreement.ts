@@ -7,7 +7,7 @@ import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/
 import { decrypt } from './utils';
 import download from 'download';
 import AWS from 'aws-sdk';
-import fetch, { FormData, File, fileFrom, Blob } from 'node-fetch';
+import fetch, { FormData, Blob } from 'node-fetch';
 
 export interface Template<T> {
   instanceFromDDO: (a: string, b: DDO, c: string, d: T) => Promise<AgreementInstance<T>>
