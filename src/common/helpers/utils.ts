@@ -46,17 +46,6 @@ const aes_encryption = (data, passphrase) => {
   return Buffer.from(iv.toString('binary') + res, 'binary').toString('base64')
 }
 
-export const aes_encryption_256 = (data, passphrase) => {
-  const salt = crypto.randomBytes(BLOCK_SIZE - 'Salted__'.length)
-  const kdf = crypto.pbkdf2Sync(passphrase, salt, 48, 10000, 'sha256').toString('binary')
-  const private_key = kdf.substring(0, 32)
-  const iv = kdf.substring(32, AES_BLOCK_SIZE)
-  const cipher = crypto.createCipheriv('aes-128-cbc', private_key, iv)
-  let res = cipher.update(pad(data), 'binary', 'binary')
-  res += cipher.final('binary')
-  return Buffer.from('Salted__' + salt.toString('binary') + res, 'binary').toString('base64')
-}
-
 const aes_decryption = (data64, passphrase) => {
   const private_key = get_aes_private_key(passphrase)
   const data = Buffer.from(data64, 'base64')
@@ -65,6 +54,31 @@ const aes_decryption = (data64, passphrase) => {
   let res = cipher.update(data.slice(AES_BLOCK_SIZE).toString('binary'), 'binary', 'binary')
   res += cipher.final('binary')
   return unpad(res)
+}
+
+export const aes_encryption_256 = (data, passphrase) => {
+  const salt = crypto.randomBytes(BLOCK_SIZE - 'Salted__'.length)
+  const kdf = crypto.pbkdf2Sync(passphrase, salt, 10000, 48, 'sha256').toString('binary')
+  const private_key = Buffer.from(kdf.substring(0, 32), 'binary')
+  const iv = Buffer.from(kdf.substring(32, 48), 'binary')
+  const cipher = crypto.createCipheriv('aes-256-cbc', private_key, iv)
+  let res = cipher.update(pad(data), 'binary', 'binary')
+  res += cipher.final('binary')
+  return Buffer.from('Salted__' + salt.toString('binary') + res, 'binary').toString('binary')
+}
+
+export const aes_decryption_256 = (encrypted, password) => {
+  const salt = Buffer.from(encrypted.substring(8, 16), 'binary')
+  const keydata = crypto
+    .pbkdf2Sync(password, salt, 10000, 48, 'sha256')
+    .toString('binary')
+  const key = Buffer.from(keydata.substring(0, 32), 'binary')
+  const iv = Buffer.from(keydata.substring(32, 48), 'binary')
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv)
+
+  let decrypted = decipher.update(encrypted.substring(16), 'binary', 'binary')
+  decrypted += decipher.final()
+  return unpad(decrypted)
 }
 
 export const encrypt = async (cipherText, method) => {
