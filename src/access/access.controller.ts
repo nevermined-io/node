@@ -3,7 +3,7 @@ import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "
 import { Request } from '../common/helpers/request.interface';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { config } from '../config'
-import { IsBoolean, IsNumber, IsString } from "class-validator";
+import { /*IsBoolean,*/ IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
 import { downloadAsset, getAssetUrl, uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -20,12 +20,14 @@ export class UploadResult {
 }
 
 export class UploadDto {
+  /*
   @ApiProperty({
     description: 'Encrypt uploaded data',
-    example: 'false'
+    example: 'false',
+    required: false,
   })
-  @IsBoolean()
-  encrypt: boolean;
+  */
+  encrypt: string;
 }
 
 export class TransferDto {
@@ -183,10 +185,18 @@ export class AccessController {
   })
   async doUpload(@Body() uploadData: UploadDto, @Param('backend') backend: string, @UploadedFile() file: Express.Multer.File): Promise<UploadResult> {
     let data = file.buffer
+    console.log(uploadData)
     if (uploadData.encrypt) {
       // generate password
-      const pass = crypto.randomBytes(32).toString('base64url')
-      data = Buffer.from(aes_encryption_256(data, pass))
+      const password = crypto.randomBytes(32).toString('base64url')
+      data = Buffer.from(aes_encryption_256(data, password))
+      if (backend === 's3') {
+        const url = await uploadS3(data, file.filename)
+        return { url, password }
+      } else if (backend === 'filecoin') {
+        const url = await uploadFilecoin(data, file.filename)
+        return { url, password }
+      }
     }
     if (backend === 's3') {
       const url = await uploadS3(data, file.filename)

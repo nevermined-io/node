@@ -7,7 +7,16 @@ import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/
 import { decrypt } from './utils';
 import download from 'download';
 import AWS from 'aws-sdk';
-import fetch from 'cross-fetch';
+// import fetch from 'node-fetch';
+import { FormData } from 'formdata-node';
+import { Blob } from 'buffer';
+
+const _importDynamic = new Function('modulePath', 'return import(modulePath)')
+
+async function fetch(...args) {
+  const {default: fetch} = await _importDynamic('node-fetch')
+  return fetch(...args)
+}
 
 export interface Template<T> {
   instanceFromDDO: (a: string, b: DDO, c: string, d: T) => Promise<AgreementInstance<T>>
@@ -133,6 +142,7 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
   }
   const filename = url.split("/").slice(-1)[0]
   const contents: Buffer = await download(url)
+  console.log('downloaded', contents, filename)
   res.set({
     'Content-Type': content_type,
     'Content-Disposition': `attachment;filename=${filename}`,
@@ -162,7 +172,9 @@ export async function uploadFilecoin(file: Buffer, filename: string): Promise<st
     headers: {
       Authorization: `Bearer ${process.env.ESTUARY_TOKEN}`,
     },
-    body: formData
+    body: formData as any
   })
-  return 'cid://' + (await res.json() as any).cid
+  const obj = await res.json() as any
+  console.log(obj)
+  return 'cid://' + obj.cid
 }

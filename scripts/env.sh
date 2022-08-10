@@ -11,3 +11,4 @@ export BUYER_BABYJUB_PUBLIC1=0x0d7cdd240c2f5b0640839c49fbaaf016a8c5571b8f592e2b6
 export BUYER_BABYJUB_PUBLIC2=0x14b14fa0a30ec744dde9f32d519c65ebaa749bfe991a32deea44b83a4e5c65bb
 export NO_GRAPH=true
 export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+export PROVIDER_PASSWORD=node0
