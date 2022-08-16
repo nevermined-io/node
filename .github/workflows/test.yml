@@ -60,4 +60,5 @@ jobs:
         yarn
         export NO_GRAPH=true
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        ./scripts/wait-nevermined.sh
         yarn run integration
