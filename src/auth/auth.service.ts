@@ -11,6 +11,7 @@ import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { AccessProofConditionExtra } from '@nevermined-io/nevermined-sdk-dtp/dist/AccessProofCondition';
 import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
+import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber';
 
 const BASE_URL = '/api/v1/gateway/services/'
 
@@ -108,14 +109,14 @@ export class AuthService {
       const ddo = await nevermined.assets.resolve(did)
       const service = ddo.findServiceByType('nft-access')
       // console.log('serive', JSON.stringify(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value))
-      const numberNfts = parseInt(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value)
+      const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value)
       if (agreement_id === '0x') {
         if (await nevermined.keeper.nftUpgradeable.balance(consumer_address, did) < numberNfts) {
           throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance, ${numberNfts} required`)
         }
         return
       }
-      const params =  nevermined.keeper.templates.nftAccessTemplate.params(consumer_address, numberNfts)
+      const params =  nevermined.keeper.templates.nftAccessTemplate.params(consumer_address, numberNfts.toNumber())
       const conditions = [
         {name: 'access', fulfill: true, condition: nevermined.keeper.conditions.nftAccessCondition},
         {name: 'lock', fulfill: false},

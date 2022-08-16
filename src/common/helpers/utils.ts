@@ -1,7 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ethers } from 'ethers';
 import { readFileSync } from 'fs';
-import path from 'path';
 import { AuthRoles } from '../type';
 import crypto from 'crypto';
 import { encrypt as ec_encrypt, decrypt as ec_decrypt} from 'eciesjs';
@@ -124,12 +123,3 @@ export const decrypt = async (cipherText, method) => {
   }
 };
 
-/*
-async function test() {
-  const { result } = await encrypt('tervvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvfkvfmfdlkvmdlfkvmldfkmvldkfmvldkfmvldkfmvldkfmvlkdmfvlkdmflvkmdflvkmdlfkvmldfkvmldkmest', 'PSK-RSA')
-  console.log(result)
-  console.log(await decrypt(result, 'PSK-RSA'))
-}
-
-test()
-*/

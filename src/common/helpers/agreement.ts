@@ -59,10 +59,12 @@ export async function validateAgreement<T>({
 }: Params<T>) {
   // const nevermined = await Nevermined.getInstance(config)
   const ddo = await nevermined.assets.resolve(did)
+  /*
   const templateId: string = await nevermined.keeper.agreementStoreManager.call('getAgreementTemplate', [
     agreement_id
   ])
-  // console.log('template', templateId, 'for', agreement_id)
+  console.log('template', templateId, 'for', agreement_id)
+  */
   const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
   // console.log('got agreement')
   const agreementData = await template.instanceFromDDO(
