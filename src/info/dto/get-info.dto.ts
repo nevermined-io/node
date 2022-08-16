@@ -2,12 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUrl } from 'class-validator';
 
 export class GetInfoDto {
-  @ApiProperty({
-    example: '7.17',
-    description: 'Elasticsearch version',
-  })
-  @IsString()
-  elasticsearchVersion: string;
 
   @ApiProperty({
     example: '1.0.4',

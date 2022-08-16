@@ -2,7 +2,6 @@ import { Get, Req, Controller } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { ElasticService } from '../shared/elasticsearch/elastic.service';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
@@ -24,8 +23,6 @@ function getProviderBabyjub() {
 @ApiTags('Info')
 @Controller()
 export class InfoController {
-  constructor(private readonly elasticService: ElasticService) {}
-
   @Get()
   @ApiOperation({
     description: 'Get API info',
@@ -51,8 +48,6 @@ export class InfoController {
     const packageJsonString = readFileSync(packageJsonPath, 'utf8');
     const packageJson = JSON.parse(packageJsonString) as { version: string };
 
-    const elsInfo = await this.elasticService.getInfo();
-
     const [
       //templateManagerOwner,
       //publisher,
@@ -61,11 +56,11 @@ export class InfoController {
     ] = await nevermined.accounts.list();
     // console.log('accounts', await nevermined.accounts.list())
 
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
+    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
 
-    const rsa_key_file = readFileSync(path.join(__dirname, '../../..', process.env['RSA_PUBKEY_FILE'] || '')).toString()
+    const rsa_key_file = readFileSync(process.env['RSA_PUBKEY_FILE'] || '').toString()
     const key = new NodeRSA(rsa_key_file)
 
     const baby = getProviderBabyjub()
@@ -73,8 +68,6 @@ export class InfoController {
 
     return {
       APIversion: packageJson.version,
-      // prettier-ignore
-      elasticsearchVersion: (elsInfo.body as { version: { "number": string } }).version.number,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
       'keeper-url': config.nodeUri,
