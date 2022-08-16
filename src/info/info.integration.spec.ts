@@ -17,11 +17,12 @@ describe('Info', () => {
     app = moduleRef.createNestApplication();
     app.useGlobalGuards(new JwtAuthGuard(new Reflector()));
     await app.init();
-  })
+  });
   it('/GET info', async () => {
     const response = await request(app.getHttpServer()).get(`/`);
 
     expect(response.statusCode).toBe(200);
+    // eslint-disable-next-line
     expect(response.body['keeper-url']).toBe('http://localhost:8545');
   });
-})
+});

@@ -41,13 +41,13 @@ export class EncryptController {
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {
     if (encryptData.method !== 'PSK-ECDSA' && encryptData.method !== 'PSK-RSA') {
-        throw new BadRequestException('Only ECDSA encryption allowed')
+        throw new BadRequestException('Only ECDSA encryption allowed');
     }
-    const { result, publicKey } = await encrypt(encryptData.message, encryptData.method)
+    const { result, publicKey } = await encrypt(encryptData.message, encryptData.method);
     return {
         'public-key': publicKey,
         'method': encryptData.method,
         'hash': result,
-    }
+    };
   }
 }

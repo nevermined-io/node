@@ -80,7 +80,7 @@ export const aes_decryption_256 = (encrypted, password) => {
   return unpad(decrypted)
 }
 
-export const encrypt = async (cipherText, method) => {
+export const encrypt = async (cipherText: string, method: string): Promise<{publicKey: string, result: string}> => {
   if (method === 'PSK-ECDSA') {
     const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
@@ -106,7 +106,7 @@ export const encrypt = async (cipherText, method) => {
   }
 };
 
-export const decrypt = async (cipherText, method) => {
+export const decrypt = async (cipherText: string, method: string) => {
   if (method === 'PSK-ECDSA') {
     const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''

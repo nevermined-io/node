@@ -5,20 +5,20 @@ import path from 'path';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js'
-import { config } from '../config'
-import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler'
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
+import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { config } from '../config';
+import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler';
+import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { ethers } from 'ethers';
 import NodeRSA from 'node-rsa';
 
-function getProviderBabyjub() {
+const getProviderBabyjub = () => {
   return {
-    x: process.env['PROVIDER_BABYJUB_PUBLIC1'] || '',
-    y: process.env['PROVIDER_BABYJUB_PUBLIC2'] || '',
-    secret: process.env['PROVIDER_BABYJUB_SECRET'] || '',
-  }
-}
+    x: process.env.PROVIDER_BABYJUB_PUBLIC1 || '',
+    y: process.env.PROVIDER_BABYJUB_PUBLIC2 || '',
+    secret: process.env.PROVIDER_BABYJUB_SECRET || '',
+  };
+};
 
 @ApiTags('Info')
 @Controller()
@@ -35,12 +35,12 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
-    const nevermined = await Nevermined.getInstance(config)
+    const nevermined = await Nevermined.getInstance(config);
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
-    }
-    const contractHandler = new ContractHandler(instanceConfig)
+    };
+    const contractHandler = new ContractHandler(instanceConfig);
     const pathEndpoint = `${req.protocol}://${req.hostname}${req.client.localPort ? `:${req.client.localPort}` : ''}${
       req.url
     }`;
@@ -49,22 +49,22 @@ export class InfoController {
     const packageJson = JSON.parse(packageJsonString) as { version: string };
 
     const [
-      //templateManagerOwner,
-      //publisher,
-      //consumer,
+      // templateManagerOwner,
+      // publisher,
+      // consumer,
       provider
     ] = await nevermined.accounts.list();
     // console.log('accounts', await nevermined.accounts.list())
 
-    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
-    const provider_password = process.env['PROVIDER_PASSWORD'] || ''
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
+    const provider_key_file = readFileSync(process.env.PROVIDER_KEYFILE || '').toString();
+    const provider_password = process.env.PROVIDER_PASSWORD || '';
+    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password);
 
-    const rsa_key_file = readFileSync(process.env['RSA_PUBKEY_FILE'] || '').toString()
-    const key = new NodeRSA(rsa_key_file)
+    const rsa_key_file = readFileSync(process.env.RSA_PUBKEY_FILE || '').toString();
+    const key = new NodeRSA(rsa_key_file);
 
-    const baby = getProviderBabyjub()
-    const artifactDir = './artifacts'
+    const baby = getProviderBabyjub();
+    const artifactDir = './artifacts';
 
     return {
       APIversion: packageJson.version,
