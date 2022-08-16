@@ -20,6 +20,7 @@ jobs:
         npm run build
         npm run lint
     - name: Setup NVM
+      run: |
         docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
         sudo chmod go+r /etc/hosts
         sudo echo "127.0.0.1  nevermined-metadata" | sudo tee -a /etc/hosts
@@ -29,7 +30,7 @@ jobs:
         export KEEPER_OWNER_ROLE_ADDRESS="0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
         rm -rf "${HOME}/.nevermined/nevermined-contracts/artifacts"
 
-        ./start_nevermined.sh --latest --no-graph --no-gateway --geth-localnet 2>&1 | tee nevermined_tools.txt &
+        ./start_nevermined.sh --latest --no-graph --no-gateway --geth 2>&1 | tee nevermined_tools.txt &
         cd ..
         ./scripts/wait-nevermined.sh
     - name: Run tests
