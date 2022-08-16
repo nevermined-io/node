@@ -19,8 +19,33 @@ jobs:
       run: |
         npm run build
         npm run lint
+    - name: Setup NVM
+        docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
+        sudo chmod go+r /etc/hosts
+        sudo echo "127.0.0.1  nevermined-metadata" | sudo tee -a /etc/hosts
+        git clone https://github.com/nevermined-io/tools
+        cd tools
+
+        export KEEPER_OWNER_ROLE_ADDRESS="0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
+        rm -rf "${HOME}/.nevermined/nevermined-contracts/artifacts"
+
+        ./start_nevermined.sh --latest --no-graph --no-gateway --geth-localnet 2>&1 | tee nevermined_tools.txt &
+        cd ..
+        ./scripts/wait-nevermined.sh
     - name: Run tests
       run: |
+        export PROVIDER_KEYFILE=publisher_key_file.json
+        export RSA_PRIVKEY_FILE=rsa_priv_key.pem
+        export RSA_PUBKEY_FILE=rsa_pub_key.pem
+        export AUTHLIB_INSECURE_TRANSPORT=true
+        export PROVIDER_BABYJUB_SECRET=abc
+        export BUYER_BABYJUB_SECRET=abd
+        export PROVIDER_BABYJUB_PUBLIC1=0x2e3133fbdaeb5486b665ba78c0e7e749700a5c32b1998ae14f7d1532972602bb
+        export PROVIDER_BABYJUB_PUBLIC2=0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561
+        export BUYER_BABYJUB_PUBLIC1=0x0d7cdd240c2f5b0640839c49fbaaf016a8c5571b8f592e2b62ea939063545981
+        export BUYER_BABYJUB_PUBLIC2=0x14b14fa0a30ec744dde9f32d519c65ebaa749bfe991a32deea44b83a4e5c65bb
+        export NO_GRAPH=true
+        export PROVIDER_PASSWORD=node0
         npm run setup:dev
         # HDWalletProvider keeps jest from exiting
         npm run test:cov -- --forceExit
