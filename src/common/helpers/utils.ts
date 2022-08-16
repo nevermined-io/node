@@ -83,7 +83,7 @@ export const aes_decryption_256 = (encrypted, password) => {
 
 export const encrypt = async (cipherText, method) => {
   if (method === 'PSK-ECDSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
+    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
     let ecdh = crypto.createECDH('secp256k1');
@@ -95,7 +95,7 @@ export const encrypt = async (cipherText, method) => {
     }
     return res
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../../..', process.env['RSA_PUBKEY_FILE'] || '')).toString()
+    const provider_key_file = readFileSync(process.env['RSA_PUBKEY_FILE'] || '').toString()
     const key = new NodeRSA(provider_key_file)
     const aes_key = crypto.randomBytes(16)
     const encrypted_data = aes_encryption(cipherText, aes_key)
@@ -109,14 +109,14 @@ export const encrypt = async (cipherText, method) => {
 
 export const decrypt = async (cipherText, method) => {
   if (method === 'PSK-ECDSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../..', process.env['PROVIDER_KEYFILE'] || '')).toString()
+    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
     const provider_password = process.env['PROVIDER_PASSWORD'] || ''
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
     let ecdh = crypto.createECDH('secp256k1');
     ecdh.setPrivateKey(Buffer.from(wallet.privateKey.substring(2), 'hex'))
     return ec_decrypt(ecdh.getPrivateKey(), Buffer.from(cipherText, 'binary')).toString()
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(path.join(__dirname, '../../../..', process.env['RSA_PRIVKEY_FILE'] || '')).toString()
+    const provider_key_file = readFileSync(process.env['RSA_PRIVKEY_FILE'] || '').toString()
     const key = new NodeRSA(provider_key_file)
     const [data, encrypted_aes_key] = cipherText.split('|')
     const aes_key = key.decrypt(Buffer.from(encrypted_aes_key, 'hex'))

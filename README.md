@@ -1,8 +1,8 @@
 [![banner](https://raw.githubusercontent.com/nevermined-io/assets/main/images/logo/banner_logo.png)](https://nevermined.io)
 
-# Nevermined Marketplace API
+# Nevermined Gateway
 
-> The API allowing to manage Marketplace common functionalities
+> Navermined Gateway for handling automatic fulfilling of agreements etc.
 
 [![Tests](https://github.com/nevermined-io/marketplace-api/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/marketplace-api/actions/workflows/test.yml)
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/marketplace-api.svg)](https://hub.docker.com/repository/docker/neverminedio/marketplace-api)
