@@ -1,6 +1,7 @@
 import { Config } from '@nevermined-io/nevermined-sdk-js'
 import { LoggerInstance, LogLevel } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
-import HDWalletProvider from '@truffle/hdwallet-provider'
+import { ethers } from 'ethers'
+import fs from 'fs';
 
 LoggerInstance.setLevel(LogLevel.Error)
 
@@ -75,10 +76,11 @@ if (process.env.NETWORK_NAME === 'mumbai') {
     } as Config)
 }
 
-if (process.env.SEED_WORDS) {
-    const seedphrase = process.env.SEED_WORDS
+configBase.accounts = []
 
-    configBase.web3Provider = new HDWalletProvider(seedphrase, configBase.nodeUri, 0, 10)
+if (process.env.PROVIDER_KEYFILE) {
+    const str = fs.readFileSync(process.env.PROVIDER_KEYFILE).toString()
+    configBase.accounts = [ethers.Wallet.fromEncryptedJsonSync(str, process.env.PROVIDER_PASSWORD)]
 }
 
 export const config: Config & { forceVerbose: Config } = configBase as any
