@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { getAssetUrl, validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
@@ -99,15 +99,55 @@ export class AuthService {
     console.log('fulfilled agreement');
   }
 
+  async validateNft721Access(agreement_id: string, did: string, consumer_address: string): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config);
+    const ddo = await nevermined.assets.resolve(did);
+    const service = ddo.findServiceByType('nft721-access');
+    // const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
+    if (agreement_id === '0x') {
+      // console.log(service.attributes.serviceAgreementTemplate.conditions[0].parameters)
+      // eslint-disable-next-line
+      const contractAddress: string = service.attributes.serviceAgreementTemplate.conditions[0].parameters[3].value;
+      const nftContract = await Nft721.getInstance(
+        (nevermined.keeper as any).instanceConfig, // eslint-disable-line
+        contractAddress
+      );
+      if (await nftContract.ownerOf(did) !== consumer_address) {
+        throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
+      }
+      return;
+    }
+    const params =  nevermined.keeper.templates.nft721AccessTemplate.params(consumer_address);
+    const conditions = [
+      {name: 'access', fulfill: true, condition: nevermined.keeper.conditions.nftAccessCondition},
+      {name: 'lock', fulfill: false},
+      {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
+    ];
+    await validateAgreement({
+      agreement_id,
+      did,
+      nevermined,
+      params,
+      template: nevermined.keeper.templates.nft721AccessTemplate,
+      conditions,
+    });
+    console.log('fulfilled agreement');
+  }
+
   async validateNftAccess(agreement_id: string, did: string, consumer_address: string): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
+    const shortId = '0x'+did.split(':')[2];
     const granted = await nevermined.keeper.conditions.nftAccessCondition.call<boolean>(
       'checkPermissions',
-      [consumer_address, '0x'+did.split(':')[2]]
+      [consumer_address, shortId]
     );
     if (!granted) {
       const ddo = await nevermined.assets.resolve(did);
       const service = ddo.findServiceByType('nft-access');
+      if (!service) {
+        await this.validateNft721Access(agreement_id, did, consumer_address);
+        return;
+      }
       // console.log('serive', JSON.stringify(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value))
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
