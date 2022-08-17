@@ -103,6 +103,9 @@
     "tslint-to-eslint-config": "^2.12.3",
     "uuid": "^8.3.2"
   },
+  "overrides": {
+    "@nevermined-io/nevermined-sdk-js": "^0.23.0"
+  },
   "lint-staged": {
     "src/**/*.{js,json}": [
       "prettier --write",
