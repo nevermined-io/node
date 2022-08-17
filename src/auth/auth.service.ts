@@ -112,7 +112,7 @@ export class AuthService {
       contractAddress
     );
     if (data !== false) {
-      console.log('addr', consumer_address, contractAddress, await nftContract.balanceOf(new Account(consumer_address)))
+      console.log('addr', consumer_address, contractAddress, await nftContract.balanceOf(new Account(consumer_address)));
       if ((await nftContract.balanceOf(new Account(consumer_address))).toNumber() <= 0) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
       }

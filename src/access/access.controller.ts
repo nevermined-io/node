@@ -138,7 +138,7 @@ export class AccessController {
     description: 'Return the url of asset',
   })
   async doNftTransfer(@Body() transferData: TransferDto): Promise<string> {
-    console.log('going to transfer', transferData)
+    console.log('going to transfer', transferData);
     const nevermined = await Nevermined.getInstance(config);
     if (transferData.nftType === 721) {
       const params = nevermined.keeper.templates.nft721SalesTemplate.params(transferData.nftReceiver);
