@@ -64,6 +64,7 @@ jobs:
         export BUYER_BABYJUB_PUBLIC2=0x14b14fa0a30ec744dde9f32d519c65ebaa749bfe991a32deea44b83a4e5c65bb
         export NO_GRAPH=true
         export PROVIDER_PASSWORD=secret
+        export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
         npm run start &
     - name: Get SDK
       run: |
