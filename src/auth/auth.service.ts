@@ -73,7 +73,7 @@ export class AuthService {
     };
     const { url } = await getAssetUrl(did, 0);
     const data = Buffer.from(url, 'hex');
-    console.log('data', data, url);
+    // console.log('data', data, url);
     const extra : AccessProofConditionExtra = {
       providerK: dtp.keytransfer.makeKey(process.env.PROVIDER_BABYJUB_SECRET),
       data
@@ -102,7 +102,7 @@ export class AuthService {
   async validateNft721Access(agreement_id: string, did: string, consumer_address: string): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const ddo = await nevermined.assets.resolve(did);
-    const data = await nevermined.keeper.templates.nft721SalesTemplate.getAgreementStatus(agreement_id);
+    const data = agreement_id === '0x' ? null : await nevermined.keeper.templates.nft721SalesTemplate.getAgreementStatus(agreement_id);
     const service = ddo.findServiceByType('nft721-access');
     // const shortId = '0x'+did.split(':')[2];
     // eslint-disable-next-line
@@ -111,7 +111,8 @@ export class AuthService {
       (nevermined.keeper as any).instanceConfig, // eslint-disable-line
       contractAddress
     );
-    if (data !== false) {
+    console.log(data);
+    if (data) {
       console.log('addr', consumer_address, contractAddress, await nftContract.balanceOf(new Account(consumer_address)));
       if ((await nftContract.balanceOf(new Account(consumer_address))).toNumber() <= 0) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
