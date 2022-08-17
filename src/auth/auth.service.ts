@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
+import { Account, Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { getAssetUrl, validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
@@ -102,16 +102,25 @@ export class AuthService {
   async validateNft721Access(agreement_id: string, did: string, consumer_address: string): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const ddo = await nevermined.assets.resolve(did);
+    const data = await nevermined.keeper.templates.nft721SalesTemplate.getAgreementStatus(agreement_id);
     const service = ddo.findServiceByType('nft721-access');
+    // const shortId = '0x'+did.split(':')[2];
+    // eslint-disable-next-line
+    const contractAddress: string = service.attributes.serviceAgreementTemplate.conditions[0].parameters[3].value;
+    const nftContract = await Nft721.getInstance(
+      (nevermined.keeper as any).instanceConfig, // eslint-disable-line
+      contractAddress
+    );
+    if (data !== false) {
+      console.log('addr', consumer_address, contractAddress, await nftContract.balanceOf(new Account(consumer_address)))
+      if ((await nftContract.balanceOf(new Account(consumer_address))).toNumber() <= 0) {
+        throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
+      }
+      return;
+    }
     // const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
     if (agreement_id === '0x') {
       // console.log(service.attributes.serviceAgreementTemplate.conditions[0].parameters)
-      // eslint-disable-next-line
-      const contractAddress: string = service.attributes.serviceAgreementTemplate.conditions[0].parameters[3].value;
-      const nftContract = await Nft721.getInstance(
-        (nevermined.keeper as any).instanceConfig, // eslint-disable-line
-        contractAddress
-      );
       if (await nftContract.ownerOf(did) !== consumer_address) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
       }

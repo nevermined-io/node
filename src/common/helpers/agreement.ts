@@ -66,7 +66,7 @@ export async function validateAgreement<T>({
   console.log('template', templateId, 'for', agreement_id)
   */
   const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
-  // console.log('got agreement')
+  // console.log('got agreement', agreement)
   const agreementData = await template.instanceFromDDO(
     agreement.agreementIdSeed,
     ddo,
@@ -81,6 +81,7 @@ export async function validateAgreement<T>({
   await Promise.all(conditions.map(async (a,idx) => {
     if (!a.fulfill) {
       const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
+      // console.log('lock', lock_state)
       if (lock_state.state !== ConditionState.Fulfilled) {
         throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)
       }
