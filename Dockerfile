@@ -13,7 +13,6 @@ COPY package*.json ./
 COPY tsconfig* ./
 COPY .env.sample ./.env
 COPY accounts ./accounts
-COPY artifacts ./artifacts
 
 RUN npm run build
 RUN npm run setup:dev
