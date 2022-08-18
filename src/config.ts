@@ -8,7 +8,7 @@ LoggerInstance.setLevel(LogLevel.Error)
 const nograph = process.env['NO_GRAPH'] === 'true'
 
 const configBase: Config = {
-    nodeUri: 'http://localhost:8545',
+    nodeUri: process.env['KEEPER_URL'] || 'http://localhost:8545',
     marketplaceUri: 'http://nevermined-metadata:3100',
     faucetUri: 'http://localhost:3001',
     gatewayUri: 'http://localhost:8030',

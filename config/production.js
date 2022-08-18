@@ -4,7 +4,7 @@ module.exports = {
   JWT_EXPIRY_KEY: process.env.JWT_EXPIRY_KEY,
   API_VERSION: process.env.API_VERSION,
   server: {
-    port: process.env.PORT || 3100,
+    port: process.env.PORT || 8030,
   },
   src: {
     root: 'dist',
@@ -22,3 +22,5 @@ module.exports = {
   },
   assetIndex: process.env.ASSET_INDEX,
 };
+console.log(module.exports.JWT_SECRET_KEY)
+console.log(process.env)
