@@ -14,8 +14,8 @@ COPY tsconfig* ./
 COPY .env.sample ./.env
 COPY accounts ./accounts
 
-RUN npm run build
 RUN npm run setup:dev
+RUN npm run build
 
 ENTRYPOINT ["npm", "run", "start:prod"]
 
