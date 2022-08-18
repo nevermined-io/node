@@ -35,9 +35,7 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
-    console.log('trying to get nvm instance')
     const nevermined = await Nevermined.getInstance(config);
-    console.log('????????????????????')
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
@@ -49,7 +47,6 @@ export class InfoController {
     const packageJsonPath = path.join(__dirname, '../..', 'package.json');
     const packageJsonString = readFileSync(packageJsonPath, 'utf8');
     const packageJson = JSON.parse(packageJsonString) as { version: string };
-    console.log('????????????????????')
 
     const [
       // templateManagerOwner,
