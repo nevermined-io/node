@@ -138,7 +138,6 @@ export class AccessController {
     description: 'Return the url of asset',
   })
   async doNftTransfer(@Body() transferData: TransferDto): Promise<string> {
-    console.log('going to transfer', transferData);
     const nevermined = await Nevermined.getInstance(config);
     if (transferData.nftType === 721) {
       const params = nevermined.keeper.templates.nft721SalesTemplate.params(transferData.nftReceiver);
@@ -175,7 +174,6 @@ export class AccessController {
         conditions,
       });
     }
-    console.log('fulfilled agreement');
     return 'success';
   }
 
@@ -211,7 +209,6 @@ export class AccessController {
   })
   async doUpload(@Body() uploadData: UploadDto, @Param('backend') backend: string, @UploadedFile() file: Express.Multer.File): Promise<UploadResult> {
     let data = file.buffer;
-    console.log(uploadData);
     if (uploadData.encrypt) {
       // generate password
       const password = crypto.randomBytes(32).toString('base64url');

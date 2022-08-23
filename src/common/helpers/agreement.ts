@@ -143,9 +143,11 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
   if (url.startsWith('cid://')) {
     url = FILECOIN_GATEWAY.replace(':cid', parseUrl(url))
   }
-  const filename = url.split("/").slice(-1)[0]
+  const param = url.split("/").slice(-1)[0]
+  const filename = param.split("?")[0]
+  // console.log('downloading', url)
   const contents: Buffer = await download(url)
-  console.log('downloaded', contents, filename)
+  // console.log('downloaded', contents, filename)
   res.set({
     'Content-Type': content_type,
     'Content-Disposition': `attachment;filename=${filename}`,
@@ -154,16 +156,25 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
 }
 
 export async function uploadS3(file: Buffer, filename: string): Promise<string> {
+  filename = filename || 'data'
   const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
+    endpoint: process.env.AWS_S3_ENDPOINT,
+    s3ForcePathStyle: true,
+    signatureVersion: 'v4',
   })
-  const uploaded = await s3.upload({
+  await s3.upload({
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     Key: filename,
     Body: file,
   }).promise()
-  return uploaded.Location
+  const url = s3.getSignedUrl('getObject', {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: filename,
+    Expires: 3600*24,
+  })
+  return url
 }
 
 export async function uploadFilecoin(file: Buffer, filename: string): Promise<string> {

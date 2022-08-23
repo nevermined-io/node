@@ -53,12 +53,10 @@ export class AuthService {
         template: nevermined.keeper.templates.accessTemplate,
         conditions,
       });
-      console.log('fulfilled agreement');
     }
   }
 
   async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
-    console.log('validate access w/ proof');
     const nevermined = await Nevermined.getInstance(config);
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
@@ -73,7 +71,6 @@ export class AuthService {
     };
     const { url } = await getAssetUrl(did, 0);
     const data = Buffer.from(url, 'hex');
-    // console.log('data', data, url);
     const extra : AccessProofConditionExtra = {
       providerK: dtp.keytransfer.makeKey(process.env.PROVIDER_BABYJUB_SECRET),
       data
@@ -83,11 +80,9 @@ export class AuthService {
       {name: 'lock', fulfill: false},
       {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
     ];
-    console.log('going to verify', buyerPub, consumer_address, babysig);
     if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
       throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
     }
-    // console.log('template', dtp.accessProofTemplate.address, nevermined.keeper.agreementStoreManager.templates)
     await validateAgreement({
       agreement_id,
       nevermined,
@@ -96,7 +91,6 @@ export class AuthService {
       template: dtp.accessProofTemplate,
       conditions,
     });
-    console.log('fulfilled agreement');
   }
 
   async validateNft721Access(agreement_id: string, did: string, consumer_address: string): Promise<void> {
@@ -111,17 +105,13 @@ export class AuthService {
       (nevermined.keeper as any).instanceConfig, // eslint-disable-line
       contractAddress
     );
-    console.log(data);
     if (data) {
-      console.log('addr', consumer_address, contractAddress, await nftContract.balanceOf(new Account(consumer_address)));
       if ((await nftContract.balanceOf(new Account(consumer_address))).toNumber() <= 0) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
       }
       return;
     }
-    // const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
     if (agreement_id === '0x') {
-      // console.log(service.attributes.serviceAgreementTemplate.conditions[0].parameters)
       if (await nftContract.ownerOf(did) !== consumer_address) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
       }
@@ -141,7 +131,6 @@ export class AuthService {
       template: nevermined.keeper.templates.nft721AccessTemplate,
       conditions,
     });
-    console.log('fulfilled agreement');
   }
 
   async validateNftAccess(agreement_id: string, did: string, consumer_address: string): Promise<void> {
@@ -158,7 +147,6 @@ export class AuthService {
         await this.validateNft721Access(agreement_id, did, consumer_address);
         return;
       }
-      // console.log('serive', JSON.stringify(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value))
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
       if (agreement_id === '0x') {
@@ -181,7 +169,6 @@ export class AuthService {
         template: nevermined.keeper.templates.nftAccessTemplate,
         conditions,
       });
-      console.log('fulfilled agreement');
     }
   }
 
@@ -205,7 +192,6 @@ export class AuthService {
       payload = jwtEthVerify(clientAssertion);
       // const address = payload.iss;
 
-      console.log('validate access', payload);
       if (payload.aud === BASE_URL + 'access') {
         await this.validateAccess(payload.sub, payload.did as string, payload.iss);
       } else if (payload.aud === BASE_URL + 'access-proof') {
@@ -215,8 +201,6 @@ export class AuthService {
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateNftAccess(payload.sub, payload.did as string, payload.iss);
       }
-
-      console.log('making new token', payload);
 
       delete payload.exp;
       return {
