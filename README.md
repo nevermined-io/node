@@ -4,9 +4,9 @@
 
 > Navermined Gateway for handling automatic fulfilling of agreements etc.
 
-[![Tests](https://github.com/nevermined-io/marketplace-api/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/marketplace-api/actions/workflows/test.yml)
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/marketplace-api.svg)](https://hub.docker.com/repository/docker/neverminedio/marketplace-api)
-[![GitHub contributors](https://img.shields.io/github/contributors/nevermined-io/marketplace-api.svg)](https://github.com/nevermined-io/marketplace-api/graphs/contributors)
+[![Tests](https://github.com/nevermined-io/gateway-ts/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/gateway-ts/actions/workflows/test.yml)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/gateway-ts.svg)](https://hub.docker.com/repository/docker/neverminedio/gateway-ts)
+[![GitHub contributors](https://img.shields.io/github/contributors/nevermined-io/gateway-ts.svg)](https://github.com/nevermined-io/gateway-ts/graphs/contributors)
 
 ## First-time setup
 
