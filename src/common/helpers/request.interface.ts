@@ -5,6 +5,7 @@ interface AuthUser {
   address: string;
   roles: AuthRoles[];
   did: string;
+  buyer: string;
 }
 
 export interface Request<G> {
