@@ -10,15 +10,6 @@ import { RolesGuard } from './common/guards/auth/roles.guards';
 import { ConfigService } from './shared/config/config.service';
 import { Logger } from './shared/logger/logger.service';
 
-/*
-import { BookmarkService } from './bookmarks/bookmark.service';
-import { UserProfileService } from './user-profiles/user-profile.service';
-import { PermissionService } from './permissions/permission.service';
-import { AssetService } from './assets/asset.service';
-import { ServiceDDOService } from './assets/ddo-service.service';
-import { DDOStatusService } from './assets/ddo-status.service';
-*/
-
 const createIndexes = (app: NestExpressApplication) => {
   let connectionTries = 0;
 
@@ -67,7 +58,7 @@ const bootstrap = async () => {
   createIndexes(app);
 
   const options = new DocumentBuilder()
-    .setTitle('Marketplace API')
+    .setTitle('Nevermined Gateway')
     .setVersion(packageJson.version)
     .addBearerAuth(
       {
@@ -77,6 +68,7 @@ const bootstrap = async () => {
     )
     .build();
   const document = SwaggerModule.createDocument(app, options);
+
 
   SwaggerModule.setup('api/v1/docs', app, document);
 

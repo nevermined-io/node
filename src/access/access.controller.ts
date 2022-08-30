@@ -10,23 +10,26 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
 
-export class AccessResult {
-  res: string;
-}
-
 export class UploadResult {
+  @ApiProperty({
+    description: 'Url of the uploaded file',
+    example: 'cid://bawoeijdoidewj',
+    required: true,
+  })
   url: string;
+  @ApiProperty({
+    description: 'Password for encrypted file',
+    example: '1234#',
+  })
   password?: string;
 }
 
 export class UploadDto {
-  /*
   @ApiProperty({
     description: 'Encrypt uploaded data',
     example: 'false',
     required: false,
   })
-  */
   encrypt: string;
 }
 
@@ -78,7 +81,7 @@ export class AccessController {
   @ApiResponse({
     status: 200,
     description: 'Return the url of asset',
-    type: AccessResult,
+    type: StreamableFile,
   })
   @ApiBearerAuth('Authorization')
   async doAccess(
@@ -97,7 +100,7 @@ export class AccessController {
   @ApiResponse({
     status: 200,
     description: 'Return the url of asset',
-    type: AccessResult,
+    type: String,
   })
   @ApiBearerAuth('Authorization')
   async doAccessProof(
@@ -116,7 +119,7 @@ export class AccessController {
   @ApiResponse({
     status: 200,
     description: 'Return the url of asset',
-    type: AccessResult,
+    type: StreamableFile,
   })
   @ApiBearerAuth('Authorization')
   async doNftAccess(
@@ -135,7 +138,7 @@ export class AccessController {
   @Public()
   @ApiResponse({
     status: 200,
-    description: 'Return the url of asset',
+    description: 'Return "success" if transfer worked',
   })
   async doNftTransfer(@Body() transferData: TransferDto): Promise<string> {
     const nevermined = await Nevermined.getInstance(config);
@@ -184,8 +187,8 @@ export class AccessController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Return the url of asset',
-    type: AccessResult,
+    description: 'Return the asset',
+    type: StreamableFile,
   })
   @ApiBearerAuth('Authorization')
   async doDownload(
