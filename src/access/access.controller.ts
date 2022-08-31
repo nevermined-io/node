@@ -113,6 +113,25 @@ export class AccessController {
     return (await getAssetUrl(req.user.did, index)).url;
   }
 
+  @Get('nft-access-proof/:agreement_id/:index')
+  @ApiOperation({
+    description: 'NFT Access asset w/ DTP proof',
+    summary: 'Public',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Return the url of asset',
+    type: String,
+  })
+  @ApiBearerAuth('Authorization')
+  async doNFTAccessProof(
+    @Req() req: Request<unknown>,
+    @Response({ passthrough: true }) res,
+    @Param('index') index: number,
+  ): Promise<string> {
+    return (await getAssetUrl(req.user.did, index)).url;
+  }
+
   @Get('nft-access/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset',
