@@ -238,7 +238,6 @@ export class AuthService {
     const ddo = await nevermined.assets.resolve(did);
     const service = ddo.findServiceByType('nft-access-proof');
     if (!service) {
-      // console.log('its 721');
       await this.validateNft721AccessProof(agreement_id, did, consumer_address, buyer, babysig);
       return;
     }
@@ -248,7 +247,6 @@ export class AuthService {
       if (await nevermined.keeper.nftUpgradeable.balance(consumer_address, did) < numberNfts) {
         throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance, ${numberNfts.toString()} required`);
       }
-      // console.log('no agreement?');
       return;
     }
     const instanceConfig = {
@@ -268,13 +266,11 @@ export class AuthService {
       throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
     }
 
-    // console.log('number', numberNfts.toNumber());
     const params = dtp.nftAccessProofTemplate.params(consumer, consumer_address, numberNfts.toNumber());
     const conditions = [
       {name: 'holder', fulfill: false},
       {name: 'access', fulfill: true, condition: dtp.accessProofCondition, extra},
     ];
-    // console.log('going to validate', consumer_address);
     await validateAgreement({
       agreement_id,
       did,
