@@ -27,7 +27,6 @@ export class AuthController {
   })
   @Public()
   token(@Body() clientAssertion: ClientAssertionDto): Promise<LoginDto> {
-    // console.log('got assertion', clientAssertion)
     return this.authService.validateClaim(clientAssertion.grant_type, clientAssertion.assertion);
   }
 

@@ -56,6 +56,19 @@ export class AuthService {
     }
   }
 
+  async validateTransferProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config);
+    const instanceConfig = {
+      ...generateIntantiableConfigFromConfig(config),
+      nevermined
+    };
+    const dtp = await Dtp.getInstance(instanceConfig);
+    const buyerPub = new BabyjubPublicKey('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
+      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
+    }
+  }
+
   async validateAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const instanceConfig = {
@@ -119,9 +132,8 @@ export class AuthService {
     }
     const params =  nevermined.keeper.templates.nft721AccessTemplate.params(consumer_address);
     const conditions = [
+      {name: 'holder', fulfill: false},
       {name: 'access', fulfill: true, condition: nevermined.keeper.conditions.nftAccessCondition},
-      {name: 'lock', fulfill: false},
-      {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
     ];
     await validateAgreement({
       agreement_id,
@@ -157,9 +169,8 @@ export class AuthService {
       }
       const params =  nevermined.keeper.templates.nftAccessTemplate.params(consumer_address, numberNfts.toNumber());
       const conditions = [
+        {name: 'holder', fulfill: false},
         {name: 'access', fulfill: true, condition: nevermined.keeper.conditions.nftAccessCondition},
-        {name: 'lock', fulfill: false},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
       ];
       await validateAgreement({
         agreement_id,
@@ -170,6 +181,104 @@ export class AuthService {
         conditions,
       });
     }
+  }
+
+  async validateNft721AccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config);
+    const ddo = await nevermined.assets.resolve(did);
+    const service = ddo.findServiceByType('nft721-access-proof');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
+    // eslint-disable-next-line
+    const contractAddress: string = service.attributes.serviceAgreementTemplate.conditions[0].parameters[3].value;
+    const nftContract = await Nft721.getInstance(
+      (nevermined.keeper as any).instanceConfig, // eslint-disable-line
+      contractAddress
+    );
+    if (agreement_id === '0x') {
+      if (await nftContract.ownerOf(did) !== consumer_address) {
+        throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance`);
+      }
+      return;
+    }
+    const instanceConfig = {
+      ...generateIntantiableConfigFromConfig(config),
+      nevermined
+    };
+    const dtp = await Dtp.getInstance(instanceConfig);
+    const buyerPub = new BabyjubPublicKey('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    const consumer = await dtp.babyjubPublicAccount('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    const { url } = await getAssetUrl(did, 0);
+    const data = Buffer.from(url, 'hex');
+    const extra : AccessProofConditionExtra = {
+      providerK: dtp.keytransfer.makeKey(process.env.PROVIDER_BABYJUB_SECRET),
+      data
+    };
+    if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
+      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
+    }
+
+    const params = dtp.nftAccessProofTemplate.params(consumer, consumer_address, numberNfts.toNumber());
+    const conditions = [
+      {name: 'holder', fulfill: false},
+      {name: 'access', fulfill: true, condition: dtp.accessProofCondition, extra},
+    ];
+    await validateAgreement({
+      agreement_id,
+      did,
+      nevermined,
+      params,
+      template: dtp.nftAccessProofTemplate,
+      conditions,
+    });
+  }
+
+  async validateNftAccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
+    const nevermined = await Nevermined.getInstance(config);
+    const ddo = await nevermined.assets.resolve(did);
+    const service = ddo.findServiceByType('nft-access-proof');
+    if (!service) {
+      await this.validateNft721AccessProof(agreement_id, did, consumer_address, buyer, babysig);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
+    if (agreement_id === '0x') {
+      if (await nevermined.keeper.nftUpgradeable.balance(consumer_address, did) < numberNfts) {
+        throw new UnauthorizedException(`Address ${consumer_address} hasn't enough ${did} NFT balance, ${numberNfts.toString()} required`);
+      }
+      return;
+    }
+    const instanceConfig = {
+      ...generateIntantiableConfigFromConfig(config),
+      nevermined
+    };
+    const dtp = await Dtp.getInstance(instanceConfig);
+    const consumer = await dtp.babyjubPublicAccount('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    const { url } = await getAssetUrl(did, 0);
+    const data = Buffer.from(url, 'hex');
+    const extra : AccessProofConditionExtra = {
+      providerK: dtp.keytransfer.makeKey(process.env.PROVIDER_BABYJUB_SECRET),
+      data
+    };
+    const buyerPub = new BabyjubPublicKey('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
+      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
+    }
+
+    const params = dtp.nftAccessProofTemplate.params(consumer, consumer_address, numberNfts.toNumber());
+    const conditions = [
+      {name: 'holder', fulfill: false},
+      {name: 'access', fulfill: true, condition: dtp.accessProofCondition, extra},
+    ];
+    await validateAgreement({
+      agreement_id,
+      did,
+      nevermined,
+      params,
+      template: dtp.nftAccessProofTemplate,
+      conditions,
+    });
   }
 
   /**
@@ -196,6 +305,10 @@ export class AuthService {
         await this.validateAccess(payload.sub, payload.did as string, payload.iss);
       } else if (payload.aud === BASE_URL + 'access-proof') {
         await this.validateAccessProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
+      } else if (payload.aud === BASE_URL + 'nft-access-proof') {
+        await this.validateNftAccessProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
+      } else if (payload.aud === BASE_URL + 'nft-transfer-proof') {
+        await this.validateTransferProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
       } else if (payload.aud === BASE_URL + 'download') {
         await this.validateOwner(payload.did as string, payload.iss);
       } else if (payload.aud === BASE_URL + 'nft-access') {

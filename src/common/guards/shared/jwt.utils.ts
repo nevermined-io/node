@@ -86,7 +86,6 @@ export const jwtEthVerify = (jwt: string) => {
   let publicKey: string;
   try {
     publicKey = recoverPublicKey(protectedHeader, payload, signature);
-    // console.log(protectedHeader, "sig", signature, "public", publicKey);
   } catch (error) {
     throw new Error(`Signature: Failed to validate signature (${(error as Error).message})`);
   }
@@ -101,8 +100,6 @@ export const jwtEthVerify = (jwt: string) => {
   if (!parsedPayload.iss) {
     throw new Error('Payload: "iss" field is required');
   }
-
-  // console.log('payload', parsedPayload)
 
   const isValidAddress = ethers.utils.isAddress(parsedPayload.iss);
   if (!isValidAddress) {
