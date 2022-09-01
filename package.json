@@ -11,7 +11,7 @@
     "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp package.json ./dist",
     "prestart": "npm run build",
     "start": "node -r dotenv/config dist/src/main.js",
-    "start:prod": "./scripts/wait-nevermined.sh && node -r dotenv/config dist/src/main.js",
+    "start:prod": "node -r dotenv/config dist/src/main.js",
     "dev": "./node_modules/.bin/ts-node-dev -r dotenv/config --respawn src/main",
     "test": "jest",
     "test:integration": "jest *.test.ts",
