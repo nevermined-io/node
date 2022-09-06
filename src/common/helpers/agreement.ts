@@ -108,7 +108,7 @@ export async function getAssetUrl(did: string, index: number): Promise<{url: str
   throw new BadRequestException()
 }
 
-const FILECOIN_GATEWAY = 'https://dweeb.link/ipfs/:cid'
+const FILECOIN_GATEWAY = 'https://dweb.link/ipfs/:cid'
 
 /*
 Parses a url with the following formats:
