@@ -49,12 +49,8 @@ export class InfoController {
     const packageJson = JSON.parse(packageJsonString) as { version: string };
 
     const [
-      // templateManagerOwner,
-      // publisher,
-      // consumer,
       provider
     ] = await nevermined.accounts.list();
-    // console.log('accounts', await nevermined.accounts.list())
 
     const provider_key_file = readFileSync(process.env.PROVIDER_KEYFILE || '').toString();
     const provider_password = process.env.PROVIDER_PASSWORD || '';
