@@ -39,7 +39,7 @@ jobs:
           BRANCH_TO_CLONE: main
           REPO_TO_PUSH: nvm-docs
           PATH_TO_COPY: docs/
-          PATH_TO_PUSH: docs/architecture/components/gateway
+          PATH_TO_PUSH: docs/architecture/gateway
           REPOSITORY_NAME: ${{ github.repository }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         run: |
