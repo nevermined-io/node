@@ -22,10 +22,11 @@ jobs:
       - name: Convert openapi JSON to MD
         run: |
           # Convert json to md
-          widdershins docs/openapi.json -o docs/openapi.md
+          widdershins docs/openapi.json --omitHeader -o docs/openapi.md
+          echo "$(cat docs/_header.md docs/openapi.md)" > docs/gateway.md
           # Remove lines with pattern '*backwards compatibility*' (problematic with Docusaurus)
-          sed -i '/backwards compatibility/d' docs/openapi.md
-          rm -f docs/openapi.json
+          sed -i '/backwards compatibility/d' docs/gateway.md
+          rm -f docs/openapi.json docs/_header.md
       - name: Install envsubst
         run: |
           sudo apt update
