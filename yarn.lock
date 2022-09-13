@@ -1122,9 +1122,9 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-2.tgz":
+"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-4.tgz":
   version "0.23.4"
-  resolved "./nevermined-io-nevermined-sdk-js-2.tgz#65d1fc882fff452f3ef5aba36bfcf23f8ffa023c"
+  resolved "./nevermined-io-nevermined-sdk-js-4.tgz#62971a10d3a08b006459967d6ed25687cb5f9c06"
   dependencies:
     "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"

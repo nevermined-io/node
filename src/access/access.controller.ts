@@ -5,10 +5,12 @@ import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { /* IsBoolean,*/ IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, /* getAssetUrl, */ uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
+import { downloadAsset, /* getAssetUrl, */ uploadFilecoin, uploadS3, /*validateAgreement*/ } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
+// import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
+import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
 // import { generateIntantiableConfigFromConfig } from "@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract";
 // import { Dtp } from "@nevermined-io/nevermined-sdk-dtp/dist/Dtp";
@@ -163,8 +165,19 @@ export class AccessController {
     status: 200,
     description: 'Return "success" if transfer worked',
   })
-  async doNftTransfer(@Body() transferData: TransferDto): Promise<string> {
+  async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
     const nevermined = await Nevermined.getInstance(config);
+    let params: ValidationParams = {
+      consumer_address: transferData.nftReceiver,
+      did: (await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)).did,
+      agreement_id: transferData.agreementId,
+      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
+      buyer: (req.user || {}).buyer as string, 
+    }
+    const plugin = nevermined.assets.servicePlugin['nft-sales']
+    const [from] = await nevermined.accounts.list()
+    await plugin.process(params, from, undefined)
+    /*
     if (transferData.nftType === 721) {
       const params = nevermined.keeper.templates.nft721SalesTemplate.params(transferData.nftReceiver);
       const conditions = [
@@ -199,7 +212,7 @@ export class AccessController {
         template: nevermined.keeper.templates.nftSalesTemplate,
         conditions,
       });
-    }
+    }*/
     return 'success';
   }
 
