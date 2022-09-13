@@ -5,12 +5,13 @@ import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { /* IsBoolean,*/ IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, getAssetUrl, uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
+import { downloadAsset, /* getAssetUrl, */ uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
-import { generateIntantiableConfigFromConfig } from "@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract";
-import { Dtp } from "@nevermined-io/nevermined-sdk-dtp/dist/Dtp";
+import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
+// import { generateIntantiableConfigFromConfig } from "@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract";
+// import { Dtp } from "@nevermined-io/nevermined-sdk-dtp/dist/Dtp";
 
 export class UploadResult {
   @ApiProperty({
@@ -61,8 +62,8 @@ export class TransferDto {
     description: 'Number of NFTs to transfer',
     example: '1'
   })
-  @IsNumber()
-  nftAmount: number;
+  @IsString()
+  nftAmount: string;
 
   @ApiProperty({
     description: 'Type of NFT',
@@ -94,6 +95,7 @@ export class AccessController {
     return await downloadAsset(req.user.did, index, res);
   }
 
+  /*
   @Get('access-proof/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset w/ DTP proof',
@@ -130,7 +132,7 @@ export class AccessController {
     @Param('index') index: number,
   ): Promise<string> {
     return (await getAssetUrl(req.user.did, index)).url;
-  }
+  }*/
 
   @Get('nft-access/:agreement_id/:index')
   @ApiOperation({
@@ -181,7 +183,7 @@ export class AccessController {
         conditions,
       });
     } else {
-      const params = nevermined.keeper.templates.nftSalesTemplate.params(transferData.nftReceiver, transferData.nftAmount, transferData.nftHolder);
+      const params = nevermined.keeper.templates.nftSalesTemplate.params(transferData.nftReceiver, BigNumber.from(transferData.nftAmount), transferData.nftHolder);
       const conditions = [
         {name: 'lock', fulfill: false},
         {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNftCondition},
@@ -201,6 +203,7 @@ export class AccessController {
     return 'success';
   }
 
+/*
   @Post('nft-transfer-proof')
   @ApiOperation({
     description: 'Access asset',
@@ -264,6 +267,7 @@ export class AccessController {
     }
     return 'success';
   }
+*/
 
   @Get('download/:index')
   @ApiOperation({

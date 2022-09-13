@@ -7,7 +7,6 @@ import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/
 import { decrypt } from './utils';
 import download from 'download';
 import AWS from 'aws-sdk';
-// import fetch from 'node-fetch';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 
@@ -23,7 +22,7 @@ export interface Template<T> {
 }
 
 export interface NormalCondition {
-  fulfillInstance: (a: ConditionInstance<{}>, b: any, from: Account, params?: TxParameters, method?: string) => Promise<any>
+  fulfillInstance: (a: ConditionInstance<any>, b: any, from: Account, params?: TxParameters, method?: string) => Promise<any>
   sendFrom: (name: string, args: any[], from: Account) => Promise<any>
 }
 

@@ -3,7 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { Account, Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
+// import { Account, Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
+import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import { getAssetUrl, validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
@@ -12,6 +13,7 @@ import { AccessProofConditionExtra } from '@nevermined-io/nevermined-sdk-dtp/dis
 import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber';
+import { ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
@@ -106,6 +108,7 @@ export class AuthService {
     });
   }
 
+  /*
   async validateNft721Access(agreement_id: string, did: string, consumer_address: string): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const ddo = await nevermined.assets.resolve(did);
@@ -143,11 +146,12 @@ export class AuthService {
       template: nevermined.keeper.templates.nft721AccessTemplate,
       conditions,
     });
-  }
+  }*/
 
-  async validateNftAccess(agreement_id: string, did: string, consumer_address: string): Promise<void> {
+  async validateNftAccess({agreement_id, did, consumer_address}: ValidationParams): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const shortId = '0x'+did.split(':')[2];
+    const granted = await nevermined.assets.servicePlugin['nft-access'].accept()
     const granted = await nevermined.keeper.conditions.nftAccessCondition.call<boolean>(
       'checkPermissions',
       [consumer_address, shortId]
@@ -155,10 +159,12 @@ export class AuthService {
     if (!granted) {
       const ddo = await nevermined.assets.resolve(did);
       const service = ddo.findServiceByType('nft-access');
+      /*
       if (!service) {
-        await this.validateNft721Access(agreement_id, did, consumer_address);
+        // await this.validateNft721Access(agreement_id, did, consumer_address);
         return;
-      }
+      }*/
+      
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const numberNfts = BigNumber.from(service.attributes.serviceAgreementTemplate.conditions[0].parameters[2].value);
       if (agreement_id === '0x') {
@@ -167,7 +173,7 @@ export class AuthService {
         }
         return;
       }
-      const params =  nevermined.keeper.templates.nftAccessTemplate.params(consumer_address, numberNfts.toNumber());
+      const params =  nevermined.keeper.templates.nftAccessTemplate.params(consumer_address);
       const conditions = [
         {name: 'holder', fulfill: false},
         {name: 'access', fulfill: true, condition: nevermined.keeper.conditions.nftAccessCondition},
@@ -183,6 +189,7 @@ export class AuthService {
     }
   }
 
+  /*
   async validateNft721AccessProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
     const nevermined = await Nevermined.getInstance(config);
     const ddo = await nevermined.assets.resolve(did);
@@ -279,7 +286,7 @@ export class AuthService {
       template: dtp.nftAccessProofTemplate,
       conditions,
     });
-  }
+  }*/
 
   /**
    * RFC-7523 Client Authentication https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
@@ -301,18 +308,26 @@ export class AuthService {
       payload = jwtEthVerify(clientAssertion);
       // const address = payload.iss;
 
+      let params: ValidationParams = {
+        consumer_address: payload.iss,
+        did: '0x'+(payload.did as string).split(':')[2],
+        agreement_id: payload.sub,
+        buyer: payload.buyer as string, 
+        babysig: payload.babysig as Babysig
+      }
+
       if (payload.aud === BASE_URL + 'access') {
         await this.validateAccess(payload.sub, payload.did as string, payload.iss);
-      } else if (payload.aud === BASE_URL + 'access-proof') {
+      } /* else if (payload.aud === BASE_URL + 'access-proof') {
         await this.validateAccessProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
       } else if (payload.aud === BASE_URL + 'nft-access-proof') {
         await this.validateNftAccessProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
       } else if (payload.aud === BASE_URL + 'nft-transfer-proof') {
         await this.validateTransferProof(payload.sub, payload.did as string, payload.iss, payload.buyer as string, payload.babysig as Babysig);
-      } else if (payload.aud === BASE_URL + 'download') {
+      } */ else if (payload.aud === BASE_URL + 'download') {
         await this.validateOwner(payload.did as string, payload.iss);
       } else if (payload.aud === BASE_URL + 'nft-access') {
-        await this.validateNftAccess(payload.sub, payload.did as string, payload.iss);
+        await this.validateNftAccess(params);
       }
 
       delete payload.exp;
