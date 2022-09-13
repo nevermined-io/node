@@ -177,42 +177,6 @@ export class AccessController {
     const plugin = nevermined.assets.servicePlugin['nft-sales']
     const [from] = await nevermined.accounts.list()
     await plugin.process(params, from, undefined)
-    /*
-    if (transferData.nftType === 721) {
-      const params = nevermined.keeper.templates.nft721SalesTemplate.params(transferData.nftReceiver);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNft721Condition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template: nevermined.keeper.templates.nft721SalesTemplate,
-        conditions,
-      });
-    } else {
-      const params = nevermined.keeper.templates.nftSalesTemplate.params(transferData.nftReceiver, BigNumber.from(transferData.nftAmount), transferData.nftHolder);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNftCondition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template: nevermined.keeper.templates.nftSalesTemplate,
-        conditions,
-      });
-    }*/
     return 'success';
   }
 
