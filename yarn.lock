@@ -1111,20 +1111,21 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@^0.0.5":
+"@nevermined-io/nevermined-sdk-dtp@./nevermined-io-nevermined-sdk-dtp-4.tgz":
   version "0.0.5"
-  resolved "https://registry.npmjs.org/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.0.5.tgz"
-  integrity sha512-XPV6plnASgYcgT6gRSKFq9WzcAIs98rSNNYemzeBKnr3ITjfVdFsQM4uxkF4hcGd3HVR9T9C+/mDTCPi7qAuiA==
+  resolved "./nevermined-io-nevermined-sdk-dtp-4.tgz#9ef9ea1b49649d9c75aa06dfb7f69df2c2818ebf"
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "^0.23.4"
+    "@nevermined-io/nevermined-sdk-js" "./nevermined-io-nevermined-sdk-js-8.tgz"
     circomlibjs "^0.1.1"
+    eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
+    node-rsa "^1.1.1"
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-4.tgz":
-  version "0.23.4"
-  resolved "./nevermined-io-nevermined-sdk-js-4.tgz#62971a10d3a08b006459967d6ed25687cb5f9c06"
+"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-8.tgz":
+  version "0.23.5"
+  resolved "./nevermined-io-nevermined-sdk-js-8.tgz#4e8d879218a18fef48cf98c23818b8a2af8cf805"
   dependencies:
     "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"
@@ -1146,10 +1147,10 @@
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
 
-"@nevermined-io/nevermined-sdk-js@^0.23.4":
-  version "0.23.4"
-  resolved "https://registry.npmjs.org/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.23.4.tgz"
-  integrity sha512-d9YD5hVdsdlJa2LecTleu1ZhGPSynEO1RMIYSgnpDHZY8uftk8PwpgP2FnaKGbHJ+KAKGKz29abhfqNzHiu7kw==
+"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-9.tgz":
+  version "0.23.5"
+  uid "4e8d879218a18fef48cf98c23818b8a2af8cf805"
+  resolved "./nevermined-io-nevermined-sdk-js-9.tgz#4e8d879218a18fef48cf98c23818b8a2af8cf805"
   dependencies:
     "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"

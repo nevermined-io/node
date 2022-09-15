@@ -1,19 +1,14 @@
 import { Body, Controller, Get, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../config';
-import { /* IsBoolean,*/ IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, /* getAssetUrl, */ uploadFilecoin, uploadS3, /*validateAgreement*/ } from '../common/helpers/agreement';
+import { downloadAsset, getNevermined, /* getAssetUrl, */ uploadFilecoin, uploadS3 } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
-// import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
 import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
-// import { generateIntantiableConfigFromConfig } from "@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract";
-// import { Dtp } from "@nevermined-io/nevermined-sdk-dtp/dist/Dtp";
 
 export class UploadResult {
   @ApiProperty({
@@ -93,7 +88,7 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
+  ): Promise<StreamableFile|string> {
     return await downloadAsset(req.user.did, index, res);
   }
 
@@ -151,7 +146,8 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
+  ): Promise<StreamableFile|string> {
+    console.log('trying to access', req.user.did, index)
     return await downloadAsset(req.user.did, index, res);
   }
 
@@ -166,7 +162,7 @@ export class AccessController {
     description: 'Return "success" if transfer worked',
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
-    const nevermined = await Nevermined.getInstance(config);
+    const nevermined = await getNevermined();
     let params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: (await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)).did,
@@ -261,7 +257,7 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
+  ): Promise<StreamableFile|string> {
     return await downloadAsset(req.user.did, index, res);
   }
 

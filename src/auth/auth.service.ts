@@ -3,8 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-// import { Account, Nevermined, Nft721 } from '@nevermined-io/nevermined-sdk-js';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 // import { getAssetUrl, validateAgreement } from '../common/helpers/agreement';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
@@ -14,6 +12,7 @@ import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/mod
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 // import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
+import { getNevermined } from '../common/helpers/agreement';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
@@ -26,7 +25,7 @@ export class AuthService {
 
 
   async validateOwner(did: string, consumer_address: string): Promise<void> {
-    const nevermined = await Nevermined.getInstance(config);
+    const nevermined = await getNevermined();
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(consumer_address, did);
     if (!granted) {
       throw new UnauthorizedException(`Address ${consumer_address} has no permission to access ${did}`);
@@ -34,8 +33,9 @@ export class AuthService {
   }
 
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
-    const nevermined = await Nevermined.getInstance(config);
+    const nevermined = await getNevermined();
     const plugin = nevermined.assets.servicePlugin[service]
+    console.log('using service', service)
     const granted = await plugin.accept(params)
     if (!granted) {
       const [from] = await nevermined.accounts.list()
@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async validateTransferProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
-    const nevermined = await Nevermined.getInstance(config);
+    const nevermined = await getNevermined();
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
@@ -203,6 +203,7 @@ export class AuthService {
    * - the hash function used. ES256K uses sha-256 while ethereum uses keccak
    **/
   async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
+
     if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
       throw new UnauthorizedException('Invalid "assertion_type"');
     }
@@ -212,6 +213,7 @@ export class AuthService {
     try {
       payload = jwtEthVerify(clientAssertion);
       // const address = payload.iss;
+      console.log('got payload', payload)
 
       let params: ValidationParams = {
         consumer_address: payload.iss,

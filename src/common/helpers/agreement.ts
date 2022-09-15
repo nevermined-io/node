@@ -9,6 +9,8 @@ import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
+import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
+import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -45,6 +47,12 @@ export interface Params<T> {
 
 export async function getNevermined() {
   const nevermined = await Nevermined.getInstance(config)
+  const instanceConfig = {
+    ...generateIntantiableConfigFromConfig(config),
+    nevermined
+  };
+  // const _dtp = 
+  await Dtp.getInstance(instanceConfig);
   return nevermined
 }
 
@@ -90,7 +98,8 @@ export async function validateAgreement<T>({
   }
 }
 
-export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string}> {
+export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
+  console.log('downloading DID', did)
   const nevermined = await Nevermined.getInstance(config)
   // get url for DID
   const asset = await nevermined.assets.resolve(did)
@@ -102,7 +111,7 @@ export async function getAssetUrl(did: string, index: number): Promise<{url: str
     const filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
     // download url or what?
     const url: string = filelist[index].url
-    return { url, content_type }
+    return { url, content_type, dtp: service.attributes.main.isDTP }
   }
   throw new BadRequestException()
 }
@@ -126,9 +135,12 @@ function parseUrl(url: string): string {
   return parts.pop()
 }
 
-export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
+export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
   try {
-    let {url, content_type} = await getAssetUrl(did, index)
+    let {url, content_type, dtp} = await getAssetUrl(did, index)
+    if (dtp) {
+      return url
+    }
     if (!url) {
       throw new InternalServerErrorException(undefined, 'Bad URL')
     }
@@ -138,6 +150,7 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
     }
     const param = url.split("/").slice(-1)[0]
     const filename = param.split("?")[0]
+    console.log('downloading', url)
     const contents: Buffer = await download(url)
     res.set({
       'Content-Type': content_type,
