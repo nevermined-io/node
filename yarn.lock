@@ -1111,9 +1111,9 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@./nevermined-io-nevermined-sdk-dtp-4.tgz":
+"@nevermined-io/nevermined-sdk-dtp@./nevermined-io-nevermined-sdk-dtp-6.tgz":
   version "0.0.5"
-  resolved "./nevermined-io-nevermined-sdk-dtp-4.tgz#9ef9ea1b49649d9c75aa06dfb7f69df2c2818ebf"
+  resolved "./nevermined-io-nevermined-sdk-dtp-6.tgz#28736f5edd55143f553279ebdf85215a1e6c1077"
   dependencies:
     "@nevermined-io/nevermined-sdk-js" "./nevermined-io-nevermined-sdk-js-8.tgz"
     circomlibjs "^0.1.1"
