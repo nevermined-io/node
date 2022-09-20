@@ -51,7 +51,6 @@ export async function getNevermined() {
     ...generateIntantiableConfigFromConfig(config),
     nevermined
   };
-  // const _dtp = 
   await Dtp.getInstance(instanceConfig);
   return nevermined
 }
@@ -81,6 +80,7 @@ export async function validateAgreement<T>({
     if (!a.fulfill) {
       const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
       if (lock_state.state !== ConditionState.Fulfilled) {
+        // TODO: add log
         throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)
       }
     }
@@ -92,6 +92,7 @@ export async function validateAgreement<T>({
       await a.condition.fulfillInstance(condInstance, a.extra || {}, from, undefined, method)
       const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
       if (lock_state.state !== ConditionState.Fulfilled) {
+        // TODO: add log
         throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)
       }
     }
@@ -99,7 +100,6 @@ export async function validateAgreement<T>({
 }
 
 export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
-  console.log('downloading DID', did)
   const nevermined = await Nevermined.getInstance(config)
   // get url for DID
   const asset = await nevermined.assets.resolve(did)
@@ -113,6 +113,7 @@ export async function getAssetUrl(did: string, index: number): Promise<{url: str
     const url: string = filelist[index].url
     return { url, content_type, dtp: service.attributes.main.isDTP }
   }
+  // TODO: add log
   throw new BadRequestException()
 }
 
@@ -142,6 +143,7 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
       return url
     }
     if (!url) {
+      // TODO: add log
       throw new InternalServerErrorException(undefined, 'Bad URL')
     }
     // get url for DID
@@ -150,7 +152,6 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
     }
     const param = url.split("/").slice(-1)[0]
     const filename = param.split("?")[0]
-    console.log('downloading', url)
     const contents: Buffer = await download(url)
     res.set({
       'Content-Type': content_type,
@@ -161,6 +162,7 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
     if (e instanceof InternalServerErrorException) {
       throw e
     } else {
+      // TODO: add log
       throw new InternalServerErrorException(e.toString())
     }
   }

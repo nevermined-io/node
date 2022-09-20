@@ -108,7 +108,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    console.log('trying to access', req.user.did, index)
+    console.log('trying to access', req.user.did, index);
     return await downloadAsset(req.user.did, index, res);
   }
 
@@ -124,16 +124,16 @@ export class AccessController {
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
     const nevermined = await getNevermined();
-    let params: ValidationParams = {
+    const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: (await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)).did,
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
-      buyer: (req.user || {}).buyer as string, 
-    }
-    const plugin = nevermined.assets.servicePlugin['nft-sales']
-    const [from] = await nevermined.accounts.list()
-    await plugin.process(params, from, undefined)
+      buyer: (req.user || {}).buyer , 
+    };
+    const plugin = nevermined.assets.servicePlugin['nft-sales'];
+    const [from] = await nevermined.accounts.list();
+    await plugin.process(params, from, undefined);
     return 'success';
   }
 

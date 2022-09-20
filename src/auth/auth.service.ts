@@ -31,12 +31,11 @@ export class AuthService {
 
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
     const nevermined = await getNevermined();
-    const plugin = nevermined.assets.servicePlugin[service]
-    console.log('using service', service)
-    const granted = await plugin.accept(params)
+    const plugin = nevermined.assets.servicePlugin[service];
+    const granted = await plugin.accept(params);
     if (!granted) {
-      const [from] = await nevermined.accounts.list()
-      await plugin.process(params, from, undefined)
+      const [from] = await nevermined.accounts.list();
+      await plugin.process(params, from, undefined);
     }
   }
 
@@ -73,15 +72,15 @@ export class AuthService {
     try {
       payload = jwtEthVerify(clientAssertion);
       // const address = payload.iss;
-      console.log('got payload', payload)
+      // console.log('got payload', payload);
 
-      let params: ValidationParams = {
+      const params: ValidationParams = {
         consumer_address: payload.iss,
         did: '0x'+(payload.did as string).split(':')[2],
         agreement_id: payload.sub,
         buyer: payload.buyer as string, 
         babysig: payload.babysig as Babysig
-      }
+      };
 
       if (payload.aud === BASE_URL + 'access') {
         await this.validateAccess(params, 'access');
