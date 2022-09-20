@@ -13,6 +13,7 @@ jobs:
       with:
         repository: neverminedio/sdk-dtp
         path: sdk-dtp
+        ref: main
     - uses: actions/setup-node@v1
       with:
         node-version: '16.x'
