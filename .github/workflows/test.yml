@@ -14,6 +14,7 @@ jobs:
         repository: nevermined-io/sdk-dtp
         path: sdk-dtp
         ref: main
+        token: ${{ secrets.API_TOKEN_GITHUB }}
     - uses: actions/setup-node@v1
       with:
         node-version: '16.x'
