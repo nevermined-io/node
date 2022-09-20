@@ -108,7 +108,6 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    console.log('trying to access', req.user.did, index);
     return await downloadAsset(req.user.did, index, res);
   }
 

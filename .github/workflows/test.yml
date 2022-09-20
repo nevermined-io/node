@@ -66,7 +66,7 @@ jobs:
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
         npm run start &
-    - name: Get SDK
+    - name: Run tests from SDK
       run: |
         git clone https://github.com/nevermined-io/sdk-js
         cd sdk-js
@@ -77,3 +77,14 @@ jobs:
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         ./scripts/wait-nevermined.sh
         yarn run integration
+    - name: Run tests from SDK-DTP
+      run: |
+        git clone https://github.com/nevermined-io/sdk-dtp
+        cd sdk-dtp
+        git checkout feat/service-refactor
+        yarn
+        export NO_GRAPH=true
+        export OLD_GATEWAY=false
+        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        ./scripts/wait-nevermined.sh
+        yarn test
