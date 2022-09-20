@@ -68,7 +68,7 @@ jobs:
         npm run start &
     - name: Run tests from SDK-DTP
       run: |
-        git clone https://github.com/nevermined-io/sdk-dtp
+        git clone git@github.com:nevermined-io/sdk-dtp.git
         cd sdk-dtp
         git checkout feat/service-refactor
         yarn
