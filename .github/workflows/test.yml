@@ -70,6 +70,7 @@ jobs:
       run: |
         git clone https://github.com/nevermined-io/sdk-js
         cd sdk-js
+        git checkout feat/service-refactor
         yarn
         export NO_GRAPH=true
         export OLD_GATEWAY=false

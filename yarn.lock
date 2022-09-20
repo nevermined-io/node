@@ -1111,11 +1111,12 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@./nevermined-io-nevermined-sdk-dtp-6.tgz":
-  version "0.0.5"
-  resolved "./nevermined-io-nevermined-sdk-dtp-6.tgz#28736f5edd55143f553279ebdf85215a1e6c1077"
+"@nevermined-io/nevermined-sdk-dtp@0.0.6-test":
+  version "0.0.6-test"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.0.6-test.tgz#a22abf35ff04852ff384e1171eef4447ca3aa6d0"
+  integrity sha512-ZRPUSswR8SVO2+HrK4z4DRd+vVPNxckTttNbXwP+WjG96My/Bu8HJjwPnxYrD/mLrS2x/QmWPT7F3KbR0E3oAA==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "./nevermined-io-nevermined-sdk-js-8.tgz"
+    "@nevermined-io/nevermined-sdk-js" "0.23.5-test"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1123,34 +1124,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-8.tgz":
-  version "0.23.5"
-  resolved "./nevermined-io-nevermined-sdk-js-8.tgz#4e8d879218a18fef48cf98c23818b8a2af8cf805"
-  dependencies:
-    "@nevermined-io/secret-store-client" "^0.0.16"
-    "@nevermined-io/subgraphs" "0.4.1"
-    assert "^2.0.0"
-    codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
-    crypto-browserify "^3.12.0"
-    deprecated-decorator "^0.1.6"
-    ethers "^5.6.9"
-    https-browserify "^1.0.0"
-    jose "^4.5.1"
-    js-file-download "^0.4.12"
-    node-fetch "^2.6.1"
-    os-browserify "^0.3.0"
-    path-browserify "^1.0.1"
-    save-file "^2.3.1"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    url "^0.11.0"
-    uuid "^3.4.0"
-    whatwg-url "^7.1.0"
-
-"@nevermined-io/nevermined-sdk-js@./nevermined-io-nevermined-sdk-js-9.tgz":
-  version "0.23.5"
-  uid "4e8d879218a18fef48cf98c23818b8a2af8cf805"
-  resolved "./nevermined-io-nevermined-sdk-js-9.tgz#4e8d879218a18fef48cf98c23818b8a2af8cf805"
+"@nevermined-io/nevermined-sdk-js@0.23.5-test":
+  version "0.23.5-test"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.23.5-test.tgz#b9cce20d4d018e4e3198adcffbe8743af63d53e7"
+  integrity sha512-55mU3pFhzdX9+MQKiVAlnyvbELYMaGDe6JKkr9n5BPym5YWfixRhraE8qDz8uyztLrq152CtOiQ+LtJXiavqKg==
   dependencies:
     "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"
