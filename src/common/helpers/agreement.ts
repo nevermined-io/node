@@ -57,7 +57,7 @@ export async function downloadAsset(nvm: Nevermined, did: string, index: number,
     }
     if (!url) {
       // TODO: add log
-      throw new NotFoundException(undefined, 'Bad URL')
+      throw new NotFoundException(`URL for did ${did} not found`)
     }
     // get url for DID
     if (url.startsWith('cid://')) {
@@ -72,7 +72,7 @@ export async function downloadAsset(nvm: Nevermined, did: string, index: number,
     });
     return new StreamableFile(contents)
   } catch (e) {
-    if (e instanceof InternalServerErrorException) {
+    if (e instanceof NotFoundException) {
       throw e
     } else {
       // TODO: add log

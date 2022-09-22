@@ -10,7 +10,7 @@ import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/mod
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
 import { NeverminedService } from '../shared/nevermined/nvm.service';
-import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
+import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
@@ -46,7 +46,7 @@ export class AuthService {
       nevermined
     };
     const dtp = await Dtp.getInstance(instanceConfig);
-    const buyerPub = new BabyjubPublicKey('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
+    const buyerPub = new BabyjubPublicKey(zeroX(buyer.substring(0,64)), zeroX(buyer.substring(64,128)));
     if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
       throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
     }
