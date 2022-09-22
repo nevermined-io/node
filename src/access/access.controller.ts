@@ -126,9 +126,9 @@ export class AccessController {
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
     const nevermined = this.nvmService.getNevermined();
-    const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)
+    const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
     if (!agreement) {
-      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
     }
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
