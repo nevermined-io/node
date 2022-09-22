@@ -14,11 +14,11 @@ jobs:
         node-version: '16.x'
     - name: Install dependencies
       run: |
-        npm i
+        yarn
     - name: Compile and lint
       run: |
-        npm run build
-        npm run lint
+        yarn run build
+        yarn run lint
     - name: Setup NVM
       run: |
         docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
@@ -47,9 +47,9 @@ jobs:
         export NO_GRAPH=true
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
-        npm run setup:dev
+        yarn run setup:dev
         # HDWalletProvider keeps jest from exiting
-        npm run test:cov -- --forceExit
+        yarn run test:cov -- --forceExit
     - name: Start gateway
       run: |
         export PROVIDER_KEYFILE=accounts/provider.json
@@ -65,10 +65,30 @@ jobs:
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
-        npm run start &
-    - name: Get SDK
+        yarn run start &
+    - uses: actions/checkout@v3
+      with:
+        repository: nevermined-io/sdk-dtp
+        path: sdk-dtp
+        ref: feat/service-refactor
+        token: ${{ secrets.API_TOKEN_GITHUB }}
+    - name: Run tests from SDK-DTP
       run: |
-        git clone https://github.com/nevermined-io/sdk-js
+        cd sdk-dtp
+        yarn
+        export NO_GRAPH=true
+        export OLD_GATEWAY=false
+        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        ./scripts/wait-nevermined.sh
+        yarn test
+    - uses: actions/checkout@v3
+      with:
+        repository: nevermined-io/sdk-js
+        path: sdk-js
+        ref: feat/service-refactor
+        token: ${{ secrets.API_TOKEN_GITHUB }}
+    - name: Run tests from SDK
+      run: |
         cd sdk-js
         yarn
         export NO_GRAPH=true

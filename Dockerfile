@@ -3,9 +3,9 @@ LABEL maintainer="Nevermined <root@nevermined.io>"
 
 RUN apk add --no-cache autoconf automake alpine-sdk
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
-RUN npm install
+RUN yarn
 
 COPY src ./src
 COPY config ./config
@@ -14,8 +14,8 @@ COPY tsconfig* ./
 COPY .env.sample ./.env
 COPY accounts ./accounts
 
-RUN npm run setup:dev
-RUN npm run build
+RUN yarn run setup:dev
+RUN yarn run build
 
-ENTRYPOINT ["npm", "run", "start:prod"]
+ENTRYPOINT ["yarn", "run", "start:prod"]
 
