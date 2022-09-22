@@ -3,9 +3,8 @@ LABEL maintainer="Nevermined <root@nevermined.io>"
 
 RUN apk add --no-cache autoconf automake alpine-sdk
 
-COPY package*.json ./
+COPY package*.json yarn.lock ./
 
-RUN npm i -g yarn
 RUN yarn
 
 COPY src ./src
