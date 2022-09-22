@@ -3,13 +3,13 @@ import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "
 import { Request } from '../common/helpers/request.interface';
 import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, getNevermined, uploadFilecoin, uploadS3 } from '../common/helpers/agreement';
+import { downloadAsset, uploadFilecoin, uploadS3 } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
 import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
-
+import { NeverminedService } from '../shared/nevermined/nvm.service';
 export class UploadResult {
   @ApiProperty({
     description: 'Url of the uploaded file',
@@ -73,6 +73,9 @@ export class TransferDto {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
+
+  constructor(private nvmService: NeverminedService) {}
+
   @Get('access/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset',
@@ -89,7 +92,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(req.user.did, index, res);
+    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -108,7 +111,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(req.user.did, index, res);
+    return await downloadAsset(this.nvmService.getNevermined(),req.user.did, index, res);
   }
 
   @Post('nft-transfer')
@@ -122,7 +125,7 @@ export class AccessController {
     description: 'Return "success" if transfer worked',
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
-    const nevermined = await getNevermined();
+    const nevermined = this.nvmService.getNevermined();
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: (await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)).did,
@@ -152,7 +155,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(req.user.did, index, res);
+    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
   }
 
   @Post('upload/:backend')

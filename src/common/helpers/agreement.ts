@@ -1,13 +1,10 @@
-import { BadRequestException, InternalServerErrorException, StreamableFile } from '@nestjs/common';
+import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../../config';
 import { decrypt } from './utils';
 import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -16,18 +13,7 @@ async function fetch(...args) {
   return fetch(...args)
 }
 
-export async function getNevermined() {
-  const nevermined = await Nevermined.getInstance(config)
-  const instanceConfig = {
-    ...generateIntantiableConfigFromConfig(config),
-    nevermined
-  };
-  await Dtp.getInstance(instanceConfig);
-  return nevermined
-}
-
-export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
-  const nevermined = await Nevermined.getInstance(config)
+export async function getAssetUrl(nevermined: Nevermined, did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
   // get url for DID
   const asset = await nevermined.assets.resolve(did)
   const service = asset.findServiceByType('metadata')
@@ -63,15 +49,15 @@ function parseUrl(url: string): string {
   return parts.pop()
 }
 
-export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
+export async function downloadAsset(nvm: Nevermined, did: string, index: number, res: any): Promise<StreamableFile|string> {
   try {
-    let {url, content_type, dtp} = await getAssetUrl(did, index)
+    let {url, content_type, dtp} = await getAssetUrl(nvm, did, index)
     if (dtp) {
       return url
     }
     if (!url) {
       // TODO: add log
-      throw new InternalServerErrorException(undefined, 'Bad URL')
+      throw new NotFoundException(undefined, 'Bad URL')
     }
     // get url for DID
     if (url.startsWith('cid://')) {

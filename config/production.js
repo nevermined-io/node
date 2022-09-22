@@ -22,5 +22,3 @@ module.exports = {
   },
   assetIndex: process.env.ASSET_INDEX,
 };
-console.log(module.exports.JWT_SECRET_KEY)
-console.log(process.env)

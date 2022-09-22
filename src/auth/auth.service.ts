@@ -9,7 +9,7 @@ import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
-import { getNevermined } from '../common/helpers/agreement';
+import { NeverminedService } from '../shared/nevermined/nvm.service';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
@@ -17,12 +17,11 @@ const BASE_URL = '/api/v1/gateway/services/';
 export class AuthService {
   constructor(
     private jwtService: JwtService,
-    // private userProfileService: UserProfileService,
+    private nvmService: NeverminedService,
   ) {}
 
-
   async validateOwner(did: string, consumer_address: string): Promise<void> {
-    const nevermined = await getNevermined();
+    const nevermined = this.nvmService.getNevermined();
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(consumer_address, did);
     if (!granted) {
       throw new UnauthorizedException(`Address ${consumer_address} has no permission to access ${did}`);
@@ -30,7 +29,7 @@ export class AuthService {
   }
 
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
-    const nevermined = await getNevermined();
+    const nevermined = this.nvmService.getNevermined();
     const plugin = nevermined.assets.servicePlugin[service];
     const granted = await plugin.accept(params);
     if (!granted) {
@@ -40,7 +39,7 @@ export class AuthService {
   }
 
   async validateTransferProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
-    const nevermined = await getNevermined();
+    const nevermined = this.nvmService.getNevermined();
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined
@@ -68,11 +67,8 @@ export class AuthService {
     }
 
     let payload: JWTPayload;
-    // let userProfile: UserProfile;
     try {
       payload = jwtEthVerify(clientAssertion);
-      // const address = payload.iss;
-      // console.log('got payload', payload);
 
       const params: ValidationParams = {
         consumer_address: payload.iss,

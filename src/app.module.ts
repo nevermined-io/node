@@ -8,6 +8,7 @@ import { HttpsRedirectMiddleware } from './common/middlewares/https-redirection/
 import { AuthModule } from './auth/auth.module';
 import { EncryptModule } from './encrypt/encrypt.module';
 import { AccessModule } from './access/access.module';
+import { NeverminedModule } from './shared/nevermined/nvm.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AccessModule } from './access/access.module';
     EncryptModule,
     AccessModule,
     AuthModule,
+    NeverminedModule,
   ],
 })
 export class ApplicationModule {
