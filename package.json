@@ -56,7 +56,7 @@
     "formdata-node": "^4.3.3",
     "formdata-polyfill": "^4.0.10",
     "joi": "^17.6.0",
-    "jose": "^4.6.0",
+    "jose": "^4.9.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "moment": "^2.24.0",
