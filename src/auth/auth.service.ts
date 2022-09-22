@@ -10,6 +10,7 @@ import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/mod
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
 import { NeverminedService } from '../shared/nevermined/nvm.service';
+import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
@@ -72,7 +73,7 @@ export class AuthService {
 
       const params: ValidationParams = {
         consumer_address: payload.iss,
-        did: '0x'+(payload.did as string).split(':')[2],
+        did: didZeroX(payload.did as string),
         agreement_id: payload.sub,
         buyer: payload.buyer as string, 
         babysig: payload.babysig as Babysig
