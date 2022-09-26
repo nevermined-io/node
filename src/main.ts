@@ -28,7 +28,7 @@ const createIndexes = (app: NestExpressApplication) => {
           }
         )
       );
-      Logger.log('Marketplace API is connected to ElasticSearch');
+      Logger.log('Nevermined Gateway is up and running');
       clearInterval(tryConnectionInterval);
     } catch {
       Logger.log('Error to connect to ElasticSearch. Trying in 10s');

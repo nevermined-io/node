@@ -14,11 +14,11 @@ jobs:
         node-version: '16.x'
     - name: Install dependencies
       run: |
-        npm i
+        yarn
     - name: Compile and lint
       run: |
-        npm run build
-        npm run lint
+        yarn build
+        yarn lint
     - name: Setup NVM
       run: |
         docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
@@ -47,9 +47,9 @@ jobs:
         export NO_GRAPH=true
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
-        npm run setup:dev
+        yarn setup:dev
         # HDWalletProvider keeps jest from exiting
-        npm run test:cov -- --forceExit
+        yarn test:cov -- --forceExit
     - name: Start gateway
       run: |
         export PROVIDER_KEYFILE=accounts/provider.json
@@ -65,7 +65,7 @@ jobs:
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
-        npm run start &
+        yarn start &
     - name: Get SDK
       run: |
         git clone https://github.com/nevermined-io/sdk-js
