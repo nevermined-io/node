@@ -1,17 +1,15 @@
-import { Body, Controller, Get, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, NotFoundException, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../config';
-import { /* IsBoolean,*/ IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, getAssetUrl, uploadFilecoin, uploadS3, validateAgreement } from '../common/helpers/agreement';
+import { downloadAsset, uploadFilecoin, uploadS3 } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
-import { generateIntantiableConfigFromConfig } from "@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract";
-import { Dtp } from "@nevermined-io/nevermined-sdk-dtp/dist/Dtp";
-
+import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
+import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
+import { NeverminedService } from '../shared/nevermined/nvm.service';
 export class UploadResult {
   @ApiProperty({
     description: 'Url of the uploaded file',
@@ -61,8 +59,8 @@ export class TransferDto {
     description: 'Number of NFTs to transfer',
     example: '1'
   })
-  @IsNumber()
-  nftAmount: number;
+  @IsString()
+  nftAmount: string;
 
   @ApiProperty({
     description: 'Type of NFT',
@@ -75,6 +73,9 @@ export class TransferDto {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
+
+  constructor(private nvmService: NeverminedService) {}
+
   @Get('access/:agreement_id/:index')
   @ApiOperation({
     description: 'Access asset',
@@ -90,46 +91,8 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
-    return await downloadAsset(req.user.did, index, res);
-  }
-
-  @Get('access-proof/:agreement_id/:index')
-  @ApiOperation({
-    description: 'Access asset w/ DTP proof',
-    summary: 'Public',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the url of asset',
-    type: String,
-  })
-  @ApiBearerAuth('Authorization')
-  async doAccessProof(
-    @Req() req: Request<unknown>,
-    @Response({ passthrough: true }) res,
-    @Param('index') index: number,
-  ): Promise<string> {
-    return (await getAssetUrl(req.user.did, index)).url;
-  }
-
-  @Get('nft-access-proof/:agreement_id/:index')
-  @ApiOperation({
-    description: 'NFT Access asset w/ DTP proof',
-    summary: 'Public',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Return the url of asset',
-    type: String,
-  })
-  @ApiBearerAuth('Authorization')
-  async doNFTAccessProof(
-    @Req() req: Request<unknown>,
-    @Response({ passthrough: true }) res,
-    @Param('index') index: number,
-  ): Promise<string> {
-    return (await getAssetUrl(req.user.did, index)).url;
+  ): Promise<StreamableFile|string> {
+    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -147,8 +110,8 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
-    return await downloadAsset(req.user.did, index, res);
+  ): Promise<StreamableFile|string> {
+    return await downloadAsset(this.nvmService.getNevermined(),req.user.did, index, res);
   }
 
   @Post('nft-transfer')
@@ -161,107 +124,22 @@ export class AccessController {
     status: 200,
     description: 'Return "success" if transfer worked',
   })
-  async doNftTransfer(@Body() transferData: TransferDto): Promise<string> {
-    const nevermined = await Nevermined.getInstance(config);
-    if (transferData.nftType === 721) {
-      const params = nevermined.keeper.templates.nft721SalesTemplate.params(transferData.nftReceiver);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNft721Condition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template: nevermined.keeper.templates.nft721SalesTemplate,
-        conditions,
-      });
-    } else {
-      const params = nevermined.keeper.templates.nftSalesTemplate.params(transferData.nftReceiver, transferData.nftAmount, transferData.nftHolder);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNftCondition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template: nevermined.keeper.templates.nftSalesTemplate,
-        conditions,
-      });
+  async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
+    const nevermined = this.nvmService.getNevermined();
+    const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
+    if (!agreement) {
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
     }
-    return 'success';
-  }
-
-  @Post('nft-transfer-proof')
-  @ApiOperation({
-    description: 'Access asset',
-    summary: 'Public',
-  })
-  @ApiBearerAuth('Authorization')
-  @ApiResponse({
-    status: 200,
-    description: 'Return "success" if transfer worked',
-  })
-  async doNftTransferProof(
-    @Body() transferData: TransferDto,
-    @Req() req: Request<unknown>,
-  ): Promise<string> {
-    const nevermined = await Nevermined.getInstance(config);
-    const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
-      nevermined
+    const params: ValidationParams = {
+      consumer_address: transferData.nftReceiver,
+      did: agreement.did,
+      agreement_id: transferData.agreementId,
+      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
+      buyer: (req.user || {}).buyer , 
     };
-    const dtp = await Dtp.getInstance(instanceConfig);
-    const buyer = req.user.buyer;
-    const consumer = await dtp.babyjubPublicAccount('0x'+buyer.substring(0,64), '0x'+buyer.substring(64,128));
-    if (transferData.nftType === 721) {
-      const template = dtp.nft721SalesWithAccessTemplate;
-      const params = template.params(consumer);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNft721Condition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-        {name: 'access', fulfill: true, condition: dtp.accessProofCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template,
-        conditions,
-      });
-    } else {
-      const template = dtp.nftSalesWithAccessTemplate;
-      const params = template.params(consumer, transferData.nftHolder, transferData.nftAmount);
-      const conditions = [
-        {name: 'lock', fulfill: false},
-        {name: 'transfer', fulfill: true, delegate: true, condition: nevermined.keeper.conditions.transferNftCondition},
-        {name: 'escrow', fulfill: true, condition: nevermined.keeper.conditions.escrowPaymentCondition},
-        {name: 'access', fulfill: true, condition: dtp.accessProofCondition},
-      ];
-      const agreement_id = transferData.agreementId;
-      const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id);
-      await validateAgreement({
-        nevermined,
-        agreement_id,
-        did: agreement.did,
-        params,
-        template,
-        conditions,
-      });
-    }
+    const plugin = nevermined.assets.servicePlugin['nft-sales'];
+    const [from] = await nevermined.accounts.list();
+    await plugin.process(params, from, undefined);
     return 'success';
   }
 
@@ -280,8 +158,8 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
-  ): Promise<StreamableFile> {
-    return await downloadAsset(req.user.did, index, res);
+  ): Promise<StreamableFile|string> {
+    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
   }
 
   @Post('upload/:backend')

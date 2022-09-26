@@ -6,10 +6,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../common/strategies/jwt.strategy';
 import { ConfigModule } from '../shared/config/config.module';
 import { ConfigService } from '../shared/config/config.service';
+import { NeverminedModule } from '../shared/nevermined/nvm.module';
 
 @Module({
   imports: [
     ConfigModule,
+    NeverminedModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
