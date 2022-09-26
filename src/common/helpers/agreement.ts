@@ -1,13 +1,8 @@
-import { BadRequestException, InternalServerErrorException, StreamableFile, UnauthorizedException } from '@nestjs/common';
-import { Account, ConditionState, DDO, Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../../config';
-import { ConditionInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/conditions';
-import { AgreementInstance } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/templates';
-import { TxParameters } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/ContractBase';
+import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
+import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { decrypt } from './utils';
 import download from 'download';
 import AWS from 'aws-sdk';
-// import fetch from 'node-fetch';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 
@@ -18,81 +13,7 @@ async function fetch(...args) {
   return fetch(...args)
 }
 
-export interface Template<T> {
-  instanceFromDDO: (a: string, b: DDO, c: string, d: T) => Promise<AgreementInstance<T>>
-}
-
-export interface NormalCondition {
-  fulfillInstance: (a: ConditionInstance<{}>, b: any, from: Account, params?: TxParameters, method?: string) => Promise<any>
-  sendFrom: (name: string, args: any[], from: Account) => Promise<any>
-}
-
-export interface ConditionInfo {
-  fulfill: boolean,
-  condition?: NormalCondition,
-  name: string,
-  delegate?: boolean,
-  extra?: any,
-}
-
-export interface Params<T> {
-  nevermined: Nevermined,
-  agreement_id: string, 
-  did: string, 
-  template: Template<T>,
-  params: T,
-  conditions: ConditionInfo[]
-}
-
-export async function getNevermined() {
-  const nevermined = await Nevermined.getInstance(config)
-  return nevermined
-}
-
-export async function validateAgreement<T>({
-  nevermined,
-  agreement_id, 
-  did, 
-  template,
-  params,
-  conditions,
-}: Params<T>) {
-  const ddo = await nevermined.assets.resolve(did)
-  const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(agreement_id)
-  const agreementData = await template.instanceFromDDO(
-    agreement.agreementIdSeed,
-    ddo,
-    agreement.creator,
-    params
-  )
-  if (agreementData.agreementId !== agreement_id) {
-    throw new UnauthorizedException(`Agreement doesn't match ${agreement_id} should be ${agreementData.agreementId}`)
-  }
-  const [from] = await nevermined.accounts.list()
-  // Check that lock condition is fulfilled
-  await Promise.all(conditions.map(async (a,idx) => {
-    if (!a.fulfill) {
-      const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
-      if (lock_state.state !== ConditionState.Fulfilled) {
-        throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)
-      }
-    }
-  }))
-  for (let {idx, a} of conditions.map((a,idx) => ({idx, a}))) {
-    if (a.fulfill) {
-      const condInstance = agreementData.instances[idx] as ConditionInstance<{}>
-      const method = a.delegate ? 'fulfillForDelegate' : 'fulfill'
-      await a.condition.fulfillInstance(condInstance, a.extra || {}, from, undefined, method)
-      const lock_state = await nevermined.keeper.conditionStoreManager.getCondition(agreementData.instances[idx].id)
-      if (lock_state.state !== ConditionState.Fulfilled) {
-        throw new UnauthorizedException(`In agreement ${agreement_id}, ${a.name} condition ${agreementData.instances[idx].id} is not fulfilled`)
-      }
-    }
-  }
-}
-
-export async function getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string}> {
-  const nevermined = await Nevermined.getInstance(config)
+export async function getAssetUrl(nevermined: Nevermined, did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
   // get url for DID
   const asset = await nevermined.assets.resolve(did)
   const service = asset.findServiceByType('metadata')
@@ -103,8 +24,9 @@ export async function getAssetUrl(did: string, index: number): Promise<{url: str
     const filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
     // download url or what?
     const url: string = filelist[index].url
-    return { url, content_type }
+    return { url, content_type, dtp: service.attributes.main.isDTP }
   }
+  // TODO: add log
   throw new BadRequestException()
 }
 
@@ -127,11 +49,15 @@ function parseUrl(url: string): string {
   return parts.pop()
 }
 
-export async function downloadAsset(did: string, index: number, res: any): Promise<StreamableFile> {
+export async function downloadAsset(nvm: Nevermined, did: string, index: number, res: any): Promise<StreamableFile|string> {
   try {
-    let {url, content_type} = await getAssetUrl(did, index)
+    let {url, content_type, dtp} = await getAssetUrl(nvm, did, index)
+    if (dtp) {
+      return url
+    }
     if (!url) {
-      throw new InternalServerErrorException(undefined, 'Bad URL')
+      // TODO: add log
+      throw new NotFoundException(`URL for did ${did} not found`)
     }
     // get url for DID
     if (url.startsWith('cid://')) {
@@ -146,9 +72,10 @@ export async function downloadAsset(did: string, index: number, res: any): Promi
     });
     return new StreamableFile(contents)
   } catch (e) {
-    if (e instanceof InternalServerErrorException) {
+    if (e instanceof NotFoundException) {
       throw e
     } else {
+      // TODO: add log
       throw new InternalServerErrorException(e.toString())
     }
   }

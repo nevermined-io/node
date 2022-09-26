@@ -47,9 +47,9 @@ jobs:
         export NO_GRAPH=true
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
-        yarn setup:dev
+        yarn run setup:dev
         # HDWalletProvider keeps jest from exiting
-        yarn test:cov -- --forceExit
+        yarn run test:cov -- --forceExit
     - name: Start gateway
       run: |
         export PROVIDER_KEYFILE=accounts/provider.json
@@ -65,10 +65,30 @@ jobs:
         export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
-        yarn start &
-    - name: Get SDK
+        yarn run start &
+    - uses: actions/checkout@v3
+      with:
+        repository: nevermined-io/sdk-dtp
+        path: sdk-dtp
+        ref: feat/service-refactor
+        token: ${{ secrets.API_TOKEN_GITHUB }}
+    - name: Run tests from SDK-DTP
       run: |
-        git clone https://github.com/nevermined-io/sdk-js
+        cd sdk-dtp
+        yarn
+        export NO_GRAPH=true
+        export OLD_GATEWAY=false
+        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        ./scripts/wait-nevermined.sh
+        yarn test
+    - uses: actions/checkout@v3
+      with:
+        repository: nevermined-io/sdk-js
+        path: sdk-js
+        ref: feat/service-refactor
+        token: ${{ secrets.API_TOKEN_GITHUB }}
+    - name: Run tests from SDK
+      run: |
         cd sdk-js
         yarn
         export NO_GRAPH=true
