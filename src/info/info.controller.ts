@@ -32,7 +32,7 @@ export class InfoController {
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
     Logger.debug('Serving info');
-    const nevermined = this.nvmService.getNevermined()
+    const nevermined = this.nvmService.getNevermined();
     const contractHandler = new ContractHandler(this.nvmService.instanceConfig());
     const pathEndpoint = `${req.protocol}://${req.hostname}${req.client.localPort ? `:${req.client.localPort}` : ''}${
       req.url
