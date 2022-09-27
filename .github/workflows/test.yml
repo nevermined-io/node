@@ -70,7 +70,6 @@ jobs:
       with:
         repository: nevermined-io/sdk-dtp
         path: sdk-dtp
-        ref: feat/service-refactor
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK-DTP
       run: |
