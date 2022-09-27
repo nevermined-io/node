@@ -3,7 +3,6 @@ import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "
 import { Request } from '../common/helpers/request.interface';
 import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
-import { downloadAsset, uploadFilecoin, uploadS3 } from '../common/helpers/agreement';
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
 import { aes_encryption_256 } from "../common/helpers/utils";
@@ -92,7 +91,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res);
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -111,7 +110,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(this.nvmService.getNevermined(),req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res);
   }
 
   @Post('nft-transfer')
@@ -135,7 +134,7 @@ export class AccessController {
       did: agreement.did,
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
-      buyer: (req.user || {}).buyer , 
+      buyer: (req.user || {}).buyer,
     };
     const plugin = nevermined.assets.servicePlugin['nft-sales'];
     const [from] = await nevermined.accounts.list();
@@ -159,7 +158,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await downloadAsset(this.nvmService.getNevermined(), req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res);
   }
 
   @Post('upload/:backend')
@@ -180,18 +179,18 @@ export class AccessController {
       const password = crypto.randomBytes(32).toString('base64url');
       data = Buffer.from(aes_encryption_256(data, password));
       if (backend === 's3') {
-        const url = await uploadS3(data, file.filename);
+        const url = await this.nvmService.uploadS3(data, file.filename);
         return { url, password };
       } else if (backend === 'filecoin') {
-        const url = await uploadFilecoin(data, file.filename);
+        const url = await this.nvmService.uploadFilecoin(data, file.filename);
         return { url, password };
       }
     }
     if (backend === 's3') {
-      const url = await uploadS3(data, file.filename);
+      const url = await this.nvmService.uploadS3(data, file.filename);
       return { url };
     } else if (backend === 'filecoin') {
-      const url = await uploadFilecoin(data, file.filename);
+      const url = await this.nvmService.uploadFilecoin(data, file.filename);
       return { url };
     }
   }
