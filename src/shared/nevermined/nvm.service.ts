@@ -64,7 +64,7 @@ export class NeverminedService {
         const content_type = file_attributes.contentType
         const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
         if (auth_method === 'RSAES-OAEP') {
-            const filelist = JSON.parse(await decrypt(service.attributes.encryptedFiles, 'PSK-RSA'))
+            const filelist = JSON.parse(await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA'))
             // download url or what?
             const url: string = filelist[index].url
             return { url, content_type, dtp: service.attributes.main.isDTP }

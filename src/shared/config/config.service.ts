@@ -2,6 +2,7 @@
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
 import { Config } from '@nevermined-io/nevermined-sdk-js';
+import { readFileSync } from 'fs';
 import * as Joi from 'joi';
 import { get as loGet } from 'lodash';
 import { Logger } from '../logger/logger.service';
@@ -12,7 +13,10 @@ export interface EnvConfig {
 }
 
 export interface CryptoConfig {
-  
+  provider_key: string,
+  provider_password: string,
+  provider_rsa_public: string,
+  provider_rsa_private: string,
 }
 
 const configProfile = require('../../../config');
@@ -70,9 +74,16 @@ type DotenvSchemaKeys =
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
+  private readonly crypto: CryptoConfig
 
   constructor() {
     this.envConfig = this.validateInput(configProfile);
+    this.crypto = {
+      provider_password: this.get('PROVIDER_PASSWORD'),
+      provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
+      provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
+      provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
+    }
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
@@ -81,6 +92,10 @@ export class ConfigService {
 
   nvm(): Config {
     return this.envConfig.nvm
+  }
+
+  cryptoConfig(): CryptoConfig {
+    return this.crypto
   }
 
   getProviderBabyjub() {
