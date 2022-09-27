@@ -69,7 +69,7 @@ export class NeverminedService {
                 Logger.error(`URL for did ${did} not found`)
                 throw new NotFoundException(`URL for did ${did} not found`)
             }
-            console.log("URL", url)
+            Logger.debug(`Serving URL ${url}`)
             // get url for DID
             if (url.startsWith('cid://')) {
                 url = FILECOIN_GATEWAY.replace(':cid', parseUrl(url))

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, NotFoundException, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
 import { Public } from "../common/decorators/auth.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
@@ -11,20 +11,7 @@ import { NeverminedService } from '../shared/nevermined/nvm.service';
 import { Logger } from '../shared/logger/logger.service';
 import { TransferDto } from "./dto/transfer";
 import { UploadDto } from "./dto/upload";
-
-export class UploadResult {
-  @ApiProperty({
-    description: 'Url of the uploaded file',
-    example: 'cid://bawoeijdoidewj',
-    required: true,
-  })
-  url: string;
-  @ApiProperty({
-    description: 'Password for encrypted file',
-    example: '1234#',
-  })
-  password?: string;
-}
+import { UploadResult } from "./dto/upload-result";
 
 @ApiTags('Access')
 @Controller()
@@ -81,11 +68,11 @@ export class AccessController {
     description: 'Return "success" if transfer worked',
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
-    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
+    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`);
     const nevermined = this.nvmService.getNevermined();
     const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
     if (!agreement) {
-      Logger.error(`Agreement ${transferData.agreementId} not found`)
+      Logger.error(`Agreement ${transferData.agreementId} not found`);
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
     }
     const params: ValidationParams = {
@@ -135,7 +122,7 @@ export class AccessController {
     let data = file.buffer;
     if (uploadData.encrypt) {
       // generate password
-      Logger.debug(`Uploading with password, filename ${file.filename}`)
+      Logger.debug(`Uploading with password, filename ${file.filename}`);
       const password = crypto.randomBytes(32).toString('base64url');
       data = Buffer.from(aes_encryption_256(data, password));
       if (backend === 's3') {

@@ -35,7 +35,7 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
-    Logger.debug('Serving info')
+    Logger.debug('Serving info');
     const nevermined = await Nevermined.getInstance(config);
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
