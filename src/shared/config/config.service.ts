@@ -1,12 +1,14 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
+import { Config } from '@nevermined-io/nevermined-sdk-js';
 import * as Joi from 'joi';
 import { get as loGet } from 'lodash';
 import { Logger } from '../logger/logger.service';
 
 export interface EnvConfig {
   [key: string]: string;
+  nvm: any
 }
 
 const configProfile = require('../../../config');
@@ -23,6 +25,21 @@ const DOTENV_SCHEMA = Joi.object({
   }).default({
     enableHttpsRedirect: false,
   }),
+  nvm: Joi.any(),
+  PROVIDER_KEYFILE: Joi.string().required().error(new Error('PROVIDER_KEYFILE is required!')),
+  RSA_PRIVKEY_FILE: Joi.string().required().error(new Error('RSA_PRIVKEY_FILE is required!')),
+  RSA_PUBKEY_FILE: Joi.string().required().error(new Error('RSA_PUBKEY_FILE is required!')),
+  PROVIDER_BABYJUB_SECRET: Joi.string(),
+  PROVIDER_BABYJUB_PUBLIC1: Joi.string(),
+  PROVIDER_BABYJUB_PUBLIC2: Joi.string(),
+  PROVIDER_PASSWORD: Joi.string(),
+  ESTUARY_TOKEN: Joi.string(),
+  ESTUARY_ENDPOINT: Joi.string(),
+  FILECOIN_GATEWAY: Joi.string(),
+  AWS_S3_ACCESS_KEY_ID: Joi.string(),
+  AWS_S3_SECRET_ACCESS_KEY: Joi.string(),
+  AWS_S3_ENDPOINT: Joi.string(),
+  AWS_S3_BUCKET_NAME: Joi.string(),
 });
 
 type DotenvSchemaKeys =
@@ -32,6 +49,20 @@ type DotenvSchemaKeys =
   | 'JWT_SECRET_KEY'
   | 'JWT_EXPIRY_KEY'
   | 'security.enableHttpsRedirect'
+  | 'PROVIDER_KEYFILE'
+  | 'RSA_PRIVKEY_FILE'
+  | 'RSA_PUBKEY_FILE'
+  | 'PROVIDER_BABYJUB_SECRET'
+  | 'PROVIDER_BABYJUB_PUBLIC1'
+  | 'PROVIDER_BABYJUB_PUBLIC2'
+  | 'PROVIDER_PASSWORD'
+  | 'ESTUARY_TOKEN'
+  | 'ESTUARY_ENDPOINT'
+  | 'FILECOIN_GATEWAY'
+  | 'AWS_S3_ACCESS_KEY_ID'
+  | 'AWS_S3_SECRET_ACCESS_KEY'
+  | 'AWS_S3_ENDPOINT'
+  | 'AWS_S3_BUCKET_NAME'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
@@ -42,6 +73,10 @@ export class ConfigService {
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
     return loGet(this.envConfig, path) as unknown as T | undefined;
+  }
+
+  nvm(): Config {
+    return this.envConfig.nvm
   }
 
   private validateInput(envConfig: EnvConfig): EnvConfig {

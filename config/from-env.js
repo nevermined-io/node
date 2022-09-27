@@ -16,6 +16,12 @@ const keys = [
     'PROVIDER_PASSWORD',
   
     'ESTUARY_TOKEN',
+    'AWS_S3_ACCESS_KEY_ID',
+    'AWS_S3_SECRET_ACCESS_KEY',
+    'AWS_S3_ENDPOINT',
+    'AWS_S3_BUCKET_NAME',
+    'FILECOIN_GATEWAY',
+    'ESTUARY_ENDPOINT',
 ]
 
 const config = {}

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../../config';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
 import { decrypt } from '../../common/helpers/utils';
 import download from 'download';
@@ -10,6 +9,7 @@ import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 import { Logger } from '../logger/logger.service';
+import { ConfigService } from '../config/config.service';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -24,13 +24,13 @@ function parseUrl(url: string): string {
     return parts.pop()
 }
 
-const FILECOIN_GATEWAY = 'https://dweb.link/ipfs/:cid'
-
 @Injectable()
 export class NeverminedService {
     nevermined: Nevermined;
+    constructor(private config: ConfigService) {}
     // TODO: handle configuration properly
     async onModuleInit() {
+        const config = this.config.nvm()
         this.nevermined = await Nevermined.getInstance(config);
         const instanceConfig = {
             ...generateIntantiableConfigFromConfig(config),
@@ -72,7 +72,7 @@ export class NeverminedService {
             Logger.debug(`Serving URL ${url}`)
             // get url for DID
             if (url.startsWith('cid://')) {
-                url = FILECOIN_GATEWAY.replace(':cid', parseUrl(url))
+                url = this.config.get<string>('FILECOIN_GATEWAY').replace(':cid', parseUrl(url))
             }
             const param = url.split("/").slice(-1)[0]
             const filename = param.split("?")[0]
@@ -97,19 +97,19 @@ export class NeverminedService {
         filename = filename || 'data'
         try {
             const s3 = new AWS.S3({
-                accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
-                secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY,
-                endpoint: process.env.AWS_S3_ENDPOINT,
+                accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
+                secretAccessKey: this.config.get('AWS_S3_SECRET_ACCESS_KEY'),
+                endpoint: this.config.get('AWS_S3_ENDPOINT'),
                 s3ForcePathStyle: true,
                 signatureVersion: 'v4',
             })
             await s3.upload({
-                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
                 Key: filename,
                 Body: file,
             }).promise()
             const url = s3.getSignedUrl('getObject', {
-                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
                 Key: filename,
                 Expires: 3600*24,
             })
@@ -126,10 +126,10 @@ export class NeverminedService {
             const formData = new FormData()
             const blob = new Blob([file])
             formData.append('data', blob);
-            const res = await fetch('https://shuttle-4.estuary.tech/content/add', {
+            const res = await fetch(this.config.get('ESTUARY_ENDPOINT'), {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${process.env.ESTUARY_TOKEN}`,
+                    Authorization: `Bearer ${this.config.get('ESTUARY_TOKEN')}`,
                 },
                 body: formData as any
             })
