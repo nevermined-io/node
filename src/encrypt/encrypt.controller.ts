@@ -1,29 +1,10 @@
 import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
-import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { encrypt } from "../common/helpers/utils";
 import { Public } from '../common/decorators/auth.decorator';
-
-export class EncryptResult {
-    'public-key': string;
-    hash: string;
-    method: string;
-}
-
-export class EncryptDto {
-    @ApiProperty({
-        example: 'PSK-ECDSA',
-        description: 'Encryption method',
-    })
-    @IsString()
-    method: string;
-    @ApiProperty({
-        example: 'Hello!',
-        description: 'Encrypted message',
-    })
-    @IsString()
-    message: string;
-}
+import { Logger } from "@nevermined-io/nevermined-sdk-js";
+import { EncryptDto } from "./dto/encrypt";
+import { EncryptResult } from "./dto/result";
 
 @ApiTags('Encrypt')
 @Controller()
@@ -40,8 +21,10 @@ export class EncryptController {
   })
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {
+    Logger.debug('Serving encrypt');
     if (encryptData.method !== 'PSK-ECDSA' && encryptData.method !== 'PSK-RSA') {
-        throw new BadRequestException('Only PSK-ECDSA or PSK-RSA encryption allowed');
+      Logger.error(`Unknown encryption method ${encryptData.method}`);
+      throw new BadRequestException('Only PSK-ECDSA or PSK-RSA encryption allowed');
     }
     const { result, publicKey } = await encrypt(encryptData.message, encryptData.method);
     return {
