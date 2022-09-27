@@ -3,16 +3,16 @@ process.env.NODE_ENV = 'development';
 
 module.exports = {
   NODE_ENV: process.env.NODE_ENV,
-  JWT_SECRET_KEY: 'secret',
-  JWT_EXPIRY_KEY: '60m',
   server: {
     port: 8030,
   },
+  nvm: require("./nevermined").config,
   src: {
     root: 'src',
     fileExtension: 'ts',
   },
   security: {
     enableHttpsRedirect: false,
-  }
+  },
+  ... require('./from-env').config
 };
