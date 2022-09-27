@@ -10,36 +10,6 @@ import { RolesGuard } from './common/guards/auth/roles.guards';
 import { ConfigService } from './shared/config/config.service';
 import { Logger } from './shared/logger/logger.service';
 
-const createIndexes = (app: NestExpressApplication) => {
-  let connectionTries = 0;
-
-  /* eslint @typescript-eslint/no-misused-promises: 0 */
-  const tryConnectionInterval = setInterval(async () => {
-    try {
-      await Promise.all(
-        [].map(
-          async (service) => {
-            const serviceInstance = app.get(service);
-            const serviceIndexExits = await serviceInstance.checkIndex();
-
-            if (!serviceIndexExits) {
-              await serviceInstance.createIndex();
-            }
-          }
-        )
-      );
-      Logger.log('Marketplace API is connected to ElasticSearch');
-      clearInterval(tryConnectionInterval);
-    } catch {
-      Logger.log('Error to connect to ElasticSearch. Trying in 10s');
-      connectionTries += 1;
-      if (connectionTries >= 50) {
-        clearInterval(tryConnectionInterval);
-      }
-    }
-  }, 10000);
-};
-
 const bootstrap = async () => {
   const logger = new Logger(bootstrap.name);
 
@@ -54,8 +24,6 @@ const bootstrap = async () => {
   const packageJsonPath = path.join(__dirname, '..', 'package.json');
   const packageJsonString = readFileSync(packageJsonPath, 'utf8');
   const packageJson = JSON.parse(packageJsonString) as { version: string };
-
-  createIndexes(app);
 
   const options = new DocumentBuilder()
     .setTitle('Nevermined Gateway')

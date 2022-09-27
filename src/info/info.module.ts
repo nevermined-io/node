@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { ElasticModule } from '../shared/elasticsearch/elastic.module';
 import { InfoController } from './info.controller';
 
 @Module({
-  imports: [ElasticModule],
+  imports: [],
   providers: [],
   controllers: [InfoController],
   exports: [],

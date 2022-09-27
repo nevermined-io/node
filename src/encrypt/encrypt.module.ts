@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { EncryptController } from './encrypt.controller';
-import { ElasticModule } from '../shared/elasticsearch/elastic.module';
 
 @Module({
-  imports: [ElasticModule],
+  imports: [],
   providers: [],
   controllers: [EncryptController],
   exports: [],
