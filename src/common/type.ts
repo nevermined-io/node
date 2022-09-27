@@ -12,10 +12,6 @@ export enum Status {
   Pending = 'PENDING',
 }
 
-export enum SourceType {
-  Elasticsearch = 'Elasticsearch',
-}
-
 export enum State {
   Disabled = 'disabled',
   Unconfirmed = 'unconfirmed',
