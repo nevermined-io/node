@@ -23,8 +23,10 @@
     "postupgrade-interactive": "npm test"
   },
   "dependencies": {
+    "@elastic/elasticsearch": "^7.17.0",
     "@nestjs/common": "^8.4.0",
     "@nestjs/core": "^8.4.0",
+    "@nestjs/elasticsearch": "^8.1",    
     "@nestjs/jwt": "^8.0.0",
     "@nestjs/passport": "^8.2.1",
     "@nestjs/platform-express": "^8.4.1",

@@ -20,18 +20,13 @@ const createIndexes = (app: NestExpressApplication) => {
         [].map(
           async (service) => {
             const serviceInstance = app.get(service);
-            const serviceIndexExits = await serviceInstance.checkIndex();
-
-            if (!serviceIndexExits) {
-              await serviceInstance.createIndex();
-            }
           }
         )
       );
       Logger.log('Nevermined Gateway is up and running');
       clearInterval(tryConnectionInterval);
     } catch {
-      Logger.log('Error to connect to ElasticSearch. Trying in 10s');
+      Logger.log('Error starting up Gateway. Trying in 10s');
       connectionTries += 1;
       if (connectionTries >= 50) {
         clearInterval(tryConnectionInterval);
