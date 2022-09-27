@@ -4,15 +4,17 @@ import { Test } from '@nestjs/testing';
 import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard';
 import { InfoController } from './info.controller';
 import request from 'supertest';
+import { ConfigModule } from '../shared/config/config.module';
+import { NeverminedModule } from '../shared/nevermined/nvm.module';
 
 describe('Info', () => {
   let app: INestApplication;
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-        imports: [],
-        providers: [],
-        controllers: [InfoController],
-        exports: [],
+      imports: [ConfigModule, NeverminedModule],
+      providers: [],
+      controllers: [InfoController],
+      exports: [],
     }).compile();
     app = moduleRef.createNestApplication();
     app.useGlobalGuards(new JwtAuthGuard(new Reflector()));

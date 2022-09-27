@@ -9,7 +9,9 @@ module.exports = {
     root: 'dist',
     fileExtension: 'js',
   },
+  nvm: require("./nevermined").config,
   security: {
     enableHttpsRedirect: process.env.ENABLE_HTTPS_REDIRECT,
   },
+  ... require('./from-env').config
 };

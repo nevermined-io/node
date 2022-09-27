@@ -1,10 +1,10 @@
 import { ForbiddenException } from '@nestjs/common';
 import { ethers } from 'ethers';
-import { readFileSync } from 'fs';
 import { AuthRoles } from '../type';
 import crypto from 'crypto';
 import { encrypt as ec_encrypt, decrypt as ec_decrypt} from 'eciesjs';
 import NodeRSA from 'node-rsa';
+import { CryptoConfig } from '../../shared/config/config.service';
 
 export const checkOwnership = (userId: string, entityUserId: string, roles: AuthRoles[]) => {
   if (!roles.some((r) => r === AuthRoles.Admin) && userId !== entityUserId) {
@@ -80,11 +80,9 @@ export const aes_decryption_256 = (encrypted, password) => {
   return unpad(decrypted)
 }
 
-export const encrypt = async (cipherText: string, method: string): Promise<{publicKey: string, result: string}> => {
+export const encrypt = async (config: CryptoConfig, cipherText: string, method: string): Promise<{publicKey: string, result: string}> => {
   if (method === 'PSK-ECDSA') {
-    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
-    const provider_password = process.env['PROVIDER_PASSWORD'] || ''
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
+    const wallet = await ethers.Wallet.fromEncryptedJson(config.provider_key, config.provider_password)
     let ecdh = crypto.createECDH('secp256k1');
     ecdh.setPrivateKey(Buffer.from(wallet.privateKey.substring(2), 'hex'))
     const result = ec_encrypt(ecdh.getPublicKey(), Buffer.from(cipherText)).toString('binary')
@@ -94,8 +92,7 @@ export const encrypt = async (cipherText: string, method: string): Promise<{publ
     }
     return res
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(process.env['RSA_PUBKEY_FILE'] || '').toString()
-    const key = new NodeRSA(provider_key_file)
+    const key = new NodeRSA(config.provider_rsa_public)
     const aes_key = crypto.randomBytes(16)
     const encrypted_data = aes_encryption(cipherText, aes_key)
     const encrypted_aes_key = key.encrypt(aes_key)
@@ -106,17 +103,14 @@ export const encrypt = async (cipherText: string, method: string): Promise<{publ
   }
 };
 
-export const decrypt = async (cipherText: string, method: string) => {
+export const decrypt = async (config: CryptoConfig, cipherText: string, method: string) => {
   if (method === 'PSK-ECDSA') {
-    const provider_key_file = readFileSync(process.env['PROVIDER_KEYFILE'] || '').toString()
-    const provider_password = process.env['PROVIDER_PASSWORD'] || ''
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
+    const wallet = await ethers.Wallet.fromEncryptedJson(config.provider_key, config.provider_password)
     let ecdh = crypto.createECDH('secp256k1');
     ecdh.setPrivateKey(Buffer.from(wallet.privateKey.substring(2), 'hex'))
     return ec_decrypt(ecdh.getPrivateKey(), Buffer.from(cipherText, 'binary')).toString()
   } else if (method === 'PSK-RSA') {
-    const provider_key_file = readFileSync(process.env['RSA_PRIVKEY_FILE'] || '').toString()
-    const key = new NodeRSA(provider_key_file)
+    const key = new NodeRSA(config.provider_rsa_private)
     const [data, encrypted_aes_key] = cipherText.split('|')
     const aes_key = key.decrypt(Buffer.from(encrypted_aes_key, 'hex'))
     return aes_decryption(Buffer.from(data, 'hex').toString(), aes_key)

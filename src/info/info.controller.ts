@@ -5,24 +5,20 @@ import path from 'path';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
-import { Logger, Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../config';
 import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler';
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { ethers } from 'ethers';
 import NodeRSA from 'node-rsa';
-
-const getProviderBabyjub = () => {
-  return {
-    x: process.env.PROVIDER_BABYJUB_PUBLIC1 || '',
-    y: process.env.PROVIDER_BABYJUB_PUBLIC2 || '',
-    secret: process.env.PROVIDER_BABYJUB_SECRET || '',
-  };
-};
+import { NeverminedService } from '../shared/nevermined/nvm.service';
+import { ConfigService } from '../shared/config/config.service';
+import { Logger } from '../shared/logger/logger.service';
 
 @ApiTags('Info')
 @Controller()
 export class InfoController {
+  constructor(
+    private nvmService: NeverminedService,
+    private config: ConfigService
+  ) {}
   @Get()
   @ApiOperation({
     description: 'Get API info',
@@ -36,12 +32,8 @@ export class InfoController {
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
     Logger.debug('Serving info');
-    const nevermined = await Nevermined.getInstance(config);
-    const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
-      nevermined
-    };
-    const contractHandler = new ContractHandler(instanceConfig);
+    const nevermined = this.nvmService.getNevermined();
+    const contractHandler = new ContractHandler(this.nvmService.instanceConfig());
     const pathEndpoint = `${req.protocol}://${req.hostname}${req.client.localPort ? `:${req.client.localPort}` : ''}${
       req.url
     }`;
@@ -53,21 +45,21 @@ export class InfoController {
       provider
     ] = await nevermined.accounts.list();
 
-    const provider_key_file = readFileSync(process.env.PROVIDER_KEYFILE || '').toString();
-    const provider_password = process.env.PROVIDER_PASSWORD || '';
+    const provider_key_file = readFileSync(this.config.get<string>('PROVIDER_KEYFILE')).toString();
+    const provider_password = this.config.get<string>('PROVIDER_PASSWORD');
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password);
 
-    const rsa_key_file = readFileSync(process.env.RSA_PUBKEY_FILE || '').toString();
+    const rsa_key_file = readFileSync(this.config.get<string>('RSA_PUBKEY_FILE')).toString();
     const key = new NodeRSA(rsa_key_file);
 
-    const baby = getProviderBabyjub();
+    const baby = this.config.getProviderBabyjub();
     const artifactDir = './artifacts';
 
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
-      'keeper-url': config.nodeUri,
+      'keeper-url': this.nvmService.nodeUri(),
       contracts: [],
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion("DIDRegistry", artifactDir),
