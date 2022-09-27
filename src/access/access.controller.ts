@@ -1,7 +1,6 @@
 import { Body, Controller, Get, NotFoundException, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
-import { IsNumber, IsString } from "class-validator";
 import { Public } from "../common/decorators/auth.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
@@ -9,6 +8,10 @@ import { aes_encryption_256 } from "../common/helpers/utils";
 import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
 import { NeverminedService } from '../shared/nevermined/nvm.service';
+import { Logger } from '../shared/logger/logger.service';
+import { TransferDto } from "./dto/transfer";
+import { UploadDto } from "./dto/upload";
+
 export class UploadResult {
   @ApiProperty({
     description: 'Url of the uploaded file',
@@ -21,52 +24,6 @@ export class UploadResult {
     example: '1234#',
   })
   password?: string;
-}
-
-export class UploadDto {
-  @ApiProperty({
-    description: 'Encrypt uploaded data',
-    example: 'false',
-    required: false,
-  })
-  encrypt: string;
-}
-
-export class TransferDto {
-  @ApiProperty({
-    description: 'The agreement for NFT transfer',
-    example: '0x...'
-  })
-  @IsString()
-  agreementId: string;
-
-  @ApiProperty({
-    description: 'NFT holder address',
-    example: '0x...'
-  })
-  @IsString()
-  nftHolder: string;
-
-  @ApiProperty({
-    description: 'NFT receiver address',
-    example: '0x...'
-  })
-  @IsString()
-  nftReceiver: string;
-
-  @ApiProperty({
-    description: 'Number of NFTs to transfer',
-    example: '1'
-  })
-  @IsString()
-  nftAmount: string;
-
-  @ApiProperty({
-    description: 'Type of NFT',
-    example: '721'
-  })
-  @IsNumber()
-  nftType: number;
 }
 
 @ApiTags('Access')
@@ -124,9 +81,11 @@ export class AccessController {
     description: 'Return "success" if transfer worked',
   })
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
+    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined();
     const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
     if (!agreement) {
+      Logger.error(`Agreement ${transferData.agreementId} not found`)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
     }
     const params: ValidationParams = {
@@ -176,6 +135,7 @@ export class AccessController {
     let data = file.buffer;
     if (uploadData.encrypt) {
       // generate password
+      Logger.debug(`Uploading with password, filename ${file.filename}`)
       const password = crypto.randomBytes(32).toString('base64url');
       data = Buffer.from(aes_encryption_256(data, password));
       if (backend === 's3') {

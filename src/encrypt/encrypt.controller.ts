@@ -3,6 +3,7 @@ import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from "@nestjs/swagger
 import { IsString } from "class-validator";
 import { encrypt } from "../common/helpers/utils";
 import { Public } from '../common/decorators/auth.decorator';
+import { Logger } from "@nevermined-io/nevermined-sdk-js";
 
 export class EncryptResult {
     'public-key': string;
@@ -40,8 +41,10 @@ export class EncryptController {
   })
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {
+    Logger.debug('Serving encrypt')
     if (encryptData.method !== 'PSK-ECDSA' && encryptData.method !== 'PSK-RSA') {
-        throw new BadRequestException('Only PSK-ECDSA or PSK-RSA encryption allowed');
+      Logger.error(`Unknown encryption method ${encryptData.method}`)
+      throw new BadRequestException('Only PSK-ECDSA or PSK-RSA encryption allowed');
     }
     const { result, publicKey } = await encrypt(encryptData.message, encryptData.method);
     return {

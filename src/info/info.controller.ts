@@ -5,7 +5,7 @@ import path from 'path';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { Logger, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { config } from '../config';
 import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
@@ -35,6 +35,7 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
+    Logger.debug('Serving info')
     const nevermined = await Nevermined.getInstance(config);
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),

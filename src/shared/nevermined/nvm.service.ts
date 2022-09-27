@@ -9,6 +9,7 @@ import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
+import { Logger } from '../logger/logger.service';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -53,18 +54,19 @@ export class NeverminedService {
             const url: string = filelist[index].url
             return { url, content_type, dtp: service.attributes.main.isDTP }
         }
-        // TODO: add log
+        Logger.error(`Auth METHOD wasn't RSAES-OAEP`)
         throw new BadRequestException()
     }
-      
+
     async downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
+        Logger.debug(`Downloading asset from ${did} index ${index}`)
         try {
             let {url, content_type, dtp} = await this.getAssetUrl(did, index)
             if (dtp) {
                 return url
             }
             if (!url) {
-                // TODO: add log
+                Logger.error(`URL for did ${did} not found`)
                 throw new NotFoundException(`URL for did ${did} not found`)
             }
             console.log("URL", url)
@@ -84,13 +86,14 @@ export class NeverminedService {
             if (e instanceof NotFoundException) {
                 throw e
             } else {
-                // TODO: add log
+                Logger.error(``)
                 throw new InternalServerErrorException(e.toString())
             }
         }
     }
-      
+
     async uploadS3(file: Buffer, filename: string): Promise<string> {
+        Logger.debug(`Uploading to S3 ${filename}`)
         filename = filename || 'data'
         try {
             const s3 = new AWS.S3({
@@ -112,12 +115,14 @@ export class NeverminedService {
             })
             return url
         } catch (e) {
+            Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
             throw new InternalServerErrorException(e.response)
         }
     }
       
     async uploadFilecoin(file: Buffer, filename: string): Promise<string> {
         try {
+            Logger.debug(`Uploading to filecoin ${filename}`)
             const formData = new FormData()
             const blob = new Blob([file])
             formData.append('data', blob);
@@ -134,6 +139,7 @@ export class NeverminedService {
             }
             return 'cid://' + obj.cid
         } catch (e) {
+            Logger.error(`Uploading ${filename}: Filecoin error ${e.response}`)
             throw new InternalServerErrorException(e.response)
         }
     }
