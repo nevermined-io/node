@@ -15,7 +15,7 @@
     "dev": "./node_modules/.bin/ts-node-dev -r dotenv/config --respawn src/main",
     "test": "jest --setupFiles dotenv/config",
     "test:cov": "jest --setupFiles dotenv/config --coverage",
-    "typings:generate": "./node_modules/.bin/ts-node scripts/generate-typings",
+    "typings:generate": "./node_modules/.bin/ts-node scripts/generate-typings"
   },
   "dependencies": {
     "@nestjs/common": "^8.4.0",
