@@ -38,14 +38,14 @@ jobs:
         export PROVIDER_KEYFILE=accounts/provider.json
         export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
         export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
-        export PROVIDER_BABYJUB_SECRET=abc
-        export BUYER_BABYJUB_SECRET=abd
-        export PROVIDER_BABYJUB_PUBLIC1=0x2e3133fbdaeb5486b665ba78c0e7e749700a5c32b1998ae14f7d1532972602bb
-        export PROVIDER_BABYJUB_PUBLIC2=0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561
-        export BUYER_BABYJUB_PUBLIC1=0x0d7cdd240c2f5b0640839c49fbaaf016a8c5571b8f592e2b62ea939063545981
-        export BUYER_BABYJUB_PUBLIC2=0x14b14fa0a30ec744dde9f32d519c65ebaa749bfe991a32deea44b83a4e5c65bb
+        export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
+        export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
+        export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+        export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+        export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+        export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
         export NO_GRAPH=true
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        export SEED_WORDS=${{ secrets.seedWords }}
         export PROVIDER_PASSWORD=secret
         yarn run setup:dev
         # HDWalletProvider keeps jest from exiting
@@ -55,22 +55,21 @@ jobs:
         export PROVIDER_KEYFILE=accounts/provider.json
         export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
         export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
-        export PROVIDER_BABYJUB_SECRET=abc
-        export BUYER_BABYJUB_SECRET=abd
-        export PROVIDER_BABYJUB_PUBLIC1=0x2e3133fbdaeb5486b665ba78c0e7e749700a5c32b1998ae14f7d1532972602bb
-        export PROVIDER_BABYJUB_PUBLIC2=0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561
-        export BUYER_BABYJUB_PUBLIC1=0x0d7cdd240c2f5b0640839c49fbaaf016a8c5571b8f592e2b62ea939063545981
-        export BUYER_BABYJUB_PUBLIC2=0x14b14fa0a30ec744dde9f32d519c65ebaa749bfe991a32deea44b83a4e5c65bb
+        export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
+        export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
+        export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+        export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+        export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+        export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
         export NO_GRAPH=true
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        export SEED_WORDS=${{ secrets.seedWords }}
         export PROVIDER_PASSWORD=secret
-        export ESTUARY_TOKEN="EST651aa3a7-4756-4bd9-a563-1cdd54229f64ARY"
+        export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
         yarn run start &
     - uses: actions/checkout@v3
       with:
         repository: nevermined-io/sdk-dtp
         path: sdk-dtp
-        ref: feat/service-refactor
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK-DTP
       run: |
@@ -85,7 +84,6 @@ jobs:
       with:
         repository: nevermined-io/sdk-js
         path: sdk-js
-        ref: feat/service-refactor
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK
       run: |

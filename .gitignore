@@ -393,6 +393,7 @@ Temporary Items
 dist
 development.env
 /config/local.js
+package-lock.json
 yarn.lock
 .vscode
 tsconfig.build.
