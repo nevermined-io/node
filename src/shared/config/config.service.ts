@@ -23,15 +23,6 @@ const DOTENV_SCHEMA = Joi.object({
   }).default({
     enableHttpsRedirect: false,
   }),
-  elasticsearch: Joi.object({
-    node: Joi.string().default('http://localhost:9200'),
-    auth: Joi.object({
-      username: Joi.string().required().error(new Error('CLUSTER_NAME is required!')),
-      password: Joi.string(),
-    }).error(new Error('auth of elasticsearch need to be set')),
-  })
-    .required()
-    .error(new Error('The config of elasticsearch need to be set')),
 });
 
 type DotenvSchemaKeys =
@@ -40,10 +31,7 @@ type DotenvSchemaKeys =
   | 'database.url'
   | 'JWT_SECRET_KEY'
   | 'JWT_EXPIRY_KEY'
-  | 'security.enableHttpsRedirect'
-  | 'elasticsearch.node'
-  | 'elasticsearch.auth.username'
-  | 'elasticsearch.auth.password';
+  | 'security.enableHttpsRedirect';
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
