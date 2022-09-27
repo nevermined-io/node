@@ -5,12 +5,11 @@ import path from 'path';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
-import { Logger, Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { config } from '../config';
+import { Logger } from '@nevermined-io/nevermined-sdk-js';
 import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler';
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { ethers } from 'ethers';
 import NodeRSA from 'node-rsa';
+import { NeverminedService } from '../shared/nevermined/nvm.service';
 
 const getProviderBabyjub = () => {
   return {
@@ -23,6 +22,9 @@ const getProviderBabyjub = () => {
 @ApiTags('Info')
 @Controller()
 export class InfoController {
+  constructor(
+    private nvmService: NeverminedService,
+  ) {}
   @Get()
   @ApiOperation({
     description: 'Get API info',
@@ -36,12 +38,8 @@ export class InfoController {
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
     Logger.debug('Serving info');
-    const nevermined = await Nevermined.getInstance(config);
-    const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
-      nevermined
-    };
-    const contractHandler = new ContractHandler(instanceConfig);
+    const nevermined = this.nvmService.getNevermined()
+    const contractHandler = new ContractHandler(this.nvmService.instanceConfig());
     const pathEndpoint = `${req.protocol}://${req.hostname}${req.client.localPort ? `:${req.client.localPort}` : ''}${
       req.url
     }`;
@@ -67,7 +65,7 @@ export class InfoController {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
-      'keeper-url': config.nodeUri,
+      'keeper-url': this.nvmService.nodeUri(),
       contracts: [],
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion("DIDRegistry", artifactDir),

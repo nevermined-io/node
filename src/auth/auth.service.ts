@@ -3,9 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { JWTPayload } from 'jose';
 import { LoginDto } from './dto/login.dto';
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { config } from '../config';
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
@@ -40,12 +37,7 @@ export class AuthService {
   }
 
   async validateTransferProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
-    const nevermined = this.nvmService.getNevermined();
-    const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
-      nevermined
-    };
-    const dtp = await Dtp.getInstance(instanceConfig);
+    const dtp = this.nvmService.getDtp();
     const buyerPub = new BabyjubPublicKey(zeroX(buyer.substring(0,64)), zeroX(buyer.substring(64,128)));
     if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
       throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);

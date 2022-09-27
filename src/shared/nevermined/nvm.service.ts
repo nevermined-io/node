@@ -27,6 +27,7 @@ function parseUrl(url: string): string {
 @Injectable()
 export class NeverminedService {
     nevermined: Nevermined;
+    dtp: Dtp;
     constructor(private config: ConfigService) {}
     // TODO: handle configuration properly
     async onModuleInit() {
@@ -36,11 +37,25 @@ export class NeverminedService {
             ...generateIntantiableConfigFromConfig(config),
             nevermined: this.nevermined,
         };
-        await Dtp.getInstance(instanceConfig);
+        this.dtp = await Dtp.getInstance(instanceConfig);
     }
     getNevermined() {
         return this.nevermined
     }
+    getDtp() {
+        return this.dtp
+    }
+    instanceConfig() {
+        const instanceConfig = {
+          ...generateIntantiableConfigFromConfig(this.config.nvm()),
+          nevermined: this.nevermined
+        }
+        return instanceConfig
+    }
+    nodeUri(): string {
+        return this.config.nvm().nodeUri
+    }
+    
     async getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
         // get url for DID
         const asset = await this.nevermined.assets.resolve(did)
