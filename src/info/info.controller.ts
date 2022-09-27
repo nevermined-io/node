@@ -5,25 +5,19 @@ import path from 'path';
 import { Public } from '../common/decorators/auth.decorator';
 import { Request } from '../common/helpers/request.interface';
 import { GetInfoDto } from './dto/get-info.dto';
-import { Logger } from '@nevermined-io/nevermined-sdk-js';
 import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler';
 import { ethers } from 'ethers';
 import NodeRSA from 'node-rsa';
 import { NeverminedService } from '../shared/nevermined/nvm.service';
-
-const getProviderBabyjub = () => {
-  return {
-    x: process.env.PROVIDER_BABYJUB_PUBLIC1 || '',
-    y: process.env.PROVIDER_BABYJUB_PUBLIC2 || '',
-    secret: process.env.PROVIDER_BABYJUB_SECRET || '',
-  };
-};
+import { ConfigService } from '../shared/config/config.service';
+import { Logger } from '../shared/logger/logger.service';
 
 @ApiTags('Info')
 @Controller()
 export class InfoController {
   constructor(
     private nvmService: NeverminedService,
+    private config: ConfigService
   ) {}
   @Get()
   @ApiOperation({
@@ -51,14 +45,14 @@ export class InfoController {
       provider
     ] = await nevermined.accounts.list();
 
-    const provider_key_file = readFileSync(process.env.PROVIDER_KEYFILE || '').toString();
-    const provider_password = process.env.PROVIDER_PASSWORD || '';
+    const provider_key_file = readFileSync(this.config.get<string>('PROVIDER_KEYFILE')).toString();
+    const provider_password = this.config.get<string>('PROVIDER_PASSWORD');
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password);
 
-    const rsa_key_file = readFileSync(process.env.RSA_PUBKEY_FILE || '').toString();
+    const rsa_key_file = readFileSync(this.config.get<string>('RSA_PUBKEY_FILE')).toString();
     const key = new NodeRSA(rsa_key_file);
 
-    const baby = getProviderBabyjub();
+    const baby = this.config.getProviderBabyjub();
     const artifactDir = './artifacts';
 
     return {

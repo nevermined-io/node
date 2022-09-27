@@ -11,6 +11,10 @@ export interface EnvConfig {
   nvm: any
 }
 
+export interface CryptoConfig {
+  
+}
+
 const configProfile = require('../../../config');
 
 const DOTENV_SCHEMA = Joi.object({
@@ -77,6 +81,14 @@ export class ConfigService {
 
   nvm(): Config {
     return this.envConfig.nvm
+  }
+
+  getProviderBabyjub() {
+    return {
+      x: this.envConfig.PROVIDER_BABYJUB_PUBLIC1 || '',
+      y: this.envConfig.PROVIDER_BABYJUB_PUBLIC2 || '',
+      secret: this.envConfig.PROVIDER_BABYJUB_SECRET || '',
+    };
   }
 
   private validateInput(envConfig: EnvConfig): EnvConfig {
