@@ -15,14 +15,28 @@
 - Make sure you've installed [docker](https://www.docker.com/products/docker-desktop)
 - Make sure you've installed NodeJS version. You can see the version in the `nvmrc` file
 - You can also install [nvm](https://github.com/nvm-sh/nvm) in order to switch between different node versions
-- Set npm to install internal packages. See guide [here](https://coachhub.atlassian.net/wiki/spaces/ENG/pages/21692438/github)
+- Set yarn to install internal packages
 
 ### Install dependencies
 
 Install all necessary dependencies via:
 
 ```bash
-npm install
+yarn
+```
+
+### Build and lint
+
+You can build the project running
+
+```bash
+yarn build
+```
+
+And check the linter
+
+```bash
+yarn lint
 ```
 
 ### Copy profile configuration
@@ -30,71 +44,54 @@ npm install
 Copy the local profile configuration via:
 
 ```bash
-npm run setup:dev
+yarn setup:dev
 ```
 
 This will leave you with a `local.js` file within the `config` folder that will be used as the profile configuration.
 
-### Setting up the database
+### Environment variables
 
-There are few options while it comes to database setup.
+The Gateway reads the following environment variables allowing the configuration of the deployment without modifying any config file:
 
-1. **<u>Run Database Locally</u>**:
+| Variable Name     | Information      | Example
 
-   - You can setup a elastic search database locally.
-   - Then update the credentials in your local.js file from previous step as:
+| Variable Name      | Description          | Example                |
+| ------------------ | -------------------- | ---------------------- |
+| **NETWORK_NAME**     | Network where the Gateway will be connected            | `mumbai`
+| **KEEPER_URL**     | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx
+| **MARKETPLACE_API_URL**     | HTTP url to the Marketplace API                 | https://marketplace-api.mumbai.public.nevermined.rocks
+| **GATEWAY_URL**     | Public HTTP url where this gateway is exposed                 | https://gateway.mumbai.public.nevermined.rocks
+| **PORT**     | Local Port the Gateway will be listen to            | `8030`
+| **GATEWAY_ADDRESS** | Public address of the gateway used to send transactions to the blockchain                 | `0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0`
+| **PROVIDER_KEYFILE**     | Path to the file where is store the private key of the Gateway credentials                 | `/mnt/credentials/keyfile.json`
+| **PROVIDER_PASSWORD**     | Password of the `PROVIDER_KEYFILE`                 | `passwd`
+| **PROVIDER_BABYJUB_SECRET**     | Secret of the babyjub algorightm used for DTP                 | `abc`
+| **PROVIDER_BABYJUB_PUBLIC1**     | Babyjub public key #1 | `0x2e3133fbdaeb5486b665ba78c0e7e749700a5c32b1998ae14f7d1532972602bb`
+| **PROVIDER_BABYJUB_PUBLIC2**     | Babyjub public key #2 | `0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561`
+| **RSA_PUBKEY_FILE**     | File having the RSA public key. The Gateway RSA credentials can be used for encrypting/decrypting files | `/accounts/rsa_pub_key.pem`
+| **RSA_PRIVKEY_FILE**     | File having the RSA private keys  | `/accounts/rsa_priv_key.pem`
 
-   ```javascript
-   elasticsearch: {
-      node: ''
-      auth: {
-         username: 'elastic',
-         password: 'password',
-      }
-   },
-   ```
+| **GRAPH_URL**     | Public URL of the Nevermined subgraphs                 | 
+| **NO_GRAPH**     | If `true` the gateway will read events from the blockchain node instead of from the subgraphs. Depending on the network there could be a limit on the number of blocks to scan.                 | `false`
+| **FILECOIN_GATEWAY**     | Public Filecoin gateway that can be used to fech content. The `:cid` part of the url will be replace by the file `cid`   | https://dweb.link/ipfs/:cid
+| **ESTUARY_TOKEN**     | Estuary is a service that facilitates the interaction with Filecoin. This variable must include the token to use their API. See more here: https://estuary.tech/   | `EST651aa3a7-4756-4bd9-a563-1cdd565894645`
+| **AWS_S3_ACCESS_KEY_ID**     | Amazon S3 Access Key Id | `4535hnj43`
+| **AWS_S3_SECRET_ACCESS_KEY**     | Amazon S3 Secret Access Key | `4535hnj43`
+| **AWS_S3_ENDPOINT**     | Amazon S3 Endpoint url | `https://s3.eu-west-1.amazonaws.com`
+| **AWS_S3_BUCKET_NAME**     | Name of the S3 Bucket     | `metadata`
 
-   - Your onboarding buddy can share a copy of database dump with you for the initial data
-
-2. <u>**Run from Docker**</u>:
-
-   - Create .env file:
-   ```
-   # Password for the 'elastic' user (at least 6 characters)
-   ELASTIC_PASSWORD=[YOUR PASSWORD]
-
-   ELASTIC_USERNAME=[YOUR USERNAME]
-   ```
-   - Make sure you installed docker
-   - From project root in terminal run
-
-   ```javascript
-      docker-compose up
-   ```
 
 ## Install and run:
 
 ```javascript
-npm run dev
+yarn dev
 ```
 
 ### Build production environment
 
 ```bash
-npm build
+yarn build
 ```
-
-### Directory structure
-
-```
-- src
-  - greeting          # Domain model, more specifically, an aggregate, where cat is the root aggregate (example endpoint)
-  - common        # Cross-cutting functionality, like guards, middleware or interceptors
-  - shared        # Modules and services that are used shared between services (Elasticsearch service is include here for example)
-- config          # Configuration per profile
-```
-
-
 
 ## License
 
