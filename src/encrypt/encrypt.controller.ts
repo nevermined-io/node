@@ -1,11 +1,11 @@
 import { BadRequestException, Body, Controller, Post } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import { encrypt } from "../common/helpers/utils";
 import { Public } from '../common/decorators/auth.decorator';
 import { Logger } from "@nevermined-io/nevermined-sdk-js";
 import { EncryptDto } from "./dto/encrypt";
 import { EncryptResult } from "./dto/result";
 import { ConfigService } from "../shared/config/config.service";
+import { encrypt } from "@nevermined-io/nevermined-sdk-dtp";
 
 @ApiTags('Encrypt')
 @Controller()

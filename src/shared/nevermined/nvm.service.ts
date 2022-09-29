@@ -3,13 +3,13 @@ import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import { decrypt } from '../../common/helpers/utils';
 import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 import { Logger } from '../logger/logger.service';
 import { ConfigService } from '../config/config.service';
+import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -37,7 +37,7 @@ export class NeverminedService {
             ...generateIntantiableConfigFromConfig(config),
             nevermined: this.nevermined,
         };
-        this.dtp = await Dtp.getInstance(instanceConfig);
+        this.dtp = await Dtp.getInstance(instanceConfig, this.config.cryptoConfig());
     }
     getNevermined() {
         return this.nevermined

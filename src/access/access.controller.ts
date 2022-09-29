@@ -4,7 +4,7 @@ import { Request } from '../common/helpers/request.interface';
 import { Public } from "../common/decorators/auth.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
-import { aes_encryption_256 } from "../common/helpers/utils";
+import { aes_encryption_256 } from "@nevermined-io/nevermined-sdk-dtp";
 import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
 import { NeverminedService } from '../shared/nevermined/nvm.service';
