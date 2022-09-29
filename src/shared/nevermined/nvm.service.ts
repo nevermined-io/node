@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { DDO, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
 import download from 'download';
 import AWS from 'aws-sdk';
@@ -58,7 +58,13 @@ export class NeverminedService {
     
     async getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
         // get url for DID
-        const asset = await this.nevermined.assets.resolve(did)
+        let asset: DDO
+        try {
+            asset = await this.nevermined.assets.resolve(did)
+        } catch (e) {
+            Logger.error(`Cannot resolve DID ${did}`)
+            throw new BadRequestException(`No such DID ${did}`)
+        }
         const service = asset.findServiceByType('metadata')
         const file_attributes = service.attributes.main.files[index]
         const content_type = file_attributes.contentType
@@ -75,36 +81,27 @@ export class NeverminedService {
 
     async downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
         Logger.debug(`Downloading asset from ${did} index ${index}`)
-        try {
-            let {url, content_type, dtp} = await this.getAssetUrl(did, index)
-            if (dtp) {
-                return url
-            }
-            if (!url) {
-                Logger.error(`URL for did ${did} not found`)
-                throw new NotFoundException(`URL for did ${did} not found`)
-            }
-            Logger.debug(`Serving URL ${url}`)
-            // get url for DID
-            if (url.startsWith('cid://')) {
-                url = this.config.get<string>('FILECOIN_GATEWAY').replace(':cid', parseUrl(url))
-            }
-            const param = url.split("/").slice(-1)[0]
-            const filename = param.split("?")[0]
-            const contents: Buffer = await download(url)
-            res.set({
-                'Content-Type': content_type,
-                'Content-Disposition': `attachment;filename=${filename}`,
-            });
-            return new StreamableFile(contents)
-        } catch (e) {
-            if (e instanceof NotFoundException) {
-                throw e
-            } else {
-                Logger.error(``)
-                throw new InternalServerErrorException(e.toString())
-            }
+        let {url, content_type, dtp} = await this.getAssetUrl(did, index)
+        if (dtp) {
+            return url
         }
+        if (!url) {
+            Logger.error(`URL for did ${did} not found`)
+            throw new NotFoundException(`URL for did ${did} not found`)
+        }
+        Logger.debug(`Serving URL ${url}`)
+        // get url for DID
+        if (url.startsWith('cid://')) {
+            url = this.config.get<string>('FILECOIN_GATEWAY').replace(':cid', parseUrl(url))
+        }
+        const param = url.split("/").slice(-1)[0]
+        const filename = param.split("?")[0]
+        const contents: Buffer = await download(url)
+        res.set({
+            'Content-Type': content_type,
+            'Content-Disposition': `attachment;filename=${filename}`,
+        });
+        return new StreamableFile(contents)
     }
 
     async uploadS3(file: Buffer, filename: string): Promise<string> {
