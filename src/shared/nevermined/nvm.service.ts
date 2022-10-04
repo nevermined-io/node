@@ -95,21 +95,25 @@ export class NeverminedService {
             const filename = param.split("?")[0]
             const contents: Buffer = await download(url)
 
-            if (this.config.get<boolean>('ENABLE_PROVENANCE'))  {
-                const [from] = await this.nevermined.accounts.list()
-                const provId = utils.generateId()
-                await this.nevermined.provenance.used(
-                    provId,
-                    didTo0xId(did),
-                    userAddress,
-                    utils.generateId(),
-                    ethers.utils.hexZeroPad('0x0', 32),
-                    'download',
-                    from
-                )
-                Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
-
+            try {
+                if (this.config.get<boolean>('ENABLE_PROVENANCE'))  {
+                    const [from] = await this.nevermined.accounts.list()
+                    const provId = utils.generateId()
+                    await this.nevermined.provenance.used(
+                        provId,
+                        didTo0xId(did),
+                        userAddress,
+                        utils.generateId(),
+                        ethers.utils.hexZeroPad('0x0', 32),
+                        'download',
+                        from
+                    )
+                    Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
+                }
+            } catch (error) {
+                Logger.warn(`Unable to register on-chain provenance: ${error.toString()}`)
             }
+            
 
             res.set({
                 'Content-Type': content_type,
