@@ -117,3 +117,11 @@ export const decrypt = async (config: CryptoConfig, cipherText: string, method: 
   }
 };
 
+
+export const didTo0xId = (did: string): string => {
+  return '0x' + did.replace('did:nv:', '');
+};
+
+export const didToShortId = (did: string): string => {
+  return did.replace('did:nv:', '');
+};

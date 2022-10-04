@@ -2,14 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { utils } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import { decrypt } from '../../common/helpers/utils';
+import { decrypt, didTo0xId } from '../../common/helpers/utils';
 import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 import { Logger } from '../logger/logger.service';
 import { ConfigService } from '../config/config.service';
+import { ethers } from 'ethers';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -52,10 +54,10 @@ export class NeverminedService {
         }
         return instanceConfig
     }
-    nodeUri(): string {
+    nodeUri(): string {        
         return this.config.nvm().nodeUri
-    }
-    
+    } 
+
     async getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
         // get url for DID
         const asset = await this.nevermined.assets.resolve(did)
@@ -73,7 +75,7 @@ export class NeverminedService {
         throw new BadRequestException()
     }
 
-    async downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
+    async downloadAsset(did: string, index: number, res: any, userAddress: string): Promise<StreamableFile|string> {
         Logger.debug(`Downloading asset from ${did} index ${index}`)
         try {
             let {url, content_type, dtp} = await this.getAssetUrl(did, index)
@@ -92,6 +94,23 @@ export class NeverminedService {
             const param = url.split("/").slice(-1)[0]
             const filename = param.split("?")[0]
             const contents: Buffer = await download(url)
+
+            if (this.config.get<boolean>('ENABLE_PROVENANCE'))  {
+                const [from] = await this.nevermined.accounts.list()
+                const provId = utils.generateId()
+                await this.nevermined.provenance.used(
+                    provId,
+                    didTo0xId(did),
+                    userAddress,
+                    utils.generateId(),
+                    ethers.utils.hexZeroPad('0x0', 32),
+                    'download',
+                    from
+                )
+                Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
+
+            }
+
             res.set({
                 'Content-Type': content_type,
                 'Content-Disposition': `attachment;filename=${filename}`,

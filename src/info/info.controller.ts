@@ -53,13 +53,16 @@ export class InfoController {
     const key = new NodeRSA(rsa_key_file);
 
     const baby = this.config.getProviderBabyjub();
-    const artifactDir = './artifacts';
+    const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE');
+    const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER');
 
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
       'keeper-url': this.nvmService.nodeUri(),
+      'provenance-enabled': provenanceEnabled,
+      'artifacts-folder': artifactDir,
       contracts: [],
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion("DIDRegistry", artifactDir),

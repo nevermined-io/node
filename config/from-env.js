@@ -22,6 +22,9 @@ const keys = [
     'AWS_S3_BUCKET_NAME',
     'FILECOIN_GATEWAY',
     'ESTUARY_ENDPOINT',
+    'ENABLE_PROVENANCE',
+    'ARTIFACTS_FOLDER'
+
 ]
 
 const config = {}
