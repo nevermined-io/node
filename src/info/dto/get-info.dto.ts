@@ -20,6 +20,8 @@ export class GetInfoDto {
   docs: string;
   network: string;
   'keeper-url': string;
+  'provenance-enabled': boolean;
+  'artifacts-folder': string;
   contracts: any;
   'external-contracts': any;
   'keeper-version': string;

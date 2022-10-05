@@ -79,7 +79,8 @@ The Gateway reads the following environment variables allowing the configuration
 | **AWS_S3_SECRET_ACCESS_KEY**     | Amazon S3 Secret Access Key | `4535hnj43`
 | **AWS_S3_ENDPOINT**     | Amazon S3 Endpoint url | `https://s3.eu-west-1.amazonaws.com`
 | **AWS_S3_BUCKET_NAME**     | Name of the S3 Bucket     | `metadata`
-
+| **ENABLE_PROVENANCE**     | If `true` it will enable the integration with the provenance registry     | `true` or `false`
+| **ARTIFACTS_FOLDER**     | Path where the gateway will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder
 
 ## Install and run:
 
