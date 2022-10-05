@@ -4,7 +4,7 @@ import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-s
 import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { utils } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import { decrypt, didTo0xId } from '../../common/helpers/utils';
+import { decrypt } from '../../common/helpers/utils';
 import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
@@ -12,6 +12,7 @@ import { Blob } from 'buffer';
 import { Logger } from '../logger/logger.service';
 import { ConfigService } from '../config/config.service';
 import { ethers } from 'ethers';
+import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)')
 
@@ -101,7 +102,7 @@ export class NeverminedService {
                     const provId = utils.generateId()
                     await this.nevermined.provenance.used(
                         provId,
-                        didTo0xId(did),
+                        didZeroX(did),
                         userAddress,
                         utils.generateId(),
                         ethers.utils.hexZeroPad('0x0', 32),
