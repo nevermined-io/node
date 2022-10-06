@@ -82,12 +82,12 @@ export class NeverminedService {
     async downloadAsset(did: string, index: number, res: any): Promise<StreamableFile|string> {
         Logger.debug(`Downloading asset from ${did} index ${index}`)
         let {url, content_type, dtp} = await this.getAssetUrl(did, index)
-        if (dtp) {
-            return url
-        }
         if (!url) {
             Logger.error(`URL for did ${did} not found`)
             throw new NotFoundException(`URL for did ${did} not found`)
+        }
+        if (dtp) {
+            return url
         }
         Logger.debug(`Serving URL ${url}`)
         // get url for DID
