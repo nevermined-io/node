@@ -1096,11 +1096,12 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@./dtp-3.tgz":
-  version "0.0.7"
-  resolved "./dtp-3.tgz#766964dc207c06b632b8ce33774af37b20f8cc8b"
+"@nevermined-io/nevermined-sdk-dtp@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.0.8.tgz#dc074bee42104946a19402fe74edc9f16fedc2bf"
+  integrity sha512-nYxXHboYbTVpHWt08Gl8rxL5Ii5fHSJaVOruW/ipKm0eh4khCM4sGGqlErd6C1nptRtQALB6M31yTXqRL2vVCw==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "./sdk-3.tgz"
+    "@nevermined-io/nevermined-sdk-js" "^0.24.1"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1108,9 +1109,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@./sdk-3.tgz":
+"@nevermined-io/nevermined-sdk-js@^0.24.1":
   version "0.24.1"
-  resolved "./sdk-3.tgz#0a6f27eac6e85376f8473f7a7bd162f597332da7"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.24.1.tgz#78c93d1862970c46853cf50dc62ad0bb41d14b27"
+  integrity sha512-QK3CJogcrySheFe5grptBt7MuI5H0tBYmub3zwHI1qWgawOqSqboX1qM5l5dAI5xzLEbMCsHSuDQ1V7PByeDPQ==
   dependencies:
     "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"
