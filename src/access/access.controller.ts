@@ -1,10 +1,23 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Req, Response, StreamableFile, UploadedFile, UseInterceptors } from "@nestjs/common";
+import { 
+  BadRequestException,
+  Body, 
+  Controller,
+  Get, 
+  NotFoundException, 
+  Param, 
+  Post, 
+  Req, 
+  Response, 
+  StreamableFile, 
+  UploadedFile, 
+  UseInterceptors 
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from '../common/helpers/request.interface';
 import { Public } from "../common/decorators/auth.decorator";
 import { FileInterceptor } from "@nestjs/platform-express";
 import crypto from 'crypto';
-import { aes_encryption_256 } from "../common/helpers/utils";
+import { aes_encryption_256 } from "@nevermined-io/nevermined-sdk-dtp/dist/utils";
 import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
 import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
 import { NeverminedService } from '../shared/nevermined/nvm.service';
@@ -12,6 +25,7 @@ import { Logger } from '../shared/logger/logger.service';
 import { TransferDto } from "./dto/transfer";
 import { UploadDto } from "./dto/upload";
 import { UploadResult } from "./dto/upload-result";
+import { AgreementData } from "@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers";
 
 @ApiTags('Access')
 @Controller()
@@ -35,6 +49,9 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
+    if (!req.user.did) {
+      throw new BadRequestException('DID not specified');
+    }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
@@ -70,7 +87,13 @@ export class AccessController {
   async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`);
     const nevermined = this.nvmService.getNevermined();
-    const agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
+    let agreement: AgreementData;
+    try {
+      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId);
+    } catch (e) {
+      Logger.error(`Error resolving agreement ${transferData.agreementId}`);
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
+    }
     if (!agreement) {
       Logger.error(`Agreement ${transferData.agreementId} not found`);
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`);
@@ -104,6 +127,9 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
+    if (!req.user.did) {
+      throw new BadRequestException('DID not specified');
+    }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
@@ -119,6 +145,9 @@ export class AccessController {
     description: 'Return the url of asset',
   })
   async doUpload(@Body() uploadData: UploadDto, @Param('backend') backend: string, @UploadedFile() file: Express.Multer.File): Promise<UploadResult> {
+    if (!file) {
+      throw new BadRequestException('No file in request');
+    }
     let data = file.buffer;
     if (uploadData.encrypt) {
       // generate password

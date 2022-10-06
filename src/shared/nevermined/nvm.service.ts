@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
-import { Nevermined } from '@nevermined-io/nevermined-sdk-js';
+import { DDO, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { utils } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import { decrypt } from '../../common/helpers/utils';
 import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
 import { Logger } from '../logger/logger.service';
 import { ConfigService } from '../config/config.service';
+import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 
@@ -40,7 +40,7 @@ export class NeverminedService {
             ...generateIntantiableConfigFromConfig(config),
             nevermined: this.nevermined,
         };
-        this.dtp = await Dtp.getInstance(instanceConfig);
+        this.dtp = await Dtp.getInstance(instanceConfig, this.config.cryptoConfig());
     }
     getNevermined() {
         return this.nevermined
@@ -61,7 +61,13 @@ export class NeverminedService {
 
     async getAssetUrl(did: string, index: number): Promise<{url: string, content_type: string, dtp: boolean}> {
         // get url for DID
-        const asset = await this.nevermined.assets.resolve(did)
+        let asset: DDO
+        try {
+            asset = await this.nevermined.assets.resolve(did)
+        } catch (e) {
+            Logger.error(`Cannot resolve DID ${did}`)
+            throw new BadRequestException(`No such DID ${did}`)
+        }
         const service = asset.findServiceByType('metadata')
         const file_attributes = service.attributes.main.files[index]
         const content_type = file_attributes.contentType
@@ -80,12 +86,12 @@ export class NeverminedService {
         Logger.debug(`Downloading asset from ${did} index ${index}`)
         try {
             let {url, content_type, dtp} = await this.getAssetUrl(did, index)
-            if (dtp) {
-                return url
-            }
             if (!url) {
                 Logger.error(`URL for did ${did} not found`)
                 throw new NotFoundException(`URL for did ${did} not found`)
+            }
+            if (dtp) {
+                return url
             }
             Logger.debug(`Serving URL ${url}`)
             // get url for DID
