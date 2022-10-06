@@ -11,7 +11,7 @@ COPY src ./src
 COPY config ./config
 COPY package*.json ./
 COPY tsconfig* ./
-COPY .env.sample ./.env
+COPY .env.sample ./.env.sample
 COPY accounts ./accounts
 
 RUN yarn run setup:dev

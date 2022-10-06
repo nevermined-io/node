@@ -52,7 +52,7 @@ export class AccessController {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified');
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -71,7 +71,7 @@ export class AccessController {
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
   ): Promise<StreamableFile|string> {
-    return await this.nvmService.downloadAsset(req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
   @Post('nft-transfer')
@@ -130,7 +130,7 @@ export class AccessController {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified');
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res);
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
   @Post('upload/:backend')

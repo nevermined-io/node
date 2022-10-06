@@ -48,6 +48,8 @@ const DOTENV_SCHEMA = Joi.object({
   AWS_S3_SECRET_ACCESS_KEY: Joi.string(),
   AWS_S3_ENDPOINT: Joi.string(),
   AWS_S3_BUCKET_NAME: Joi.string(),
+  ENABLE_PROVENANCE: Joi.boolean().default(true),
+  ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
 });
 
 type DotenvSchemaKeys =
@@ -71,6 +73,8 @@ type DotenvSchemaKeys =
   | 'AWS_S3_SECRET_ACCESS_KEY'
   | 'AWS_S3_ENDPOINT'
   | 'AWS_S3_BUCKET_NAME'
+  | 'ENABLE_PROVENANCE'
+  | 'ARTIFACTS_FOLDER'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;

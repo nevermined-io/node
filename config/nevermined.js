@@ -10,7 +10,7 @@ const configBase = {
     faucetUri: process.env['FAUCET_URI'] || 'http://localhost:3001',
     gatewayUri: process.env['GATEWAY_URI'] || 'http://localhost:8030',
     gatewayAddress: process.env['GATEWAY_ADDRESS'] || '0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0',
-    artifactsFolder: './artifacts',
+    artifactsFolder: process.env['ARTIFACTS_FOLDER'] || './artifacts',
     marketplaceAuthToken: process.env['MARKETPLACE_AUTH_TOKEN'] || 'bogus',
     graphHttpUri: nograph
         ? undefined
