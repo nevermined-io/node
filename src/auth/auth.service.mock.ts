@@ -35,7 +35,7 @@ export class AuthService {
       .ethSign(wallet);
   
     return this.validateClaim(CLIENT_ASSERTION_TYPE, clientAssertion).access_token;
-  };
+  }
   
 
 }
