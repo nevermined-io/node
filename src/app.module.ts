@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EncryptModule } from './encrypt/encrypt.module';
 import { AccessModule } from './access/access.module';
 import { NeverminedModule } from './shared/nevermined/nvm.module';
+import { ComputeModule } from './compute/compute.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { NeverminedModule } from './shared/nevermined/nvm.module';
     AccessModule,
     AuthModule,
     NeverminedModule,
+    ComputeModule
   ],
 })
 export class ApplicationModule {
