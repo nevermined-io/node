@@ -23,7 +23,7 @@ async function fetch(...args) {
 
 function parseUrl(url: string): string {
     url = url.replace(/^cid:\/\//, '')
-    let parts = url.split(/[:@\/]/)
+    const parts = url.split(/[:@/]/)
     return parts.pop()
 }
 
@@ -85,6 +85,7 @@ export class NeverminedService {
     async downloadAsset(did: string, index: number, res: any, userAddress: string): Promise<StreamableFile|string> {
         Logger.debug(`Downloading asset from ${did} index ${index}`)
         try {
+            // eslint-disable-next-line prefer-const
             let {url, content_type, dtp} = await this.getAssetUrl(did, index)
             if (!url) {
                 Logger.error(`URL for did ${did} not found`)
