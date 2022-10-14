@@ -50,6 +50,7 @@ const DOTENV_SCHEMA = Joi.object({
   AWS_S3_BUCKET_NAME: Joi.string(),
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
+  ENABLE_COMPUTE: Joi.boolean().default(false)
 });
 
 type DotenvSchemaKeys =
@@ -75,6 +76,7 @@ type DotenvSchemaKeys =
   | 'AWS_S3_BUCKET_NAME'
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
+  | 'ENABLE_COMPUTE'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;

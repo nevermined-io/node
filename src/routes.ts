@@ -5,10 +5,13 @@ import { InfoModule } from './info/info.module';
 import { AccessModule } from './access/access.module';
 import { ComputeModule } from './compute/compute.module'
 
+const exposeCompute: boolean = Boolean(process.env.ENABLE_COMPUTE) === true || false
+
 export const routes: Routes = [
   { path: '/api/v1/gateway/services/encrypt', module: EncryptModule },
   { path: '/api/v1/gateway/services/oauth', module: AuthModule },
   { path: '/api/v1/gateway/services', module: AccessModule },
-  { path: '/api/v1/gateway/compute', module: ComputeModule },
   { path: '/', module: InfoModule },
 ];
+
+if (exposeCompute) routes.push({ path: '/api/v1/gateway/compute', module: ComputeModule })
