@@ -1111,12 +1111,12 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.0.8.tgz#dc074bee42104946a19402fe74edc9f16fedc2bf"
-  integrity sha512-nYxXHboYbTVpHWt08Gl8rxL5Ii5fHSJaVOruW/ipKm0eh4khCM4sGGqlErd6C1nptRtQALB6M31yTXqRL2vVCw==
+"@nevermined-io/nevermined-sdk-dtp@0.1.0-rc2":
+  version "0.1.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.1.0-rc2.tgz#b24445f730b8fb517da395bc63c78e6fc8abbbf3"
+  integrity sha512-l4I4DX2x7YnXv3TfNqLABJnOo7o51tKsLXpXwFx5NwbTFXT05SQAsbDMjuaz+lGtuKnd5rjslVV1bguSACcA3A==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "^0.24.1"
+    "@nevermined-io/nevermined-sdk-js" "0.25.0-rc4"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1124,12 +1124,11 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@^0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.24.1.tgz#78c93d1862970c46853cf50dc62ad0bb41d14b27"
-  integrity sha512-QK3CJogcrySheFe5grptBt7MuI5H0tBYmub3zwHI1qWgawOqSqboX1qM5l5dAI5xzLEbMCsHSuDQ1V7PByeDPQ==
+"@nevermined-io/nevermined-sdk-js@0.25.0-rc4":
+  version "0.25.0-rc4"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.25.0-rc4.tgz#dd9a7eeec4b0a8cdace313ef48a918837e90990d"
+  integrity sha512-Z7v9Jt4wCstMZO8DRj9kHBsZ6fNu3KMaXnbXMcB+GaAMhRqkuWsNNZDXJaa3LOcv1U94SwsRMPcf9+qfbuzHKw==
   dependencies:
-    "@nevermined-io/secret-store-client" "^0.0.16"
     "@nevermined-io/subgraphs" "0.4.1"
     assert "^2.0.0"
     codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
@@ -1148,13 +1147,6 @@
     url "^0.11.0"
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
-
-"@nevermined-io/secret-store-client@^0.0.16":
-  version "0.0.16"
-  resolved "https://registry.npmjs.org/@nevermined-io/secret-store-client/-/secret-store-client-0.0.16.tgz"
-  integrity sha512-2YJpxQ38iYToXtOUK3ta8HrAqZL0/sBOxznbZNZO0Dbo6w9e2oKdQivRMnzqkBBFCIyXWFiv3So/cWHGUHa65A==
-  dependencies:
-    node-fetch "^2.6.0"
 
 "@nevermined-io/subgraphs@0.4.1":
   version "0.4.1"
@@ -3611,12 +3603,7 @@ eslint-config-next@^12.3.1:
     eslint-plugin-react "^7.31.7"
     eslint-plugin-react-hooks "^4.5.0"
 
-eslint-config-prettier@8.5.0:
-  version "8.5.0"
-  resolved "https://registry.npmjs.org/eslint-config-prettier/-/eslint-config-prettier-8.5.0.tgz"
-  integrity sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==
-
-eslint-config-prettier@^8.5.0:
+eslint-config-prettier@8.5.0, eslint-config-prettier@^8.5.0:
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.5.0.tgz#5a81680ec934beca02c7b1a61cf8ca34b66feab1"
   integrity sha512-obmWKLUNCnhtQRKc+tmnYuQl0pFU1ibYJQ5BGhTVB08bHe9wC8qUeG7c08dj9XX+AuPj1YSGSQIHl1pnDHZR0Q==
@@ -6341,7 +6328,7 @@ node-emoji@1.11.0:
   dependencies:
     lodash "^4.17.21"
 
-node-fetch@2.6.7, node-fetch@^2.6.0, node-fetch@^2.6.1:
+node-fetch@2.6.7, node-fetch@^2.6.1:
   version "2.6.7"
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
