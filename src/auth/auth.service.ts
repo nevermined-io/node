@@ -8,15 +8,13 @@ import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
 import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
 import { NeverminedService } from '../shared/nevermined/nvm.service';
 import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
+import { Logger } from '@nevermined-io/nevermined-sdk-js';
 
 const BASE_URL = '/api/v1/gateway/services/';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private jwtService: JwtService,
-    private nvmService: NeverminedService,
-  ) {}
+  constructor(private jwtService: JwtService, private nvmService: NeverminedService) {}
 
   async validateOwner(did: string, consumer_address: string): Promise<void> {
     const nevermined = this.nvmService.getNevermined();
@@ -36,10 +34,16 @@ export class AuthService {
     }
   }
 
-  async validateTransferProof(agreement_id: string, did: string, consumer_address: string, buyer: string, babysig: Babysig): Promise<void> {
+  async validateTransferProof(
+    agreement_id: string,
+    did: string,
+    consumer_address: string,
+    buyer: string,
+    babysig: Babysig
+  ): Promise<void> {
     const dtp = this.nvmService.getDtp();
-    const buyerPub = new BabyjubPublicKey(zeroX(buyer.substring(0,64)), zeroX(buyer.substring(64,128)));
-    if (!await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig)) {
+    const buyerPub = new BabyjubPublicKey(zeroX(buyer.substring(0, 64)), zeroX(buyer.substring(64, 128)));
+    if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig))) {
       throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
     }
   }
@@ -54,7 +58,6 @@ export class AuthService {
    * - the hash function used. ES256K uses sha-256 while ethereum uses keccak
    **/
   async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
-
     if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
       throw new UnauthorizedException('Invalid "assertion_type"');
     }
@@ -67,8 +70,8 @@ export class AuthService {
         consumer_address: payload.iss,
         did: didZeroX(payload.did as string),
         agreement_id: payload.sub,
-        buyer: payload.buyer as string, 
-        babysig: payload.babysig as Babysig
+        buyer: payload.buyer as string,
+        babysig: payload.babysig as Babysig,
       };
 
       if (payload.aud === BASE_URL + 'access') {
@@ -84,8 +87,8 @@ export class AuthService {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
+      Logger.error(error);
       throw new UnauthorizedException(`The 'client_assertion' is invalid: ${(error as Error).message}`);
     }
   }
-
 }

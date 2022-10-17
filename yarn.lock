@@ -1111,10 +1111,10 @@
   dependencies:
     uuid "8.3.2"
 
-"@nevermined-io/nevermined-sdk-dtp@0.1.0-rc1":
-  version "0.1.0-rc1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.1.0-rc1.tgz#5b3f1293132fba9ed00fb053f0ae36ebf4e4d5fa"
-  integrity sha512-OICRnz5/WYFEW9BreN95hq5nLPuZeHEJaJp6+MImTcPiSSX4MF9bF1HT7JifcskfHlDcEhsqh9+vSfsymVWkMA==
+"@nevermined-io/nevermined-sdk-dtp@0.1.0-rc2":
+  version "0.1.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.1.0-rc2.tgz#b24445f730b8fb517da395bc63c78e6fc8abbbf3"
+  integrity sha512-l4I4DX2x7YnXv3TfNqLABJnOo7o51tKsLXpXwFx5NwbTFXT05SQAsbDMjuaz+lGtuKnd5rjslVV1bguSACcA3A==
   dependencies:
     "@nevermined-io/nevermined-sdk-js" "0.25.0-rc4"
     circomlibjs "^0.1.1"
