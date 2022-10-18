@@ -16,15 +16,12 @@ import {
   import { ComputeService } from './compute.service'
   //import { DDO } from "@nevermined-io/nevermined-sdk-js";
   import { InitDto } from "./dto/init";
-  //import {ApiClient, WorkflowServiceApi} from "argo_workflows_api"
   import { WorkflowServiceApi, ApiClient} from "argo_workflows_api"
   import {IoArgoprojWorkflowV1alpha1WorkflowCreateRequest} from  'argo_workflows_api'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service'
 
   const yaml = require('js-yaml');
-
-
 
   @ApiTags('Compute')
   @Controller()
