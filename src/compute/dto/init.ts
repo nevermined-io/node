@@ -14,6 +14,6 @@ export class InitDto {
       description: 'A Serialized Compute Workflow DDO',
       example: ''
     })
-    @IsString()
+   // @IsString()
     computeDdoString: string;
   }

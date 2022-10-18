@@ -1,29 +1,45 @@
 import { 
-    BadRequestException,
     Body, 
     Controller,
-    Get, 
-    NotFoundException, 
+    Get,  
     Param, 
     Post, 
     Req, 
     Response, 
-    StreamableFile, 
-    UploadedFile, 
-    UseInterceptors 
+    NotFoundException,
+    InternalServerErrorException,
   } from "@nestjs/common";
-  import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+  import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { Request } from '../common/helpers/request.interface';
-  import { NeverminedService } from '../shared/nevermined/nvm.service';
-  import { DDO } from "@nevermined-io/nevermined-sdk-js";
+  //import { NeverminedService } from '../shared/nevermined/nvm.service';
+  import { ComputeService } from './compute.service'
+  //import { DDO } from "@nevermined-io/nevermined-sdk-js";
   import { InitDto } from "./dto/init";
+  //import {ApiClient, WorkflowServiceApi} from "argo_workflows_api"
+  import { WorkflowServiceApi} from "argo_workflows_api"
+  import {IoArgoprojWorkflowV1alpha1WorkflowCreateRequest} from  'argo_workflows_api'
+  import { Logger } from '../shared/logger/logger.service';
+
+  const yaml = require('js-yaml');
+
+
 
   @ApiTags('Compute')
   @Controller()
   export class ComputeController {
   
-    constructor(private nvmService: NeverminedService) {}
+    /*
+    constructor(private nvmService: NeverminedService,
+                private computeService: ComputeService) {}
+                */
+
+    constructor(
+                    private computeService: ComputeService) {}
+
+
+    workflowServiceApi = new WorkflowServiceApi();
+
 
     @Post('init')
     @ApiOperation({
@@ -43,8 +59,13 @@ import {
         @Response({ passthrough: true }) res: string
     ): Promise<string> {
 
-        const ddo: DDO = DDO.deserialize(initData.computeDdoString)
-        return "Compute started";
+        let sampleWorkflow = this.computeService.readWorkflowTemplate()
+        const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ namespace: "argo", workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
+        const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, "argo")
+        return response.body
+
+        //const ddo: DDO = DDO.deserialize(initData.computeDdoString)
+       
     }
 
     @Get('info/:workflowID')
@@ -64,7 +85,16 @@ import {
         @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
-        return "Info of workflow: " + workflowID;
+
+        Logger.debug(`Getting information about workflow ${workflowID}`);
+
+        try {
+            const response = await this.workflowServiceApi.workflowServiceGetWorkflow("argo", workflowID, {})
+            return response.body.metadata
+        }catch(e) {
+            Logger.error(`Error trying to get information about workflow ${workflowID}`);
+            throw new NotFoundException(`Workflow ${workflowID} not found`);
+        }   
     }
 
     @Get('status/:workflowID')
@@ -84,7 +114,17 @@ import {
         @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
-        return "Status of workflow: " + workflowID;
+        
+        Logger.debug(`Getting status about workflow ${workflowID}`);
+
+        try {
+            const response = await this.workflowServiceApi.workflowServiceGetWorkflow("argo", workflowID, {})
+            return response.body
+        }catch(e) {
+            Logger.error(`Error trying to get status about workflow ${workflowID}`);
+            throw new NotFoundException(`Workflow ${workflowID} not found`);
+        }   
+        
     }
 
     @Get('stop/:workflowID')
@@ -143,7 +183,23 @@ import {
         @Req() req: Request<unknown>,
         @Response({ passthrough: true }) res: string
     ): Promise<string> {
-        return "List of workflows: ";
+
+        Logger.debug(`Getting list of workflows`);
+        try {
+            var opts = {};
+            const response = await this.workflowServiceApi.workflowServiceListWorkflows("argo", opts)
+            const result = []
+
+            response.body.items.forEach(element => {
+                result.push(element.metadata.name)
+            });
+            
+            return JSON.stringify(result)
+        }catch(e) {
+            Logger.error(`Error trying to get the list of status: ${e}`);
+            throw new InternalServerErrorException('There was an error trying to get the list of workflows');
+        }       
+       
     }
 
 
