@@ -17,7 +17,7 @@ import {
   //import { DDO } from "@nevermined-io/nevermined-sdk-js";
   import { InitDto } from "./dto/init";
   //import {ApiClient, WorkflowServiceApi} from "argo_workflows_api"
-  import { WorkflowServiceApi} from "argo_workflows_api"
+  import { WorkflowServiceApi, ApiClient} from "argo_workflows_api"
   import {IoArgoprojWorkflowV1alpha1WorkflowCreateRequest} from  'argo_workflows_api'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service'
@@ -35,12 +35,18 @@ import {
                 private computeService: ComputeService) {}
                 */
 
-    constructor(
-                private computeService: ComputeService,
-                private configService: ConfigService) {}
+    constructor(private computeService: ComputeService,
+                private configService: ConfigService)
+    {
+        let argoClient = ApiClient.instance
+        argoClient.basePath = this.configService.computeConfig().argo_host
+        argoClient.disableTlsCert = this.configService.computeConfig().disable_tls_cert
 
+    }
 
-    workflowServiceApi = new WorkflowServiceApi();
+    
+    private workflowServiceApi = new WorkflowServiceApi();
+    private argoNamespace = this.configService.computeConfig().argo_namespace
 
 
     @Post('init')
@@ -62,7 +68,7 @@ import {
     ): Promise<string> {
 
         let sampleWorkflow = this.computeService.readWorkflowTemplate()
-        const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ namespace: "argo", workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
+        const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ namespace: this.argoNamespace, workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
         const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, "argo")
         return response.body
 
@@ -91,7 +97,7 @@ import {
         Logger.debug(`Getting information about workflow ${workflowID}`);
 
         try {
-            const response = await this.workflowServiceApi.workflowServiceGetWorkflow("argo", workflowID, {})
+            const response = await this.workflowServiceApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, {})
             return response.body.metadata
         }catch(e) {
             Logger.error(`Error trying to get information about workflow ${workflowID}`);
@@ -120,7 +126,7 @@ import {
         Logger.debug(`Getting status about workflow ${workflowID}`);
 
         try {
-            const response = await this.workflowServiceApi.workflowServiceGetWorkflow("argo", workflowID, {})
+            const response = await this.workflowServiceApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, {})
             return response.body
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}`);
@@ -176,7 +182,7 @@ import {
     })
     @ApiResponse({
         status: 200,
-        description: 'Returns an object that contains the list of workflows',
+        description: 'Returns an object that contains the list of workflows IDs',
         type: String,
     })
     //@ApiBearerAuth('Authorization')
@@ -190,7 +196,7 @@ import {
 
         try {
             var opts = {};
-            const response = await this.workflowServiceApi.workflowServiceListWorkflows("argo", opts)
+            const response = await this.workflowServiceApi.workflowServiceListWorkflows(this.argoNamespace, opts)
             const result = []
 
             response.body.items.forEach(element => {
@@ -200,7 +206,7 @@ import {
             return JSON.stringify(result)
         }catch(e) {
             Logger.error(`Error trying to get the list of status: ${e}`);
-            throw new InternalServerErrorException('There was an error trying to get the list of workflows');
+            throw new InternalServerErrorException(`There was an error trying to get the list of workflows of namespace ${this.argoNamespace}`);
         }       
        
     }
