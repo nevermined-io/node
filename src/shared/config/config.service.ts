@@ -19,6 +19,13 @@ export interface CryptoConfig {
   provider_rsa_private: string,
 }
 
+export interface ComputeConfig {
+  enable_compute: boolean,
+  disable_tls_cert: boolean,
+  argo_host: string,
+  argo_namespace: string,
+}
+
 const configProfile = require('../../../config');
 
 const DOTENV_SCHEMA = Joi.object({
@@ -50,7 +57,10 @@ const DOTENV_SCHEMA = Joi.object({
   AWS_S3_BUCKET_NAME: Joi.string(),
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
-  ENABLE_COMPUTE: Joi.boolean().default(false)
+  ENABLE_COMPUTE: Joi.boolean().default(false),
+  DISABLE_TLS_CERT: Joi.boolean().default(false),
+  ARGO_HOST: Joi.string().default("http:localhost:2746/"),
+  ARGO_NAMESPACE: Joi.string().default("argo")
 });
 
 type DotenvSchemaKeys =
@@ -77,10 +87,14 @@ type DotenvSchemaKeys =
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
   | 'ENABLE_COMPUTE'
+  | 'DISABLE_TLS_CERT'
+  | 'ARGO_HOST'
+  | 'ARGO_NAMESPACE' 
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
   private readonly crypto: CryptoConfig
+  private readonly compute: ComputeConfig
 
   constructor() {
     this.envConfig = this.validateInput(configProfile);
@@ -89,6 +103,12 @@ export class ConfigService {
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
+    }
+    this.compute = {
+      enable_compute: this.get('ENABLE_COMPUTE'),
+      disable_tls_cert: this.get('DISABLE_TLS_CERT'),
+      argo_host: this.get('ARGO_HOST'),
+      argo_namespace: this.get('ARGO_NAMESPACE'),
     }
   }
 
@@ -102,6 +122,10 @@ export class ConfigService {
 
   cryptoConfig(): CryptoConfig {
     return this.crypto
+  }
+
+  computeConfig(): ComputeConfig {
+    return this.compute
   }
 
   getProviderBabyjub() {

@@ -20,6 +20,7 @@ import {
   import { WorkflowServiceApi} from "argo_workflows_api"
   import {IoArgoprojWorkflowV1alpha1WorkflowCreateRequest} from  'argo_workflows_api'
   import { Logger } from '../shared/logger/logger.service';
+  import { ConfigService } from  '../shared/config/config.service'
 
   const yaml = require('js-yaml');
 
@@ -35,7 +36,8 @@ import {
                 */
 
     constructor(
-                    private computeService: ComputeService) {}
+                private computeService: ComputeService,
+                private configService: ConfigService) {}
 
 
     workflowServiceApi = new WorkflowServiceApi();
@@ -185,6 +187,7 @@ import {
     ): Promise<string> {
 
         Logger.debug(`Getting list of workflows`);
+
         try {
             var opts = {};
             const response = await this.workflowServiceApi.workflowServiceListWorkflows("argo", opts)
