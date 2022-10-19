@@ -13,8 +13,6 @@ import {
   import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { Request } from '../common/helpers/request.interface';
-  //import { NeverminedService } from '../shared/nevermined/nvm.service';
-  //import { DDO } from "@nevermined-io/nevermined-sdk-js";
   import { ComputeService } from './compute.service'
   import { InitDto } from "./dto/init";
   import { WorkflowServiceApi, ApiClient} from "argo_workflows_api"
@@ -27,11 +25,6 @@ import {
   @ApiTags('Compute')
   @Controller()
   export class ComputeController {
-  
-    /*
-    constructor(private nvmService: NeverminedService,
-                private computeService: ComputeService) {}
-                */
 
     constructor(private computeService: ComputeService,
                 private configService: ConfigService)
@@ -137,50 +130,9 @@ import {
             throw new NotFoundException(`Workflow ${workflowID} not found`)
         }   
 
-        try{
-            let result 
-            let pods = []
-               
-            // Transform from tuple objects to array
-            const nodesTuples = response.body.status.nodes
-            var nodesArray = []
-            for (var i in nodesTuples){
-                nodesArray.push(nodesTuples[i])
-            }
-
-            nodesArray.forEach((element) => {
-                const podName = element.displayName
-                if (podName === workflowID){
-                    result = {
-                        "status": element.phase,
-                        "startedAt": element.startedAt,
-                        "finishedAt": element.finishedAt,         
-                        "did": undefined,
-                        "pods": []
-                    }
-                }
-                else {
-                    const statusMessage = {
-                        "podName": podName,
-                        "status": element.phase,
-                        "startedAt": element.startedAt,
-                        "finishedAt": element.finishedAt || undefined            
-                    }
-                    pods.push(statusMessage)
-                }          
-            })
-
-            result = {...result, pods: pods}
-            // TODO look for did
-            if (result.status === 'Succeeded'){
-                result = {...result, did:"did:nv:xxxxx"}
-                /*
-                      ddo = nevermined.assets.search(f'"{execution_id}"')[0]
-                      result["did"] = ddo.did
-                */
-            }
-            
-            return JSON.stringify(result)
+        try{     
+            const status = this.computeService.createWorkflowStatus(response.body, workflowID)
+            return JSON.stringify(status)
 
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`)
@@ -210,7 +162,6 @@ import {
        try {
 
             let sampleWorkflow = this.computeService.readExample()
-            //const ddo: DDO = DDO.deserialize(initData.computeDdoString)
 
             const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ serverDryRun:false, namespace: this.argoNamespace, workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
             const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, this.argoNamespace)
