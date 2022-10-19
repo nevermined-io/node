@@ -3,7 +3,8 @@ import {
     Controller,
     Get,  
     Param, 
-    Post, 
+    Post,
+    Delete, 
     Req, 
     Response, 
     NotFoundException,
@@ -108,9 +109,6 @@ import {
         }   
     }
 
-
-
-
     @Get('status/:workflowID')
     @ApiOperation({
         description: 'Status',
@@ -140,7 +138,6 @@ import {
         }   
 
         try{
-
             let result 
             let pods = []
                
@@ -192,7 +189,6 @@ import {
         
     }
 
-
     @Post('init')
     @ApiOperation({
         description: 'Compute Init',
@@ -211,13 +207,20 @@ import {
         @Response({ passthrough: true }) res: string
     ): Promise<string> {
 
-        let sampleWorkflow = this.computeService.readWorkflowTemplate()
-        const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ namespace: this.argoNamespace, workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
-        const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, "argo")
-        return response.body
+       try {
 
-        //const ddo: DDO = DDO.deserialize(initData.computeDdoString)
-       
+            let sampleWorkflow = this.computeService.readExample()
+            //const ddo: DDO = DDO.deserialize(initData.computeDdoString)
+
+            const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ serverDryRun:false, namespace: this.argoNamespace, workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
+            const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, this.argoNamespace)
+            Logger.debug("Argo Workflow created: " + JSON.stringify(response.body))
+            return response.body.metadata.name
+
+        }catch(e) {
+            Logger.error(`Problem initialing workflow for service Agreement ${initData.agreementId}. Error: ${e}`)
+            throw new InternalServerErrorException(`Problem initialing workflow for service Agreement ${initData.agreementId}`)
+        }         
     }
     
 
@@ -238,7 +241,22 @@ import {
         @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
-        return "workflow " + workflowID + " successfully deleted";
+
+        Logger.debug(`Deleting workflow ${workflowID}`)
+
+        try {
+            const opts = {
+                deleteOptionsGracePeriodSeconds: "60",
+                deleteOptionsOrphanDependents: "true",
+                deleteOptionsPropagationPolicy: 'propagation_policy_example'
+            }
+            const response = await this.workflowServiceApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, opts)
+            return response.data
+
+        }catch(e) {
+            Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`)
+            throw new InternalServerErrorException(`Error trying delete workflow  ${workflowID}`)
+        }   
     }
 
     @Get('logs/:workflowID')
