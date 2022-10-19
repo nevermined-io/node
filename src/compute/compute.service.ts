@@ -119,14 +119,14 @@ export class ComputeService {
     const args = transformationMetadata.attributes.main.algorithm.entrypoint
     const image = transformationMetadata.attributes.main.algorithm.requirements.container.image
     const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag
+
+    const providerKeyFile = readFileSync(this.configService.get<string>('PROVIDER_KEYFILE')).toString();
     
-    // TODO. credentials, did   
+    // TODO. credentials  
     return [
             {
                 name: "credentials",
-                //remove white spaces
-                //"value": json.dumps(KEYFILE, separators=(",", ":"))
-                value: "KK"
+                value: JSON.stringify(providerKeyFile)
             },
             {
                 name: "password",
