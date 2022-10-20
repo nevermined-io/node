@@ -79,7 +79,7 @@
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^8.11.0",
-    "eslint-config-nevermined": "^0.1.0",
+    "eslint-config-nevermined": "^0.2.0",
     "eslint-config-next": "^12.3.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
@@ -108,17 +108,13 @@
       "git add"
     ]
   },
-  "prettier": {
-    "printWidth": 120,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
   "jest": {
     "moduleFileExtensions": [
       "js",
       "json",
       "ts"
     ],
+    "testTimeout": 20000,
     "setupFiles": [
       "jest-date-mock"
     ],

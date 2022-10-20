@@ -1,5 +1,5 @@
-import { IsString } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator"
+import { ApiProperty } from "@nestjs/swagger"
 
 export class EncryptDto {
     @ApiProperty({
@@ -7,11 +7,11 @@ export class EncryptDto {
         description: 'Encryption method',
     })
     @IsString()
-    method: string;
+    method: string
     @ApiProperty({
         example: 'Hello!',
         description: 'Encrypted message',
     })
     @IsString()
-    message: string;
+    message: string
 }

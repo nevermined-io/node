@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger"
 
 export class UploadResult {
     @ApiProperty({
@@ -6,11 +6,11 @@ export class UploadResult {
       example: 'cid://bawoeijdoidewj',
       required: true,
     })
-    url: string;
+    url: string
     @ApiProperty({
       description: 'Password for encrypted file',
       example: '1234#',
     })
-    password?: string;
+    password?: string
 }
   

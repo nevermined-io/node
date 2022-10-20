@@ -77,7 +77,7 @@ jobs:
         yarn
         export NO_GRAPH=true
         export OLD_GATEWAY=false
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        export SEED_WORDS=${{ secrets.seedWords }}
         ./scripts/wait-nevermined.sh
         yarn test
     - uses: actions/checkout@v3
@@ -91,6 +91,6 @@ jobs:
         yarn
         export NO_GRAPH=true
         export OLD_GATEWAY=false
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
+        export SEED_WORDS=${{ secrets.seedWords }}
         ./scripts/wait-nevermined.sh
         yarn run integration

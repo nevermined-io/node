@@ -1,19 +1,19 @@
 
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger"
 
 export class EncryptResult {
     @ApiProperty({
         description: 'Public key used by the gateway'
     })
-    'public-key': string;
+    'public-key': string
     @ApiProperty({
         description: 'Encrypted data'
     })
-    hash: string;
+    hash: string
     @ApiProperty({
         description: 'Encryption method (PSK-ECDSA or PSK-RSA)',
         example: 'PSK-ECDSA'
     })
-    method: string;
+    method: string
 }
 

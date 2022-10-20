@@ -1,4 +1,4 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from "@nestjs/swagger"
 
 export class UploadDto {
     @ApiProperty({
@@ -6,5 +6,5 @@ export class UploadDto {
       example: 'false',
       required: false,
     })
-    encrypt: string;
+    encrypt: string
 }

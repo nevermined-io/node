@@ -3583,10 +3583,10 @@ escodegen@^2.0.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-nevermined@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-nevermined/-/eslint-config-nevermined-0.1.0.tgz#fdee39252d485cbe5194a420b30ec34c09e8bc44"
-  integrity sha512-b49PKyTANbwQAwsBC3ZESHAdOkrF3tYA+qoNjgnP1gT30O2ojysi/W95CYBP87QbrT6AQxBDSvt4OzFkabyNJA==
+eslint-config-nevermined@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-nevermined/-/eslint-config-nevermined-0.2.0.tgz#49ca6977d1b7d9ecf8716529a95e318986807f94"
+  integrity sha512-j8q/SSbAFQXlqOxLCDobAHdx0H7bNwwcdi9CjM7WXn5m1Su79lPfhcwQIMRpIvYKxTOEq0xxSXKLcpiACdxTXw==
 
 eslint-config-next@^12.3.1:
   version "12.3.1"

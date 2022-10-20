@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { NeverminedService } from './nvm.service';
-import { ConfigModule } from '../config/config.module';
+import { Module } from '@nestjs/common'
+import { NeverminedService } from './nvm.service'
+import { ConfigModule } from '../config/config.module'
 
 @Module({
   imports: [ConfigModule],

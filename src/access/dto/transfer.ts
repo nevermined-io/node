@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsString } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger"
+import { IsNumber, IsString } from "class-validator"
 
 export class TransferDto {
     @ApiProperty({
@@ -7,33 +7,33 @@ export class TransferDto {
       example: '0x...'
     })
     @IsString()
-    agreementId: string;
+    agreementId: string
   
     @ApiProperty({
       description: 'NFT holder address',
       example: '0x...'
     })
     @IsString()
-    nftHolder: string;
+    nftHolder: string
   
     @ApiProperty({
       description: 'NFT receiver address',
       example: '0x...'
     })
     @IsString()
-    nftReceiver: string;
+    nftReceiver: string
   
     @ApiProperty({
       description: 'Number of NFTs to transfer',
       example: '1'
     })
     @IsString()
-    nftAmount: string;
+    nftAmount: string
   
     @ApiProperty({
       description: 'Type of NFT',
       example: '721'
     })
     @IsNumber()
-    nftType: number;
+    nftType: number
   }
