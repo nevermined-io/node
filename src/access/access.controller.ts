@@ -46,7 +46,7 @@ export class AccessController {
   async doAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number
+    @Param('index') index: number,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
@@ -68,7 +68,7 @@ export class AccessController {
   async doNftAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number
+    @Param('index') index: number,
   ): Promise<StreamableFile | string> {
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
   }
@@ -83,12 +83,17 @@ export class AccessController {
     status: 200,
     description: 'Return "success" if transfer worked',
   })
-  async doNftTransfer(@Body() transferData: TransferDto, @Req() req: Request<unknown>): Promise<string> {
+  async doNftTransfer(
+    @Body() transferData: TransferDto,
+    @Req() req: Request<unknown>,
+  ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
     let agreement: AgreementData
     try {
-      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(transferData.agreementId)
+      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
+        transferData.agreementId,
+      )
     } catch (e) {
       Logger.error(`Error resolving agreement ${transferData.agreementId}`)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
@@ -124,7 +129,7 @@ export class AccessController {
   async doDownload(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number
+    @Param('index') index: number,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
@@ -146,7 +151,7 @@ export class AccessController {
   async doUpload(
     @Body() uploadData: UploadDto,
     @Param('backend') backend: string,
-    @UploadedFile() file: Express.Multer.File
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<UploadResult> {
     if (!file) {
       throw new BadRequestException('No file in request')
@@ -156,7 +161,7 @@ export class AccessController {
       // generate password
       Logger.debug(`Uploading with password, filename ${file.filename}`)
       const password = crypto.randomBytes(32).toString('base64url')
-      data = Buffer.from(aes_encryption_256(data, password))
+      data = Buffer.from(aes_encryption_256(data, password), 'binary')
       if (backend === 's3') {
         const url = await this.nvmService.uploadS3(data, file.filename)
         return { url, password }

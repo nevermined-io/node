@@ -3,7 +3,12 @@ import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
 import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
 import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { utils } from '@nevermined-io/nevermined-sdk-js'
-import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common'
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+  StreamableFile,
+} from '@nestjs/common'
 import download from 'download'
 import AWS from 'aws-sdk'
 import { FormData } from 'formdata-node'
@@ -59,7 +64,10 @@ export class NeverminedService {
     return this.config.nvm().nodeUri
   }
 
-  async getAssetUrl(did: string, index: number): Promise<{ url: string; content_type: string; dtp: boolean }> {
+  async getAssetUrl(
+    did: string,
+    index: number,
+  ): Promise<{ url: string; content_type: string; dtp: boolean }> {
     // get url for DID
     let asset: DDO
     try {
@@ -74,7 +82,7 @@ export class NeverminedService {
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
       const filelist = JSON.parse(
-        await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA')
+        await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA'),
       )
       // download url or what?
       const url: string = filelist[index].url
@@ -84,7 +92,12 @@ export class NeverminedService {
     throw new BadRequestException()
   }
 
-  async downloadAsset(did: string, index: number, res: any, userAddress: string): Promise<StreamableFile | string> {
+  async downloadAsset(
+    did: string,
+    index: number,
+    res: any,
+    userAddress: string,
+  ): Promise<StreamableFile | string> {
     Logger.debug(`Downloading asset from ${did} index ${index}`)
     try {
       // eslint-disable-next-line prefer-const
@@ -93,7 +106,7 @@ export class NeverminedService {
         Logger.error(`URL for did ${did} not found`)
         throw new NotFoundException(`URL for did ${did} not found`)
       }
-      if (dtp) {
+      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
         return url
       }
       Logger.debug(`Serving URL ${url}`)
@@ -116,7 +129,7 @@ export class NeverminedService {
             utils.generateId(),
             ethers.utils.hexZeroPad('0x0', 32),
             'download',
-            from
+            from,
           )
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }
