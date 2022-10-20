@@ -97,8 +97,6 @@ export class ComputeService {
     TODO -  FEDERATED LEARNING USE CASES
     if  (( metadata.attributes.main.type) === 'fl-coordinator')
         workflow.spec.entrypoint= "coordinator-workflow"
-    else 
-        workflow.spec.entrypoint= "compute-workflow"
 */
 
     return workflow;
@@ -122,7 +120,7 @@ export class ComputeService {
 
     const providerKeyFile = readFileSync(this.configService.get<string>('PROVIDER_KEYFILE')).toString();
     
-    // TODO. credentials  
+    // TODO. did  
     return [
             {
                 name: "credentials",

@@ -202,7 +202,7 @@ import {
                 deleteOptionsPropagationPolicy: 'propagation_policy_example'
             }
             const response = await this.workflowServiceApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, opts)
-            return response.data
+            return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`})
 
         }catch(e) {
             Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`)
