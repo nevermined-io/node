@@ -156,7 +156,7 @@ export class AccessController {
       // generate password
       Logger.debug(`Uploading with password, filename ${file.filename}`);
       const password = crypto.randomBytes(32).toString('base64url');
-      data = Buffer.from(aes_encryption_256(data, password));
+      data = Buffer.from(aes_encryption_256(data, password), 'binary');
       if (backend === 's3') {
         const url = await this.nvmService.uploadS3(data, file.filename);
         return { url, password };

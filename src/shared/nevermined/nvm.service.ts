@@ -93,7 +93,7 @@ export class NeverminedService {
         Logger.error(`URL for did ${did} not found`);
         throw new NotFoundException(`URL for did ${did} not found`);
       }
-      if (dtp) {
+      if (dtp && (!url.startsWith('cid://') && !url.startsWith('http'))) {
         return url;
       }
       Logger.debug(`Serving URL ${url}`);
