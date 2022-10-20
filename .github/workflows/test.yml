@@ -79,6 +79,7 @@ jobs:
         export OLD_GATEWAY=false
         export SEED_WORDS=${{ secrets.seedWords }}
         ./scripts/wait-nevermined.sh
+        ./scripts/wait-service.sh http://localhost:8030
         yarn test
     - uses: actions/checkout@v3
       with:
