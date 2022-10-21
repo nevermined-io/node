@@ -8,7 +8,6 @@ import path from 'path';
 import { InitDto } from "./dto/init";
 import { DDO } from "@nevermined-io/nevermined-sdk-js";
 import { ConfigService } from  '../shared/config/config.service'
-import { clearScreenDown } from 'readline';
 
 @Injectable()
 export class ComputeService {
