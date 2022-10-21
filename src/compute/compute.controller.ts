@@ -15,10 +15,9 @@ import {
   import { Request } from '../common/helpers/request.interface';
   import { ComputeService } from './compute.service'
   import { InitDto } from "./dto/init";
-  import { WorkflowServiceApi, ApiClient} from "argo_workflows_api"
-  import {IoArgoprojWorkflowV1alpha1WorkflowCreateRequest} from  'argo_workflows_api'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service'
+  import {WorkflowServiceApi} from 'argo-workflows-api'
 
   const yaml = require('js-yaml');
 
@@ -28,15 +27,10 @@ import {
 
     constructor(private computeService: ComputeService,
                 private configService: ConfigService)
-    {
-        let argoClient = ApiClient.instance
-        argoClient.basePath = this.configService.computeConfig().argo_host
-        argoClient.disableTlsCert = this.configService.computeConfig().disable_tls_cert
-
-    }
+    {}
     
-    private workflowServiceApi = new WorkflowServiceApi();
     private argoNamespace = this.configService.computeConfig().argo_namespace
+    private argoWorkflowApi= new WorkflowServiceApi({ basePath: this.configService.computeConfig().argo_host}) 
 
     @Get('list')
     @ApiOperation({
@@ -56,17 +50,18 @@ import {
     ): Promise<string> {
 
         Logger.debug(`Getting list of workflows`);
-
+       
         try {
-            var opts = {};
-            const response = await this.workflowServiceApi.workflowServiceListWorkflows(this.argoNamespace, opts)
+            
+            const response = await this.argoWorkflowApi.workflowServiceListWorkflows(this.argoNamespace)
             const result = []
 
-            response.body.items.forEach(element => {
+            response.data.items.forEach(element => {
                 result.push(element.metadata.name)
             });
+
+            return JSON.stringify(result)       
             
-            return JSON.stringify(result)
         }catch(e) {
             Logger.error(`Error trying to get the list of status: ${e}`);
             throw new InternalServerErrorException(`There was an error trying to get the list of workflows of namespace ${this.argoNamespace}`);
@@ -94,8 +89,9 @@ import {
         Logger.debug(`Getting information about workflow ${workflowID}`)
 
         try {
-            const response = await this.workflowServiceApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, {})
-            return response.body.metadata
+            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID)
+            return JSON.stringify(response.data.metadata)
+            
         }catch(e) {
             Logger.error(`Error trying to get information about workflow ${workflowID}. Error: ${e}`)
             throw new NotFoundException(`Workflow ${workflowID} not found`)
@@ -124,14 +120,14 @@ import {
         let response
 
         try {
-             response = await this.workflowServiceApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, {})
+            response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID)
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`)
             throw new NotFoundException(`Workflow ${workflowID} not found`)
         }   
 
         try{     
-            const status = this.computeService.createWorkflowStatus(response.body, workflowID)
+            const status = this.computeService.createWorkflowStatus(response.data, workflowID)
             return JSON.stringify(status)
 
         }catch(e) {
@@ -161,12 +157,12 @@ import {
 
        try {
 
-            let sampleWorkflow = this.computeService.readExample()
+            // TODO. Replace for NVM Compute workflow
+            let argoWorkflow = this.computeService.readExample()
 
-            const createParams = IoArgoprojWorkflowV1alpha1WorkflowCreateRequest.constructFromObject({ serverDryRun:false, namespace: this.argoNamespace, workflow: sampleWorkflow}, new IoArgoprojWorkflowV1alpha1WorkflowCreateRequest())
-            const response = await this.workflowServiceApi.workflowServiceCreateWorkflow( createParams, this.argoNamespace)
-            Logger.debug("Argo Workflow created: " + JSON.stringify(response.body))
-            return response.body.metadata.name
+            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace)
+            Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
+            return response.data.metadata.name
 
         }catch(e) {
             Logger.error(`Problem initialing workflow for service Agreement ${initData.agreementId}. Error: ${e}`)
@@ -175,6 +171,7 @@ import {
     }
     
 
+    // TODO - after testing, define the endpoint as DELETE op
     @Get('stop/:workflowID')
     @ApiOperation({
         description: 'Stop',
@@ -196,12 +193,12 @@ import {
         Logger.debug(`Deleting workflow ${workflowID}`)
 
         try {
-            const opts = {
-                deleteOptionsGracePeriodSeconds: "60",
-                deleteOptionsOrphanDependents: "true",
-                deleteOptionsPropagationPolicy: 'propagation_policy_example'
-            }
-            const response = await this.workflowServiceApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, opts)
+            
+            const deleteOptionsGracePeriodSeconds =  '60'
+            const deleteOptionsOrphanDependents = true
+            const deleteOptionsPropagationPolicy= 'propagation_policy_example'
+            const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy)
+           
             return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`})
 
         }catch(e) {

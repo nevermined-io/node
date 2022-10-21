@@ -21,7 +21,6 @@ export interface CryptoConfig {
 
 export interface ComputeConfig {
   enable_compute: boolean,
-  disable_tls_cert: boolean,
   argo_host: string,
   argo_namespace: string,
 }
@@ -58,7 +57,6 @@ const DOTENV_SCHEMA = Joi.object({
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
-  DISABLE_TLS_CERT: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default("http:localhost:2746/"),
   ARGO_NAMESPACE: Joi.string().default("argo")
 });
@@ -87,7 +85,6 @@ type DotenvSchemaKeys =
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
   | 'ENABLE_COMPUTE'
-  | 'DISABLE_TLS_CERT'
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE' 
 
@@ -106,7 +103,6 @@ export class ConfigService {
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
-      disable_tls_cert: this.get('DISABLE_TLS_CERT'),
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
     }

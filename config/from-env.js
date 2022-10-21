@@ -25,7 +25,6 @@ const keys = [
     'ENABLE_PROVENANCE',
     'ARTIFACTS_FOLDER',
     'ENABLE_COMPUTE',
-    'DISABLE_TLS_CERT',
     'ARGO_HOST',
     'ARGO_NAMESPACE' 
 
