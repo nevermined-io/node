@@ -17,7 +17,7 @@ import {
   import { InitDto } from "./dto/init";
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service'
-  import {WorkflowServiceApi} from 'argo-workflows-api'
+  import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api'
 
   const yaml = require('js-yaml');
 
