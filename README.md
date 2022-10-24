@@ -1,8 +1,8 @@
 [![banner](https://raw.githubusercontent.com/nevermined-io/assets/main/images/logo/banner_logo.png)](https://nevermined.io)
 
-# Nevermined Gateway
+# Nevermined Node
 
-> Navermined Gateway for handling automatic fulfilling of agreements etc.
+> Nevermined node that helps to provide services around digital assets
 
 [![Tests](https://github.com/nevermined-io/gateway-ts/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/gateway-ts/actions/workflows/test.yml)
 [![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/gateway-ts.svg)](https://hub.docker.com/repository/docker/neverminedio/gateway-ts)
@@ -51,7 +51,7 @@ This will leave you with a `local.js` file within the `config` folder that will 
 
 ### Environment variables
 
-The Gateway reads the following environment variables allowing the configuration of the deployment without modifying any config file:
+The Nevermined Node reads the following environment variables allowing the configuration of the deployment without modifying any config file:
 
 | Variable Name     | Information      | Example
 
@@ -61,9 +61,9 @@ The Gateway reads the following environment variables allowing the configuration
 | **KEEPER_URL**     | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx
 | **MARKETPLACE_API_URL**     | HTTP url to the Marketplace API                 | https://marketplace-api.mumbai.public.nevermined.rocks
 | **GATEWAY_URL**     | Public HTTP url where this gateway is exposed                 | https://gateway.mumbai.public.nevermined.rocks
-| **PORT**     | Local Port the Gateway will be listen to            | `8030`
-| **GATEWAY_ADDRESS** | Public address of the gateway used to send transactions to the blockchain                 | `0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0`
-| **PROVIDER_KEYFILE**     | Path to the file where is store the private key of the Gateway credentials                 | `/mnt/credentials/keyfile.json`
+| **PORT**     | Local Port the server will be listen to            | `8030`
+| **GATEWAY_ADDRESS** | Public address of the Node used to send transactions to the blockchain                 | `0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0`
+| **PROVIDER_KEYFILE**     | Path to the file where is store the private key of the Node credentials                 | `/mnt/credentials/keyfile.json`
 | **PROVIDER_PASSWORD**     | Password of the `PROVIDER_KEYFILE`                 | `passwd`
 | **PROVIDER_BABYJUB_SECRET**     | Secret of the babyjub algorightm used for DTP                 | `abc`
 | **PROVIDER_BABYJUB_PUBLIC1**     | Babyjub public key #1 | `0x2e3133fbdaeb5486b665ba78c0e7e749700a5c32b1998ae14f7d1532972602bb`
