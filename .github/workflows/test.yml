@@ -65,7 +65,7 @@ jobs:
         export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
         export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
         export NO_GRAPH=true
-        export SEED_WORDS=${{ secrets.seedWords }}
+        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
         yarn run start &
@@ -81,7 +81,7 @@ jobs:
         yarn
         export NO_GRAPH=true
         export OLD_GATEWAY=false
-        export SEED_WORDS=${{ secrets.seedWords }}
+        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         ./scripts/wait-nevermined.sh
         yarn test
     - uses: actions/checkout@v3
@@ -96,6 +96,6 @@ jobs:
         yarn
         export NO_GRAPH=true
         export OLD_GATEWAY=false
-        export SEED_WORDS=${{ secrets.seedWords }}
+        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         ./scripts/wait-nevermined.sh
         yarn run integration
