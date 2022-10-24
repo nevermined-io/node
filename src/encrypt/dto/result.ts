@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class EncryptResult {
     @ApiProperty({
-        description: 'Public key used by the gateway'
+        description: 'Public key used by the node'
     })
     'public-key': string;
     @ApiProperty({

@@ -8,8 +8,8 @@ const configBase = {
     nodeUri: process.env['KEEPER_URL'] || 'http://localhost:8545',
     marketplaceUri: process.env['MARKETPLACE_URI'] || 'http://nevermined-metadata:3100',
     faucetUri: process.env['FAUCET_URI'] || 'http://localhost:3001',
-    gatewayUri: process.env['GATEWAY_URI'] || 'http://localhost:8030',
-    gatewayAddress: process.env['GATEWAY_ADDRESS'] || '0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0',
+    gatewayUri: process.env['NODE_URI'] || 'http://localhost:8030',
+    gatewayAddress: process.env['NODE_ADDRESS'] || '0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0',
     artifactsFolder: process.env['ARTIFACTS_FOLDER'] || './artifacts',
     marketplaceAuthToken: process.env['MARKETPLACE_AUTH_TOKEN'] || 'bogus',
     graphHttpUri: nograph

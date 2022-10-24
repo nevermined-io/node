@@ -50,7 +50,7 @@ jobs:
         yarn run setup:dev
         # HDWalletProvider keeps jest from exiting
         yarn run test:cov -- --forceExit
-    - name: Start gateway
+    - name: Start node
       run: |
         export PROVIDER_KEYFILE=accounts/provider.json
         export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
