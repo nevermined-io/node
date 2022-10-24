@@ -72,6 +72,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         repository: nevermined-io/sdk-dtp
+        ref: feature/node_name # TODO: Remove this line and use master when everything is merged
         path: sdk-dtp
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK-DTP
@@ -86,6 +87,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         repository: nevermined-io/sdk-js
+        ref: feature/node_name # TODO: Remove this line and use master when everything is merged
         path: sdk-js
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK
