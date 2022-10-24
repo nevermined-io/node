@@ -60,7 +60,7 @@ export class InfoController {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
-      'keeper-url': this.nvmService.nodeUri(),
+      'keeper-url': this.nvmService.web3ProviderUri(),
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
       contracts: [],

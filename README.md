@@ -58,7 +58,7 @@ The Nevermined Node reads the following environment variables allowing the confi
 | Variable Name      | Description          | Example                |
 | ------------------ | -------------------- | ---------------------- |
 | **NETWORK_NAME**     | Network where the Node will be connected            | `mumbai`
-| **KEEPER_URL**     | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx
+| **WEB3_PROVIDER_URL**     | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx
 | **MARKETPLACE_API_URL**     | HTTP url to the Marketplace API                 | https://marketplace-api.mumbai.public.nevermined.rocks
 | **NODE_URL**     | Public HTTP url where this node is exposed                 | https://node.mumbai.public.nevermined.rocks
 | **PORT**     | Local Port the server will be listen to            | `8030`
