@@ -70,7 +70,6 @@ The Gateway reads the following environment variables allowing the configuration
 | **PROVIDER_BABYJUB_PUBLIC2**     | Babyjub public key #2 | `0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561`
 | **RSA_PUBKEY_FILE**     | File having the RSA public key. The Gateway RSA credentials can be used for encrypting/decrypting files | `/accounts/rsa_pub_key.pem`
 | **RSA_PRIVKEY_FILE**     | File having the RSA private keys  | `/accounts/rsa_priv_key.pem`
-
 | **GRAPH_URL**     | Public URL of the Nevermined subgraphs                 | 
 | **NO_GRAPH**     | If `true` the gateway will read events from the blockchain node instead of from the subgraphs. Depending on the network there could be a limit on the number of blocks to scan.                 | `false`
 | **FILECOIN_GATEWAY**     | Public Filecoin gateway that can be used to fech content. The `:cid` part of the url will be replace by the file `cid`   | https://dweb.link/ipfs/:cid
@@ -81,6 +80,9 @@ The Gateway reads the following environment variables allowing the configuration
 | **AWS_S3_BUCKET_NAME**     | Name of the S3 Bucket     | `metadata`
 | **ENABLE_PROVENANCE**     | If `true` it will enable the integration with the provenance registry     | `true` or `false`
 | **ARTIFACTS_FOLDER**     | Path where the gateway will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder
+| **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false`
+| **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance`
+| **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo`
 
 ## Install and run:
 
