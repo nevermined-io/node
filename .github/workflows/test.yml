@@ -76,12 +76,13 @@ jobs:
         path: sdk-dtp
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK-DTP
+      env:
+        SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+        NO_GRAPH: true
+        OLD_GATEWAY: false
       run: |
         cd sdk-dtp
         yarn
-        export NO_GRAPH=true
-        export OLD_GATEWAY=false
-        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         ./scripts/wait-nevermined.sh
         yarn test
     - uses: actions/checkout@v3
@@ -91,11 +92,12 @@ jobs:
         path: sdk-js
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK
+      env:
+        SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+        NO_GRAPH: true
+        OLD_GATEWAY: false    
       run: |
         cd sdk-js
         yarn
-        export NO_GRAPH=true
-        export OLD_GATEWAY=false
-        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         ./scripts/wait-nevermined.sh
         yarn run integration
