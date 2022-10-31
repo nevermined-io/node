@@ -11,9 +11,9 @@ export class InitDto {
 
   
     @ApiProperty({
-      description: 'A Serialized Compute Workflow DDO',
+      description: 'The Did for the Compute Workflow DDO',
       example: ''
     })
-   // @IsString()
-    computeDdoString: string;
+    @IsString()
+    computeDid: string;
   }

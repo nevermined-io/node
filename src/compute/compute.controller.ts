@@ -13,7 +13,7 @@ import {
   import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { Request } from '../common/helpers/request.interface';
-  import { ComputeService } from './compute.service'
+  import { ComputeService } from './compute.service'
   import { InitDto } from "./dto/init";
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service'

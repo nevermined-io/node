@@ -82,11 +82,11 @@ export class ComputeService {
     return yaml.load(templateContent); 
   }
 
-  createArgoWorkflow(initData: InitDto): any {
+  async createArgoWorkflow(initData: InitDto): Promise<any> {
  
     const workflow = this.readWorkflowTemplate();
-    const ddo: DDO = DDO.deserialize(initData.computeDdoString);
-
+    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.computeDid)
+   
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
     workflow.spec.arguments.parameters = this.createArguments(ddo);
     workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId
