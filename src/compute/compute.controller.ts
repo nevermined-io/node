@@ -158,11 +158,15 @@ import {
        try {
 
             // TODO. Replace for NVM Compute workflow
-            let argoWorkflow = this.computeService.readExample()
+            //let argoWorkflow = this.computeService.readExample()
+            let argoWorkflow = await this.computeService.createArgoWorkflow(initData)
+            return JSON.stringify(argoWorkflow)
 
+            /*
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace)
             Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
             return response.data.metadata.name
+            */
 
         }catch(e) {
             Logger.error(`Problem initialing workflow for service Agreement ${initData.agreementId}. Error: ${e}`)

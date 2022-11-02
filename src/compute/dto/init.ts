@@ -15,5 +15,5 @@ export class InitDto {
       example: ''
     })
     @IsString()
-    computeDid: string;
+    workflowDid: string;
   }

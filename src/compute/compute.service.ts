@@ -8,6 +8,7 @@ import path from 'path';
 import { InitDto } from "./dto/init";
 import { DDO } from "@nevermined-io/nevermined-sdk-js";
 import { ConfigService } from  '../shared/config/config.service'
+import { Logger } from '../shared/logger/logger.service';
 
 @Injectable()
 export class ComputeService {
@@ -85,13 +86,17 @@ export class ComputeService {
   async createArgoWorkflow(initData: InitDto): Promise<any> {
  
     const workflow = this.readWorkflowTemplate();
-    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.computeDid)
+
+    Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
+    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
-    workflow.spec.arguments.parameters = this.createArguments(ddo);
+    workflow.spec.arguments.parameters = await this.createArguments(ddo);
     workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId
 
     workflow.spec.entrypoint= "compute-workflow"
+
+    Logger.debug(`workflow arguments parameters ${JSON.stringify( workflow.spec.arguments.parameters)}`)
 /*
     TODO -  FEDERATED LEARNING USE CASES
     if  (( metadata.attributes.main.type) === 'fl-coordinator')
@@ -102,13 +107,15 @@ export class ComputeService {
 
   }
 
-  async createArguments(ddo: DDO):Promise<any>{
+  async createArguments(workflowDdo: DDO):Promise<any>{
    
-    const metadata = ddo.findServiceByType('metadata')
+    const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
 
     // TODO: Currently this only supports one stage
     const transformationDid = workflow.stages[0].transformation.id
+    Logger.debug(`Resolving transformation Did ${transformationDid}`)
+
     const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(transformationDid)
     let transformationMetadata = transformationDdo.findServiceByType('metadata')
 
@@ -117,13 +124,15 @@ export class ComputeService {
     const image = transformationMetadata.attributes.main.algorithm.requirements.container.image
     const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag
 
+    Logger.debug(`transformation args: ${args}`)
+    Logger.debug(`transformation container: ${image}`)
+    Logger.debug(`transformation tag: ${tag}`)
+
     const providerKeyFile = readFileSync(this.configService.get<string>('PROVIDER_KEYFILE')).toString();
-    
-    // TODO. did  
     return [
             {
                 name: "credentials",
-                value: JSON.stringify(providerKeyFile)
+                value: providerKeyFile
             },
             {
                 name: "password",
@@ -143,8 +152,7 @@ export class ComputeService {
             },
             {
                 name: "workflow",
-                // TODO
-                value: "did:nv:{ddo.asset_id[2:]}"
+                value: workflowDdo.id
             },
             {
                 name: "verbose",
