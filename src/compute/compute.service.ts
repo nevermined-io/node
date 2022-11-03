@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
 import { NeverminedService } from '../shared/nevermined/nvm.service';
-//import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import yaml from 'js-yaml';
 import { readFileSync } from 'fs';
 import path from 'path';
