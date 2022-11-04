@@ -90,7 +90,7 @@ export class ComputeService {
     const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
-    workflow.spec.arguments.parameters = await this.createArguments(ddo);
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumerAddress);
     workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId
 
     workflow.spec.entrypoint= "compute-workflow"
@@ -106,7 +106,7 @@ export class ComputeService {
 
   }
 
-  async createArguments(workflowDdo: DDO):Promise<any>{
+  async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<any>{
    
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
@@ -128,17 +128,18 @@ export class ComputeService {
     Logger.debug(`transformation tag: ${tag}`)
 
     const providerKeyFile = readFileSync(this.configService.get<string>('PROVIDER_KEYFILE')).toString();
+
     return [
             {
-                name: "credentials",
+                name: "provider_key_file",
                 value: providerKeyFile
             },
             {
-                name: "password",
+                name: "provider_password",
                 value: process.env.PROVIDER_PASSWORD || "wewe"
             },
             {
-                name: "metadata_url",
+                name: "marketplace_api_url",
                 value: this.configService.nvm().marketplaceUri
             },
             {
@@ -146,16 +147,40 @@ export class ComputeService {
                 value: this.configService.nvm().gatewayUri
             },
             {
-                name: "node",
+                name: "gateway_address",
+                value: this.configService.nvm().gatewayAddress
+            },
+            {
+                name: "keeper_url",
                 value: this.configService.nvm().nodeUri
             },
             {
-                name: "workflow",
+                name: "workflow_did",
                 value: workflowDdo.id
             },
             {
-                name: "verbose",
-                value: "false"
+                name: "consumer_address",
+                value: consumerAddress
+            },
+            {
+                name: "minio_host",
+                value: process.env.MINIO_HOST
+            },
+            {
+                name: "minio_port",
+                value: process.env.MINIO_PORT
+            },
+            {
+                name: "minio_access_key",
+                value: process.env.MINIO_ACCESS_KEY
+            },
+            {
+                name: "minio_secret_key",
+                value: process.env.MINIO_SECRET_KEY
+            },
+            {
+                name: "minio_bucket_prefix",
+                value: "pod-publishing-"
             },
             {
                 name: "transformation_container_image",
@@ -164,6 +189,22 @@ export class ComputeService {
             {
                 name: "transformation_arguments",
                 value: args
+            },
+            {
+                name: "artifacts_folder",
+                value: "/artifacts"
+            },
+            {
+                name: "input_dir",
+                value: "inputs"
+            },
+            {
+                name: "output_dir",
+                value: "outputs"
+            },
+            {
+                name: "transformations_dir",
+                value: "transformations"
             }
     ]
   }
