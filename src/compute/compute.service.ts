@@ -76,7 +76,7 @@ export class ComputeService {
   readWorkflowTemplate(): any  {
     require('js-yaml')
 
-    const templatePath = path.join(__dirname, '/', 'argo-workflow-template.yaml');
+    const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
 
     return yaml.load(templateContent); 

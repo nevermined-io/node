@@ -76,41 +76,6 @@ spec:
         dependencies:
         - transformation
 
-  - name: coordinator-workflow
-    retryPolicy: "Never"
-    dag:
-      tasks:
-      - name: configurator
-        template: configuratorPod
-
-      - name: coordinator
-        template: transformationPod-coordinator
-        arguments:
-          parameters:
-          - name: command
-            value: coordinator
-          - name: config
-            value: /bin/config-coordinator.toml
-        dependencies:
-        - configurator
-
-      - name: aggregator
-        template: transformationPod-coordinator
-        arguments:
-          parameters:
-          - name: command
-            value: aggregator
-          - name: config
-            value: /bin/config-aggregator.toml
-        dependencies:
-        - configurator
-
-      - name: publishing
-        template: publishingPod
-        dependencies:
-        - coordinator
-        - aggregator
-
   - name: configuratorPod
     container:
       image: neverminedio/compute-pods-config:latest
@@ -171,33 +136,6 @@ spec:
         cd $NEVERMINED_TRANSFORMATIONS_PATH/*/;
         {{workflow.parameters.transformation_arguments}};
         ls -lR /data/outputs/
-      env:
-      - name: VOLUME
-        value: '{{workflow.parameters.volume}}'
-      - name: NEVERMINED_INPUTS_PATH
-        value: '{{workflow.parameters.volume}}/{{workflow.parameters.input_dir}}'
-      - name: NEVERMINED_OUTPUTS_PATH
-        value: '{{workflow.parameters.volume}}/{{workflow.parameters.output_dir}}'
-      - name: NEVERMINED_TRANSFORMATIONS_PATH
-        value: '{{workflow.parameters.volume}}/{{workflow.parameters.transformations_dir}}'
-      volumeMounts:
-      - mountPath: /data
-        name: workdir
-
-  - name: transformationPod-coordinator
-    inputs:
-      parameters:
-      - name: config
-      - name: command
-    container:
-      image: keykoio/xain-fl:latest
-      imagePullPolicy: IfNotPresent
-      name: xain-fl
-      args:
-      - -c
-      - '{{inputs.parameters.config}}'
-      command:
-      - '{{inputs.parameters.command}}'
       env:
       - name: VOLUME
         value: '{{workflow.parameters.volume}}'
