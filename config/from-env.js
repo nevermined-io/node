@@ -26,8 +26,11 @@ const keys = [
     'ARTIFACTS_FOLDER',
     'ENABLE_COMPUTE',
     'ARGO_HOST',
-    'ARGO_NAMESPACE' 
-
+    'ARGO_NAMESPACE',
+    'MINIO_HOST',
+    'MINIO_PORT',
+    'MINIO_ACCESS_KEY',
+    'MINIO_SECRET_KEY'
 ]
 
 const config = {}

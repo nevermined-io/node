@@ -127,16 +127,18 @@ export class ComputeService {
     Logger.debug(`transformation container: ${image}`)
     Logger.debug(`transformation tag: ${tag}`)
 
-    const providerKeyFile = readFileSync(this.configService.get<string>('PROVIDER_KEYFILE')).toString();
-
     return [
             {
+                name: "volume",
+                value: "/data"
+            },
+            {
                 name: "provider_key_file",
-                value: providerKeyFile
+                value: this.configService.cryptoConfig().provider_key
             },
             {
                 name: "provider_password",
-                value: process.env.PROVIDER_PASSWORD || "wewe"
+                value: this.configService.cryptoConfig().provider_password
             },
             {
                 name: "marketplace_api_url",
@@ -164,19 +166,19 @@ export class ComputeService {
             },
             {
                 name: "minio_host",
-                value: process.env.MINIO_HOST
+                value: this.configService.computeConfig().minio_host
             },
             {
                 name: "minio_port",
-                value: process.env.MINIO_PORT
+                value: this.configService.computeConfig().minio_port
             },
             {
                 name: "minio_access_key",
-                value: process.env.MINIO_ACCESS_KEY
+                value: this.configService.computeConfig().minio_access_key
             },
             {
                 name: "minio_secret_key",
-                value: process.env.MINIO_SECRET_KEY
+                value: this.configService.computeConfig().minio_secret_key
             },
             {
                 name: "minio_bucket_prefix",

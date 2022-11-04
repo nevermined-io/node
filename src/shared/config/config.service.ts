@@ -23,6 +23,10 @@ export interface ComputeConfig {
   enable_compute: boolean,
   argo_host: string,
   argo_namespace: string,
+  minio_host: string,
+  minio_port: string,
+  minio_access_key: string,
+  minio_secret_key: string
 }
 
 const configProfile = require('../../../config');
@@ -58,7 +62,11 @@ const DOTENV_SCHEMA = Joi.object({
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default("http:localhost:2746/"),
-  ARGO_NAMESPACE: Joi.string().default("argo")
+  ARGO_NAMESPACE: Joi.string().default("argo"),
+  MINIO_HOST: Joi.string().default('127.0.0.1'),
+  MINIO_PORT: Joi.string().default('9000'),
+  MINIO_ACCESS_KEY: Joi.string().default('AKIAIOSFODNN7EXAMPLE'),
+  MINIO_SECRET_KEY: Joi.string().default('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY')
 });
 
 type DotenvSchemaKeys =
@@ -87,6 +95,10 @@ type DotenvSchemaKeys =
   | 'ENABLE_COMPUTE'
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE' 
+  | 'MINIO_HOST'
+  | 'MINIO_PORT'
+  | 'MINIO_ACCESS_KEY'
+  | 'MINIO_SECRET_KEY'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
@@ -105,6 +117,10 @@ export class ConfigService {
       enable_compute: this.get('ENABLE_COMPUTE'),
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
+      minio_host: this.get('MINIO_HOST'),
+      minio_port: this.get('MINIO_PORT'),
+      minio_access_key: this.get('MINIO_ACCESS_KEY'),
+      minio_secret_key: this.get('MINIO_SECRET_KEY')
     }
   }
 
