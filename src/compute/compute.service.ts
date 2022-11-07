@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { InitDto } from "./dto/init";
 import { DDO } from "@nevermined-io/nevermined-sdk-js";
-import { ConfigService } from  '../shared/config/config.service'
+import { ConfigService } from  '../shared/config/config.service';
 import { Logger } from '../shared/logger/logger.service';
 
 @Injectable()
@@ -18,18 +18,18 @@ export class ComputeService {
 
  createWorkflowStatus(responseBody:any, workflowID: string):any {
 
-    let result 
-    let pods = []
+    let result; 
+    const pods = [];
                
     // Transform from tuple objects to array
-    const nodesTuples = responseBody.status.nodes
-    var nodesArray = []
-    for (var i in nodesTuples){
-        nodesArray.push(nodesTuples[i])
+    const nodesTuples = responseBody.status.nodes;
+    const nodesArray = [];
+    for (const i in nodesTuples){
+        nodesArray.push(nodesTuples[i]);
     }
 
     nodesArray.forEach((element) => {
-        const podName = element.displayName
+        const podName = element.displayName;
         if (podName === workflowID){
             result = {
                 "status": element.phase,
@@ -37,35 +37,35 @@ export class ComputeService {
                 "finishedAt": element.finishedAt,         
                 "did": undefined,
                 "pods": []
-            }
+            };
         }
         else {
             const statusMessage = {
-                "podName": podName,
+                podName,
                 "status": element.phase,
                 "startedAt": element.startedAt,
                 "finishedAt": element.finishedAt || undefined            
-            }
-            pods.push(statusMessage)
+            };
+            pods.push(statusMessage);
         }          
-    })
+    });
 
-    result = {...result, pods: pods}
+    result = {...result, pods};
     // TODO look for did
     if (result.status === 'Succeeded'){
-        result = {...result, did:"did:nv:xxxxx"}
+        result = {...result, did:"did:nv:xxxxx"};
         /*
             ddo = nevermined.assets.search(f'"{execution_id}"')[0]
             result["did"] = ddo.did
         */
     }
 
-    return result
+    return result;
 
  }
 
  readExample(): any {
-    require('js-yaml')
+    require('js-yaml');
 
     const templatePath = path.join(__dirname, '/', 'test-workflow.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
@@ -74,7 +74,7 @@ export class ComputeService {
  }
 
   readWorkflowTemplate(): any  {
-    require('js-yaml')
+    require('js-yaml');
 
     const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
@@ -86,16 +86,16 @@ export class ComputeService {
  
     const workflow = this.readWorkflowTemplate();
 
-    Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
-    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
+    Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`);
+    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid);
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
     workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumerAddress);
-    workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId
+    workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId;
 
-    workflow.spec.entrypoint= "compute-workflow"
+    workflow.spec.entrypoint= "compute-workflow";
 
-    Logger.debug(`workflow arguments parameters ${JSON.stringify( workflow.spec.arguments.parameters)}`)
+    Logger.debug(`workflow arguments parameters ${JSON.stringify( workflow.spec.arguments.parameters)}`);
 /*
     TODO -  FEDERATED LEARNING USE CASES
     if  (( metadata.attributes.main.type) === 'fl-coordinator')
@@ -108,24 +108,24 @@ export class ComputeService {
 
   async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<any>{
    
-    const metadata = workflowDdo.findServiceByType('metadata')
-    const workflow = metadata.attributes.main.workflow
+    const metadata = workflowDdo.findServiceByType('metadata');
+    const workflow = metadata.attributes.main.workflow;
 
     // TODO: Currently this only supports one stage
-    const transformationDid = workflow.stages[0].transformation.id
-    Logger.debug(`Resolving transformation Did ${transformationDid}`)
+    const transformationDid = workflow.stages[0].transformation.id;
+    Logger.debug(`Resolving transformation Did ${transformationDid}`);
 
-    const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(transformationDid)
-    let transformationMetadata = transformationDdo.findServiceByType('metadata')
+    const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(transformationDid);
+    const transformationMetadata = transformationDdo.findServiceByType('metadata');
 
     // get args and container
-    const args = transformationMetadata.attributes.main.algorithm.entrypoint
-    const image = transformationMetadata.attributes.main.algorithm.requirements.container.image
-    const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag
+    const args = transformationMetadata.attributes.main.algorithm.entrypoint;
+    const image = transformationMetadata.attributes.main.algorithm.requirements.container.image;
+    const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag;
 
-    Logger.debug(`transformation args: ${args}`)
-    Logger.debug(`transformation container: ${image}`)
-    Logger.debug(`transformation tag: ${tag}`)
+    Logger.debug(`transformation args: ${args}`);
+    Logger.debug(`transformation container: ${image}`);
+    Logger.debug(`transformation tag: ${tag}`);
 
     return [
             {
@@ -208,6 +208,6 @@ export class ComputeService {
                 name: "transformations_dir",
                 value: "transformations"
             }
-    ]
+    ];
   }
 }

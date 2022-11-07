@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from   '../shared/config/config.service'
+import { ConfigService } from   '../shared/config/config.service';
 import { NeverminedModule } from '../shared/nevermined/nvm.module';
 import { ComputeController } from './compute.controller';
 import { ComputeService } from './compute.service';
