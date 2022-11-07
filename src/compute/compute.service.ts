@@ -8,6 +8,16 @@ import { InitDto } from "./dto/init";
 import { DDO } from "@nevermined-io/nevermined-sdk-js";
 import { ConfigService } from  '../shared/config/config.service';
 import { Logger } from '../shared/logger/logger.service';
+require('js-yaml');
+
+export type WorkflowStatus = {
+    status: string
+    startedAt : string
+    finishedAt: string         
+    did: string,
+    pods: string[]
+    podName: string
+}
 
 @Injectable()
 export class ComputeService {
@@ -16,7 +26,7 @@ export class ComputeService {
       private configService: ConfigService,
       private nvmService: NeverminedService) {}
 
- createWorkflowStatus(responseBody:any, workflowID: string):any {
+ createWorkflowStatus(responseBody:any, workflowID: string):WorkflowStatus {
 
     let result; 
     const pods = [];
@@ -32,19 +42,19 @@ export class ComputeService {
         const podName = element.displayName;
         if (podName === workflowID){
             result = {
-                "status": element.phase,
-                "startedAt": element.startedAt,
-                "finishedAt": element.finishedAt,         
-                "did": undefined,
-                "pods": []
+                status: element.phase,
+                startedAt: element.startedAt,
+                finishedAt: element.finishedAt,         
+                did: undefined,
+                pods: []
             };
         }
         else {
             const statusMessage = {
-                podName,
-                "status": element.phase,
-                "startedAt": element.startedAt,
-                "finishedAt": element.finishedAt || undefined            
+                podName: podName,
+                status: element.phase,
+                startedAt: element.startedAt,
+                finishedAt: element.finishedAt || undefined            
             };
             pods.push(statusMessage);
         }          
@@ -65,17 +75,14 @@ export class ComputeService {
  }
 
  readExample(): any {
-    require('js-yaml');
-
     const templatePath = path.join(__dirname, '/', 'test-workflow.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
 
     return yaml.load(templateContent); 
  }
 
-  readWorkflowTemplate(): any  {
-    require('js-yaml');
-
+ readWorkflowTemplate(): any  {
+    
     const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
 
@@ -106,7 +113,7 @@ export class ComputeService {
 
   }
 
-  async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<any>{
+  async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<{name: string, value: string}[]>{
    
     const metadata = workflowDdo.findServiceByType('metadata');
     const workflow = metadata.attributes.main.workflow;

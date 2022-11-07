@@ -3,9 +3,9 @@ import { AuthModule } from './auth/auth.module';
 import { EncryptModule } from './encrypt/encrypt.module';
 import { InfoModule } from './info/info.module';
 import { AccessModule } from './access/access.module';
-import { ComputeModule } from './compute/compute.module'
+import { ComputeModule } from './compute/compute.module'
 
-const exposeCompute: boolean = Boolean(process.env.ENABLE_COMPUTE) === true || false
+const exposeCompute: boolean = Boolean(process.env.ENABLE_COMPUTE) === true || false
 
 export const routes: Routes = [
   { path: '/api/v1/gateway/services/encrypt', module: EncryptModule },

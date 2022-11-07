@@ -5,21 +5,16 @@ import {
     Param, 
     Post,
     Delete, 
-    Req, 
-    Response, 
     NotFoundException,
     InternalServerErrorException,
   } from "@nestjs/common";
   import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
-  import { Request } from '../common/helpers/request.interface';
   import { ComputeService } from './compute.service';
   import { InitDto } from "./dto/init";
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service';
   import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api';
-
-  const yaml = require('js-yaml');
 
   @ApiTags('Compute')
   @Controller()
@@ -44,10 +39,7 @@ import {
     })
     // @ApiBearerAuth('Authorization')
    @Public()
-    async getWorkflowsList(
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string
-    ): Promise<string> {
+    async getWorkflowsList(): Promise<string> {
 
         Logger.debug(`Getting list of workflows`);
        
@@ -81,8 +73,6 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowInfo(
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
@@ -111,8 +101,6 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowStatus(
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
         
@@ -151,8 +139,6 @@ import {
    @Public()
     async initCompute(
         @Body() initData: InitDto,
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string
     ): Promise<string> {
 
        try {
@@ -174,9 +160,7 @@ import {
         }         
     }
     
-
-    // TODO - after testing, define the endpoint as DELETE op
-    @Get('stop/:workflowID')
+    @Delete('stop/:workflowID')
     @ApiOperation({
         description: 'Stop',
         summary: 'Stop the execution of a workflow',
@@ -189,8 +173,6 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async stopWorkflowExecution(
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
@@ -224,8 +206,6 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowExecutionLogs(
-        @Req() req: Request<unknown>,
-        @Response({ passthrough: true }) res: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
         return "Logs of workflow: " + workflowID;
