@@ -1,36 +1,35 @@
-import { 
+import {
   BadRequestException,
-  Body, 
+  Body,
   Controller,
-  Get, 
-  NotFoundException, 
-  Param, 
-  Post, 
-  Req, 
-  Response, 
-  StreamableFile, 
-  UploadedFile, 
-  UseInterceptors 
-} from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Req,
+  Response,
+  StreamableFile,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from '../common/helpers/request.interface';
-import { Public } from "../common/decorators/auth.decorator";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { Public } from '../common/decorators/auth.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 import crypto from 'crypto';
-import { aes_encryption_256 } from "@nevermined-io/nevermined-sdk-dtp/dist/utils";
-import { ValidationParams } from "@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service";
-import BigNumber from "@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber";
+import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils';
+import { ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
+import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber';
 import { NeverminedService } from '../shared/nevermined/nvm.service';
 import { Logger } from '../shared/logger/logger.service';
-import { TransferDto } from "./dto/transfer";
-import { UploadDto } from "./dto/upload";
-import { UploadResult } from "./dto/upload-result";
-import { AgreementData } from "@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers";
+import { TransferDto } from './dto/transfer';
+import { UploadDto } from './dto/upload';
+import { UploadResult } from './dto/upload-result';
+import { AgreementData } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers';
 
 @ApiTags('Access')
 @Controller()
 export class AccessController {
-
   constructor(private nvmService: NeverminedService) {}
 
   @Get('access/:agreement_id/:index')
@@ -47,8 +46,8 @@ export class AccessController {
   async doAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number,
-  ): Promise<StreamableFile|string> {
+    @Param('index') index: number
+  ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified');
     }
@@ -69,8 +68,8 @@ export class AccessController {
   async doNftAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number,
-  ): Promise<StreamableFile|string> {
+    @Param('index') index: number
+  ): Promise<StreamableFile | string> {
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address);
   }
 
@@ -125,8 +124,8 @@ export class AccessController {
   async doDownload(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
-    @Param('index') index: number,
-  ): Promise<StreamableFile|string> {
+    @Param('index') index: number
+  ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified');
     }
@@ -144,7 +143,11 @@ export class AccessController {
     status: 200,
     description: 'Return the url of asset',
   })
-  async doUpload(@Body() uploadData: UploadDto, @Param('backend') backend: string, @UploadedFile() file: Express.Multer.File): Promise<UploadResult> {
+  async doUpload(
+    @Body() uploadData: UploadDto,
+    @Param('backend') backend: string,
+    @UploadedFile() file: Express.Multer.File
+  ): Promise<UploadResult> {
     if (!file) {
       throw new BadRequestException('No file in request');
     }
@@ -153,7 +156,7 @@ export class AccessController {
       // generate password
       Logger.debug(`Uploading with password, filename ${file.filename}`);
       const password = crypto.randomBytes(32).toString('base64url');
-      data = Buffer.from(aes_encryption_256(data, password));
+      data = Buffer.from(aes_encryption_256(data, password), 'binary');
       if (backend === 's3') {
         const url = await this.nvmService.uploadS3(data, file.filename);
         return { url, password };
@@ -170,6 +173,4 @@ export class AccessController {
       return { url };
     }
   }
-
 }
-
