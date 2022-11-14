@@ -95,6 +95,7 @@ export class ComputeService {
 
     Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`);
     const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid);
+    Logger.debug(`workflow DDO ${initData.workflowDid} resolved`);
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
     workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumerAddress);
@@ -214,6 +215,10 @@ export class ComputeService {
             {
                 name: "transformations_dir",
                 value: "transformations"
+            },
+            {
+                name: "verbose",
+                value: "true"
             }
     ];
   }

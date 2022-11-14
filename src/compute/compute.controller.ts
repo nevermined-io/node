@@ -89,6 +89,7 @@ import {
 
         try {
             const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
+            console.log(JSON.stringify(response.data))
             return JSON.stringify(response.data.metadata);
             
         }catch(e) {

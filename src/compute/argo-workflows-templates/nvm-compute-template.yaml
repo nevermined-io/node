@@ -64,19 +64,19 @@ spec:
     dag:
       tasks:
       - name: configurator
-        template: configuratorPod
+        template: configurator-pod
 
       - name: transformation
-        template: transformationPod-compute
+        template: transformation-pod-compute
         dependencies:
         - configurator
 
       - name: publishing
-        template: publishingPod
+        template: publishing-pod
         dependencies:
         - transformation
 
-  - name: configuratorPod
+  - name: configurator-pod
     container:
       image: neverminedio/compute-pods-config:latest
       imagePullPolicy: IfNotPresent
@@ -123,7 +123,7 @@ spec:
       - mountPath: /artifacts
         name: artifacts-volume
 
-  - name: transformationPod-compute
+  - name: transformation-pod-compute
     container:
       image: '{{workflow.parameters.transformation_container_image}}'
       imagePullPolicy: IfNotPresent
@@ -149,11 +149,11 @@ spec:
       - mountPath: /data
         name: workdir
 
-  - name: publishingPod
+  - name: publishing-pod
     container:
       image: neverminedio/compute-pods-publish:latest
       imagePullPolicy: IfNotPresent
-      name: publishingPod
+      name: publishing-pod
       command:
       - sh
       - -cxe
