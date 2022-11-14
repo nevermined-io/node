@@ -83,6 +83,7 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false`
 | **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance`
 | **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo`
+| **ARGO_AUTH_TOKEN**      | Authorization Token for Argo Workflows.  Requires ENABLE_COMPUTE = true  | 'Bearer sdfsdfsdfvxcvVVSDFSDFSDFsdf...'
 | **MINIO_HOST**       | Host of the MinIO server. Requires ENABLE_COMPUTE = true | `https://minio-server.nevermined.rocks`
 | **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000`
 | **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE`

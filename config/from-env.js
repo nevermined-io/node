@@ -27,6 +27,7 @@ const keys = [
     'ENABLE_COMPUTE',
     'ARGO_HOST',
     'ARGO_NAMESPACE',
+    'ARGO_AUTH_TOKEN',
     'MINIO_HOST',
     'MINIO_PORT',
     'MINIO_ACCESS_KEY',

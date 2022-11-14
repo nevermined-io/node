@@ -26,6 +26,12 @@ import {
     
     private argoNamespace = this.configService.computeConfig().argo_namespace;
     private argoWorkflowApi= new WorkflowServiceApi({ basePath: this.configService.computeConfig().argo_host}); 
+    private getAuthorizationHeaderOption():{headers: {Authorization:string}} | {} {
+        return this.configService.computeConfig().argo_auth_token?{
+            headers: { Authorization: this.configService.computeConfig().argo_auth_token }
+        }:{}
+
+    }
 
     @Get('list')
     @ApiOperation({
@@ -45,17 +51,20 @@ import {
        
         try {
             
-            const response = await this.argoWorkflowApi.workflowServiceListWorkflows(this.argoNamespace);
+            const response = await this.argoWorkflowApi.workflowServiceListWorkflows(this.argoNamespace, undefined,
+                undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, this.getAuthorizationHeaderOption());
             const result = [];
 
-            response.data.items.forEach(element => {
-                result.push(element.metadata.name);
-            });
+            if (response.data.items){
+                response.data.items.forEach(element => {
+                    result.push(element.metadata.name);
+                });
+            }
 
             return JSON.stringify(result);       
             
         }catch(e) {
-            Logger.error(`Error trying to get the list of status: ${e}`);
+            Logger.error(`Error trying to get the list of workflows: ${e}`);
             throw new InternalServerErrorException(`There was an error trying to get the list of workflows of namespace ${this.argoNamespace}`);
         }           
     }
@@ -79,7 +88,7 @@ import {
         Logger.debug(`Getting information about workflow ${workflowID}`);
 
         try {
-            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID);
+            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
             return JSON.stringify(response.data.metadata);
             
         }catch(e) {
@@ -108,7 +117,7 @@ import {
         let response;
 
         try {
-            response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID);
+            response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
             throw new NotFoundException(`Workflow ${workflowID} not found`);
@@ -143,9 +152,9 @@ import {
 
        try {
 
-            const argoWorkflow = await this.computeService.createArgoWorkflow(initData);
-
-            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace)
+            const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
+            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
+        
             Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
             return response.data.metadata.name   
 
@@ -178,7 +187,8 @@ import {
             const deleteOptionsGracePeriodSeconds =  '60';
             const deleteOptionsOrphanDependents = true;
             const deleteOptionsPropagationPolicy= 'propagation_policy_example';
-            const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy);
+            const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, 
+                deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy, undefined, undefined, this.getAuthorizationHeaderOption());
            
             return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`});
 

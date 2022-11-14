@@ -23,6 +23,7 @@ export interface ComputeConfig {
   enable_compute: boolean,
   argo_host: string,
   argo_namespace: string,
+  argo_auth_token: string,
   minio_host: string,
   minio_port: string,
   minio_access_key: string,
@@ -63,6 +64,7 @@ const DOTENV_SCHEMA = Joi.object({
   ENABLE_COMPUTE: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default("http:localhost:2746/"),
   ARGO_NAMESPACE: Joi.string().default("argo"),
+  ARGO_AUTH_TOKEN: Joi.string(),
   MINIO_HOST: Joi.string().default('127.0.0.1'),
   MINIO_PORT: Joi.string().default('9000'),
   MINIO_ACCESS_KEY: Joi.string().default('AKIAIOSFODNN7EXAMPLE'),
@@ -94,7 +96,8 @@ type DotenvSchemaKeys =
   | 'ARTIFACTS_FOLDER'
   | 'ENABLE_COMPUTE'
   | 'ARGO_HOST'
-  | 'ARGO_NAMESPACE' 
+  | 'ARGO_NAMESPACE'
+  | 'ARGO_AUTH_TOKEN'
   | 'MINIO_HOST'
   | 'MINIO_PORT'
   | 'MINIO_ACCESS_KEY'
@@ -117,6 +120,7 @@ export class ConfigService {
       enable_compute: this.get('ENABLE_COMPUTE'),
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
+      argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
       minio_host: this.get('MINIO_HOST'),
       minio_port: this.get('MINIO_PORT'),
       minio_access_key: this.get('MINIO_ACCESS_KEY'),

@@ -86,7 +86,7 @@ spec:
       - -cxe
       args:
       - |
-        cp -rv /artifacts ./artifacts;
+        ./scripts/wait-nevermined.sh;
         ./bin/pod-config \
         --workflowId $WORKFLOW_DID;
         ls -lR /data
@@ -159,7 +159,7 @@ spec:
       - -cxe
       args:
       - |
-        cp -rv /artifacts ./artifacts;
+        ./scripts/wait-nevermined.sh;
         ./bin/pod-publish \
         --workflowId $WORKFLOW_DID \
         --consumerAddress $CONSUMER_ADDRESS;
