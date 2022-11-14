@@ -55,8 +55,8 @@ export class NeverminedService {
     };
     return instanceConfig;
   }
-  nodeUri(): string {
-    return this.config.nvm().nodeUri;
+  web3ProviderUri(): string {
+    return this.config.nvm().web3ProviderUri;
   }
 
   async getAssetUrl(did: string, index: number): Promise<{ url: string; content_type: string; dtp: boolean }> {
