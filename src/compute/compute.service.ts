@@ -150,11 +150,13 @@ export class ComputeService {
             },
             {
                 name: "marketplace_api_url",
-                value: this.configService.nvm().marketplaceUri
+                value: "http://marketplace-api:3100"
+                //value: this.configService.nvm().marketplaceUri
             },
             {
                 name: "gateway_url",
-                value: this.configService.nvm().gatewayUri
+                value: "http://gateway:8030"
+                //value: this.configService.nvm().gatewayUri
             },
             {
                 name: "gateway_address",
@@ -162,7 +164,8 @@ export class ComputeService {
             },
             {
                 name: "keeper_url",
-                value: this.configService.nvm().nodeUri
+                value: "http://keeper-node:8545"
+                //value: this.configService.nvm().nodeUri
             },
             {
                 name: "workflow_did",

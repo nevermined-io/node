@@ -78,7 +78,7 @@ spec:
 
   - name: configurator-pod
     container:
-      image: neverminedio/compute-pods-config:latest
+      image: neverminedio/compute-pods-config:develop
       imagePullPolicy: IfNotPresent
       name: configurator-pod
       command:
@@ -99,11 +99,11 @@ spec:
         value: '{{workflow.parameters.keeper_url}}'
       - name: WORKFLOW_DID
         value: '{{workflow.parameters.workflow_did}}'
-      - name: GATEWAY_URL
+      - name: GATEWAY_URI
         value: '{{workflow.parameters.gateway_url}}'
       - name: GATEWAY_ADDRESS
         value: '{{workflow.parameters.gateway_address}}'
-      - name: MARKETPLACE_API_URL
+      - name: MARKETPLACE_URI
         value: '{{workflow.parameters.marketplace_api_url}}'
       - name: ARTIFACTS_FOLDER
         value: '{{workflow.parameters.artifacts_folder}}'
@@ -151,7 +151,7 @@ spec:
 
   - name: publishing-pod
     container:
-      image: neverminedio/compute-pods-publish:latest
+      image: neverminedio/compute-pods-publish:develop
       imagePullPolicy: IfNotPresent
       name: publishing-pod
       command:
@@ -175,11 +175,11 @@ spec:
         value: '{{workflow.parameters.keeper_url}}'
       - name: WORKFLOW_DID
         value: '{{workflow.parameters.workflow_did}}'
-      - name: GATEWAY_URL
+      - name: GATEWAY_URI
         value: '{{workflow.parameters.gateway_url}}'
       - name: GATEWAY_ADDRESS
         value: '{{workflow.parameters.gateway_address}}'
-      - name: MARKETPLACE_API_URL
+      - name: MARKETPLACE_URI
         value: '{{workflow.parameters.marketplace_api_url}}'
       - name: ARTIFACTS_FOLDER
         value: '{{workflow.parameters.artifacts_folder}}'
