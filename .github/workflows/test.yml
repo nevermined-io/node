@@ -25,7 +25,6 @@ jobs:
         sudo chmod go+r /etc/hosts
         sudo echo "127.0.0.1  nevermined-metadata" | sudo tee -a /etc/hosts
 
-        # TODO: Use `master` when the renaming is done
         git clone https://github.com/nevermined-io/tools
         
         cd tools
