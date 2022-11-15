@@ -86,9 +86,9 @@ spec:
       - -cxe
       args:
       - |
-        ./scripts/wait-nevermined.sh;
-        ./bin/pod-config \
-        --workflowId $WORKFLOW_DID;
+        ls -l /artifacts;
+        /bin/pod-config \
+        --workflowDid $WORKFLOW_DID;
         ls -lR /data
       env:
       - name: PROVIDER_KEY_FILE
@@ -120,8 +120,8 @@ spec:
       volumeMounts:
       - mountPath: /data
         name: workdir
-      - mountPath: /artifacts
-        name: artifacts-volume
+      - name: minikube-mount
+        mountPath: /artifacts
 
   - name: transformation-pod-compute
     container:
@@ -159,7 +159,7 @@ spec:
       - -cxe
       args:
       - |
-        ./scripts/wait-nevermined.sh;
+        ls -l /artifacts;
         ./bin/pod-publish \
         --workflowId $WORKFLOW_DID \
         --consumerAddress $CONSUMER_ADDRESS;
@@ -202,8 +202,8 @@ spec:
       volumeMounts:
       - mountPath: /data
         name: workdir
-      - mountPath: /artifacts
-        name: artifacts-volume
+      - name: minikube-mount
+        mountPath: /artifacts
 
   volumeClaimTemplates:
   - metadata:
@@ -215,7 +215,9 @@ spec:
         requests:
           storage: 2Gi
   volumes:
-  - configMap:
-      name: artifacts
-    name: artifacts-volume
+  - name: minikube-mount
+    hostPath:
+      path: /nevermined-artifacts
+      type: Directory
+
 status: {}
