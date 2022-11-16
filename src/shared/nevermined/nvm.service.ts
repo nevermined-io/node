@@ -12,8 +12,8 @@ import { ConfigService } from '../config/config.service';
 import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
-import { HttpService } from '@nestjs/axios';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { HttpModuleOptions, HttpService } from '@nestjs/axios';
+import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
@@ -107,7 +107,7 @@ export class NeverminedService {
         const cid = url.replace('cid://', '');
         url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`;
 
-        const config: AxiosRequestConfig = {
+        const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
           method: 'POST',
           responseType: 'arraybuffer',
@@ -122,7 +122,7 @@ export class NeverminedService {
 
         response = await firstValueFrom(this.httpService.request(config));
       } else {
-        const config: AxiosRequestConfig = {
+        const config: HttpModuleOptions = {
           responseType: 'arraybuffer',
         };
         response = await firstValueFrom(this.httpService.get(url, config));
