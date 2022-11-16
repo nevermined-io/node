@@ -13,7 +13,6 @@ import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import { HttpModuleOptions, HttpService } from '@nestjs/axios';
-import { AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
@@ -97,7 +96,7 @@ export class NeverminedService {
       const param = url.split('/').slice(-1)[0];
       const filename = param.split('?')[0];
 
-      let response: AxiosResponse;
+      let response;
 
       // Download from filecoin or ipfs
       if (url.startsWith('cid://')) {
