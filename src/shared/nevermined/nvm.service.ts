@@ -13,7 +13,7 @@ import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import { HttpService } from '@nestjs/axios';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { firstValueFrom } from 'rxjs';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
@@ -97,10 +97,7 @@ export class NeverminedService {
       const param = url.split('/').slice(-1)[0];
       const filename = param.split('?')[0];
 
-      // default config for axios https://axios-http.com/docs/req_config
-      let config: AxiosRequestConfig = {
-        responseType: 'arraybuffer',
-      };
+      let response: AxiosResponse;
 
       // Download from filecoin or ipfs
       if (url.startsWith('cid://')) {
@@ -110,16 +107,27 @@ export class NeverminedService {
         const cid = url.replace('cid://', '');
         url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`;
 
-        config = {
-          ...config,
+        const config: AxiosRequestConfig = {
+          url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
+          method: 'POST',
+          responseType: 'arraybuffer',
           auth: {
             username: ipfsProjectId,
             password: ipfsProjectSecret,
           },
+          params: {
+            arg: cid,
+          },
         };
+
+        response = await firstValueFrom(this.httpService.request(config));
+      } else {
+        const config: AxiosRequestConfig = {
+          responseType: 'arraybuffer',
+        };
+        response = await firstValueFrom(this.httpService.get(url, config));
       }
 
-      const response = await firstValueFrom(this.httpService.post(url, config));
       const contents: Buffer = response.data;
 
       try {
