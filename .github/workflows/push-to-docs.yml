@@ -2,7 +2,7 @@ name: Push documentation to docs repo
 
 on:
   workflow_dispatch:
-  # Disable until docs/ are updated and belongs to gateway-ts api: https://github.com/nevermined-io/docs/issues/62
+  # Disable until docs/ are updated and belongs to node-ts api: https://github.com/nevermined-io/docs/issues/62
   # push:
   #   tags:
   #     - v*
@@ -23,9 +23,9 @@ jobs:
         run: |
           # Convert json to md
           widdershins docs/openapi.json --omitHeader -o docs/openapi.md
-          echo "$(cat docs/_header.md docs/openapi.md)" > docs/gateway.md
+          echo "$(cat docs/_header.md docs/openapi.md)" > docs/node.md
           # Remove lines with pattern '*backwards compatibility*' (problematic with Docusaurus)
-          sed -i '/backwards compatibility/d' docs/gateway.md
+          sed -i '/backwards compatibility/d' docs/node.md
           rm -f docs/openapi.json docs/_header.md
       - name: Install envsubst
         run: |
@@ -39,7 +39,7 @@ jobs:
           BRANCH_TO_CLONE: main
           REPO_TO_PUSH: nvm-docs
           PATH_TO_COPY: docs/
-          PATH_TO_PUSH: docs/architecture/gateway
+          PATH_TO_PUSH: docs/architecture/node
           REPOSITORY_NAME: ${{ github.repository }}
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         run: |

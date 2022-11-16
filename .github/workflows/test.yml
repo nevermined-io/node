@@ -24,13 +24,15 @@ jobs:
         docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
         sudo chmod go+r /etc/hosts
         sudo echo "127.0.0.1  nevermined-metadata" | sudo tee -a /etc/hosts
+
         git clone https://github.com/nevermined-io/tools
+        
         cd tools
 
         export KEEPER_OWNER_ROLE_ADDRESS="0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
         rm -rf "${HOME}/.nevermined/nevermined-contracts/artifacts"
 
-        ./start_nevermined.sh --latest --no-graph --no-gateway --geth 2>&1 | tee nevermined_tools.txt &
+        ./start_nevermined.sh --latest --no-graph --no-node 2>&1 | tee nevermined_tools.txt &
         cd ..
         ./scripts/wait-nevermined.sh
     - name: Run tests
@@ -50,7 +52,7 @@ jobs:
         yarn run setup:dev
         # HDWalletProvider keeps jest from exiting
         yarn run test:cov -- --forceExit
-    - name: Start gateway
+    - name: Start node
       run: |
         export PROVIDER_KEYFILE=accounts/provider.json
         export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
@@ -62,7 +64,7 @@ jobs:
         export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
         export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
         export NO_GRAPH=true
-        export SEED_WORDS=${{ secrets.seedWords }}
+        export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
         export IPFS_GATEWAY="https://ipfs.infura.io:5001"
@@ -75,12 +77,13 @@ jobs:
         path: sdk-dtp
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK-DTP
+      env:
+        SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+        NO_GRAPH: true
+        OLD_GATEWAY: false
       run: |
         cd sdk-dtp
         yarn
-        export NO_GRAPH=true
-        export OLD_GATEWAY=false
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         ./scripts/wait-nevermined.sh
         yarn test
     - uses: actions/checkout@v3
@@ -89,11 +92,12 @@ jobs:
         path: sdk-js
         token: ${{ secrets.API_TOKEN_GITHUB }}
     - name: Run tests from SDK
+      env:
+        SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+        NO_GRAPH: true
+        OLD_GATEWAY: false    
       run: |
         cd sdk-js
         yarn
-        export NO_GRAPH=true
-        export OLD_GATEWAY=false
-        export SEED_WORDS="taxi music thumb unique chat sand crew more leg another off lamp"
         ./scripts/wait-nevermined.sh
         yarn run integration
