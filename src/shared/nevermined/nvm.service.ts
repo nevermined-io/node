@@ -4,7 +4,6 @@ import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-s
 import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js';
 import { utils } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import download from 'download';
 import AWS from 'aws-sdk';
 import { FormData } from 'formdata-node';
 import { Blob } from 'buffer';
@@ -13,6 +12,9 @@ import { ConfigService } from '../config/config.service';
 import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
 import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
+import { HttpService } from '@nestjs/axios';
+import { AxiosRequestConfig } from 'axios';
+import { firstValueFrom } from 'rxjs';
 
 const _importDynamic = new Function('modulePath', 'return import(modulePath)');
 
@@ -21,17 +23,11 @@ async function fetch(...args) {
   return fetch(...args);
 }
 
-function parseUrl(url: string): string {
-  url = url.replace(/^cid:\/\//, '');
-  const parts = url.split(/[:@/]/);
-  return parts.pop();
-}
-
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined;
   dtp: Dtp;
-  constructor(private config: ConfigService) {}
+  constructor(private config: ConfigService, private readonly httpService: HttpService) {}
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm();
@@ -93,17 +89,38 @@ export class NeverminedService {
         Logger.error(`URL for did ${did} not found`);
         throw new NotFoundException(`URL for did ${did} not found`);
       }
-      if (dtp && (!url.startsWith('cid://') && !url.startsWith('http'))) {
+      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
         return url;
       }
       Logger.debug(`Serving URL ${url}`);
-      // get url for DID
-      if (url.startsWith('cid://')) {
-        url = this.config.get<string>('FILECOIN_GATEWAY').replace(':cid', parseUrl(url));
-      }
+
       const param = url.split('/').slice(-1)[0];
       const filename = param.split('?')[0];
-      const contents: Buffer = await download(url);
+
+      // default config for axios https://axios-http.com/docs/req_config
+      let config: AxiosRequestConfig = {
+        responseType: 'arraybuffer',
+      };
+
+      // Download from filecoin or ipfs
+      if (url.startsWith('cid://')) {
+        const ipfsProjectId = this.config.get<string>('IPFS_PROJECT_ID');
+        const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET');
+
+        const cid = url.replace('cid://', '');
+        url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`;
+
+        config = {
+          ...config,
+          auth: {
+            username: ipfsProjectId,
+            password: ipfsProjectSecret,
+          },
+        };
+      }
+
+      const response = await firstValueFrom(this.httpService.post(url, config));
+      const contents: Buffer = response.data;
 
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {

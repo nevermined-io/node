@@ -9,14 +9,14 @@ import { Logger } from '../logger/logger.service';
 
 export interface EnvConfig {
   [key: string]: string;
-  nvm: any
+  nvm: any;
 }
 
 export interface CryptoConfig {
-  provider_key: string,
-  provider_password: string,
-  provider_rsa_public: string,
-  provider_rsa_private: string,
+  provider_key: string;
+  provider_password: string;
+  provider_rsa_public: string;
+  provider_rsa_private: string;
 }
 
 const configProfile = require('../../../config');
@@ -43,7 +43,9 @@ const DOTENV_SCHEMA = Joi.object({
   PROVIDER_PASSWORD: Joi.string(),
   ESTUARY_TOKEN: Joi.string(),
   ESTUARY_ENDPOINT: Joi.string(),
-  FILECOIN_GATEWAY: Joi.string(),
+  IPFS_GATEWAY: Joi.string(),
+  IPFS_PROJECT_ID: Joi.string(),
+  IPFS_PROJECT_SECRET: Joi.string(),
   AWS_S3_ACCESS_KEY_ID: Joi.string(),
   AWS_S3_SECRET_ACCESS_KEY: Joi.string(),
   AWS_S3_ENDPOINT: Joi.string(),
@@ -68,17 +70,19 @@ type DotenvSchemaKeys =
   | 'PROVIDER_PASSWORD'
   | 'ESTUARY_TOKEN'
   | 'ESTUARY_ENDPOINT'
-  | 'FILECOIN_GATEWAY'
+  | 'IPFS_GATEWAY'
+  | 'IPFS_PROJECT_ID'
+  | 'IPFS_PROJECT_SECRET'
   | 'AWS_S3_ACCESS_KEY_ID'
   | 'AWS_S3_SECRET_ACCESS_KEY'
   | 'AWS_S3_ENDPOINT'
   | 'AWS_S3_BUCKET_NAME'
   | 'ENABLE_PROVENANCE'
-  | 'ARTIFACTS_FOLDER'
+  | 'ARTIFACTS_FOLDER';
 
 export class ConfigService {
   private readonly envConfig: EnvConfig;
-  private readonly crypto: CryptoConfig
+  private readonly crypto: CryptoConfig;
 
   constructor() {
     this.envConfig = this.validateInput(configProfile);
@@ -87,7 +91,7 @@ export class ConfigService {
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
-    }
+    };
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
@@ -95,11 +99,11 @@ export class ConfigService {
   }
 
   nvm(): Config {
-    return this.envConfig.nvm
+    return this.envConfig.nvm;
   }
 
   cryptoConfig(): CryptoConfig {
-    return this.crypto
+    return this.crypto;
   }
 
   getProviderBabyjub() {
