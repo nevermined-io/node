@@ -119,6 +119,9 @@
       "json",
       "ts"
     ],
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    },
     "setupFiles": [
       "jest-date-mock"
     ],
@@ -127,7 +130,6 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "transformIgnorePatterns": ["node_modules\/(?!axios)"],
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
