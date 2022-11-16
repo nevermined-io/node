@@ -65,6 +65,9 @@ jobs:
         export SEED_WORDS=${{ secrets.seedWords }}
         export PROVIDER_PASSWORD=secret
         export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
+        export IPFS_GATEWAY="https://ipfs.infura.io:5001"
+        export IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
+        export IPFS_PROJECT_SECRET=${{ secrets.IPFS_PROJECT_SECRET }}
         yarn run start &
     - uses: actions/checkout@v3
       with:
