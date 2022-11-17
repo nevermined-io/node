@@ -150,13 +150,11 @@ export class ComputeService {
             },
             {
                 name: "marketplace_api_url",
-                value: "http://host.docker.internal:3100"
-                //value: this.configService.nvm().marketplaceUri
+                value: this.configService.nvm().marketplaceUri
             },
             {
                 name: "gateway_url",
-                value: "http://host.docker.internal:8030"
-                //value: this.configService.nvm().gatewayUri
+                value: this.configService.nvm().gatewayUri
             },
             {
                 name: "gateway_address",
@@ -164,8 +162,7 @@ export class ComputeService {
             },
             {
                 name: "keeper_url",
-                value: "http://host.docker.internal:8545"
-                //value: this.configService.nvm().nodeUri
+                value: this.configService.nvm().nodeUri
             },
             {
                 name: "workflow_did",
