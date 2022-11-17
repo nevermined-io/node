@@ -133,7 +133,7 @@ spec:
       - -cxe
       args:
       - >-
-        cd $NEVERMINED_TRANSFORMATIONS_PATH/*/;
+        cd $NEVERMINED_TRANSFORMATIONS_PATH;
         {{workflow.parameters.transformation_arguments}};
         ls -lR /data/outputs/
       env:
@@ -159,9 +159,8 @@ spec:
       - -cxe
       args:
       - |
-        ls -l /artifacts;
         ./bin/pod-publish \
-        --workflowId $WORKFLOW_DID \
+        --workflowDid $WORKFLOW_DID \
         --consumerAddress $CONSUMER_ADDRESS;
         ls -lR /data
       env:
