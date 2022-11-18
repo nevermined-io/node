@@ -78,7 +78,7 @@ spec:
 
   - name: configurator-pod
     container:
-      image: neverminedio/compute-pods-config:develop
+      image: neverminedio/compute-pods-config:latest
       imagePullPolicy: IfNotPresent
       name: configurator-pod
       command:
@@ -151,7 +151,7 @@ spec:
 
   - name: publishing-pod
     container:
-      image: neverminedio/compute-pods-publish:develop
+      image: neverminedio/compute-pods-publish:latest
       imagePullPolicy: IfNotPresent
       name: publishing-pod
       command:
