@@ -153,16 +153,16 @@ export class ComputeService {
                 value: this.configService.nvm().marketplaceUri
             },
             {
-                name: "gateway_url",
-                value: this.configService.nvm().gatewayUri
+                name: "web3_provider_url",
+                value: this.configService.nvm().web3ProviderUri
             },
             {
-                name: "gateway_address",
-                value: this.configService.nvm().gatewayAddress
+                name: "node_address",
+                value: this.configService.nvm().neverminedNodeAddress
             },
             {
-                name: "keeper_url",
-                value: this.configService.nvm().nodeUri
+                name: "node_url",
+                value: this.configService.nvm().neverminedNodeUri
             },
             {
                 name: "workflow_did",

@@ -21,7 +21,7 @@ spec:
       #   value:
       # - name: consumer_address
       #   value:
-      # - name: keeper_url
+      # - name: web3_provider_url
       #   value:
       # - name: verbose
       #   value:
@@ -29,9 +29,9 @@ spec:
       #   value:
       # - name: marketplace_api_url
       #   value:
-      # - name: gateway_url
+      # - name: node_url
       #   value:
-      # - name: gateway_address
+      # - name: node_address
       #   value:
       # - name: transformation_container_image
       #   value:
@@ -95,15 +95,15 @@ spec:
         value: '{{workflow.parameters.provider_key_file}}'
       - name: PROVIDER_PASSWORD
         value: '{{workflow.parameters.provider_password}}'
-      - name: KEEPER_URL
-        value: '{{workflow.parameters.keeper_url}}'
+      - name: WEB3_PROVIDER_URL
+        value: '{{workflow.parameters.web3_provider_url}}'
       - name: WORKFLOW_DID
         value: '{{workflow.parameters.workflow_did}}'
-      - name: GATEWAY_URI
-        value: '{{workflow.parameters.gateway_url}}'
-      - name: GATEWAY_ADDRESS
-        value: '{{workflow.parameters.gateway_address}}'
-      - name: MARKETPLACE_URI
+      - name: NODE_URL
+        value: '{{workflow.parameters.node_url}}'
+      - name: NODE_ADDRESS
+        value: '{{workflow.parameters.node_address}}'
+      - name: MARKETPLACE_API_URL
         value: '{{workflow.parameters.marketplace_api_url}}'
       - name: ARTIFACTS_FOLDER
         value: '{{workflow.parameters.artifacts_folder}}'
@@ -170,15 +170,15 @@ spec:
         value: '{{workflow.parameters.provider_password}}'
       - name: CONSUMER_ADDRESS
         value: '{{workflow.parameters.consumer_address}}'
-      - name: KEEPER_URL
-        value: '{{workflow.parameters.keeper_url}}'
+      - name: WEB3_PROVIDER_URL
+        value: '{{workflow.parameters.web3_provider_url}}'
       - name: WORKFLOW_DID
         value: '{{workflow.parameters.workflow_did}}'
-      - name: GATEWAY_URI
-        value: '{{workflow.parameters.gateway_url}}'
-      - name: GATEWAY_ADDRESS
-        value: '{{workflow.parameters.gateway_address}}'
-      - name: MARKETPLACE_URI
+      - name: NODE_URL
+        value: '{{workflow.parameters.node_url}}'
+      - name: NODE_ADDRESS
+        value: '{{workflow.parameters.node_address}}'
+      - name: MARKETPLACE_API_URL
         value: '{{workflow.parameters.marketplace_api_url}}'
       - name: ARTIFACTS_FOLDER
         value: '{{workflow.parameters.artifacts_folder}}'
