@@ -26,7 +26,7 @@ import {
     
     private argoNamespace = this.configService.computeConfig().argo_namespace;
     private argoWorkflowApi= new WorkflowServiceApi({ basePath: this.configService.computeConfig().argo_host}); 
-    private getAuthorizationHeaderOption():{headers: {Authorization:string}} | {} {
+    private getAuthorizationHeaderOption():{headers: {Authorization:string}} | any {
         return this.configService.computeConfig().argo_auth_token?{
             headers: { Authorization: this.configService.computeConfig().argo_auth_token }
         }:{}
@@ -46,9 +46,7 @@ import {
     })
     // @ApiBearerAuth('Authorization')
    @Public()
-    async initTest(
-        @Body() initData: InitDto,
-    ): Promise<string> {
+    async initTest(): Promise<string> {
 
        try {
 
@@ -198,7 +196,7 @@ import {
         }         
     }
     
-    @Get('stop/:workflowID')
+    @Delete('stop/:workflowID')
     @ApiOperation({
         description: 'Stop',
         summary: 'Stop the execution of a workflow',
