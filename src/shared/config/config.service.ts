@@ -9,14 +9,14 @@ import { Logger } from '../logger/logger.service';
 
 export interface EnvConfig {
   [key: string]: string;
-  nvm: any
+  nvm: any;
 }
 
 export interface CryptoConfig {
-  provider_key: string,
-  provider_password: string,
-  provider_rsa_public: string,
-  provider_rsa_private: string,
+  provider_key: string;
+  provider_password: string;
+  provider_rsa_public: string;
+  provider_rsa_private: string;
 }
 
 export interface ComputeConfig {
@@ -54,7 +54,9 @@ const DOTENV_SCHEMA = Joi.object({
   PROVIDER_PASSWORD: Joi.string(),
   ESTUARY_TOKEN: Joi.string(),
   ESTUARY_ENDPOINT: Joi.string(),
-  FILECOIN_GATEWAY: Joi.string(),
+  IPFS_GATEWAY: Joi.string(),
+  IPFS_PROJECT_ID: Joi.string(),
+  IPFS_PROJECT_SECRET: Joi.string(),
   AWS_S3_ACCESS_KEY_ID: Joi.string(),
   AWS_S3_SECRET_ACCESS_KEY: Joi.string(),
   AWS_S3_ENDPOINT: Joi.string(),
@@ -87,7 +89,9 @@ type DotenvSchemaKeys =
   | 'PROVIDER_PASSWORD'
   | 'ESTUARY_TOKEN'
   | 'ESTUARY_ENDPOINT'
-  | 'FILECOIN_GATEWAY'
+  | 'IPFS_GATEWAY'
+  | 'IPFS_PROJECT_ID'
+  | 'IPFS_PROJECT_SECRET'
   | 'AWS_S3_ACCESS_KEY_ID'
   | 'AWS_S3_SECRET_ACCESS_KEY'
   | 'AWS_S3_ENDPOINT'
@@ -133,11 +137,11 @@ export class ConfigService {
   }
 
   nvm(): Config {
-    return this.envConfig.nvm
+    return this.envConfig.nvm;
   }
 
   cryptoConfig(): CryptoConfig {
-    return this.crypto
+    return this.crypto;
   }
 
   computeConfig(): ComputeConfig {

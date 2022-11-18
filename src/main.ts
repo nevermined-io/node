@@ -26,7 +26,7 @@ const bootstrap = async () => {
   const packageJson = JSON.parse(packageJsonString) as { version: string };
 
   const options = new DocumentBuilder()
-    .setTitle('Nevermined Gateway')
+    .setTitle('Nevermined Node')
     .setVersion(packageJson.version)
     .addBearerAuth(
       {

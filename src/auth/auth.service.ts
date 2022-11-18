@@ -10,7 +10,7 @@ import { NeverminedService } from '../shared/nevermined/nvm.service';
 import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import { Logger } from '@nevermined-io/nevermined-sdk-js';
 
-const BASE_URL = '/api/v1/gateway/services/';
+const BASE_URL = '/api/v1/node/services/';
 
 @Injectable()
 export class AuthService {

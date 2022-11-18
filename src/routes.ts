@@ -8,9 +8,9 @@ import { ComputeModule } from './compute/compute.module'
 const exposeCompute: boolean = Boolean(process.env.ENABLE_COMPUTE) === true || false
 
 export const routes: Routes = [
-  { path: '/api/v1/gateway/services/encrypt', module: EncryptModule },
-  { path: '/api/v1/gateway/services/oauth', module: AuthModule },
-  { path: '/api/v1/gateway/services', module: AccessModule },
+  { path: '/api/v1/node/services/encrypt', module: EncryptModule },
+  { path: '/api/v1/node/services/oauth', module: AuthModule },
+  { path: '/api/v1/node/services', module: AccessModule },
   { path: '/', module: InfoModule },
 ];
 
