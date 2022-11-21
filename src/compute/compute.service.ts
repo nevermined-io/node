@@ -26,7 +26,7 @@ export class ComputeService {
       private configService: ConfigService,
       private nvmService: NeverminedService) {}
 
- createWorkflowStatus(responseBody:any, workflowID: string):WorkflowStatus {
+ async createWorkflowStatus(responseBody:any, workflowID: string):Promise<WorkflowStatus> {
 
     let result; 
     const pods = [];
@@ -61,13 +61,24 @@ export class ComputeService {
     });
 
     result = {...result, pods};
-    // TODO look for did
+   
     if (result.status === 'Succeeded'){
-        result = {...result, did:"did:nv:xxxxx"};
-        /*
-            ddo = nevermined.assets.search(f'"{execution_id}"')[0]
-            result["did"] = ddo.did
-        */
+
+        const query = {
+            nested: {
+                path: "service",
+                query: {
+                    match: { 'service.attributes.additionalInformation.customData.workflowID': workflowID }
+                }
+            }
+        }
+
+        const queryResult = await this.nvmService.getNevermined().assets.query({query: query})
+
+        if (queryResult.totalResults.value > 0){
+            const did = queryResult.results[0].id
+            result = {...result, did:did}    
+        }
     }
 
     return result;

@@ -156,7 +156,7 @@ import {
         }   
 
         try{     
-            const status = this.computeService.createWorkflowStatus(response.data, workflowID);
+            const status = await this.computeService.createWorkflowStatus(response.data, workflowID);
             return JSON.stringify(status);
 
         }catch(e) {
@@ -176,7 +176,7 @@ import {
         description: 'Returns the Workflow ID',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
+   // @ApiBearerAuth('Authorization')
    @Public()
     async initCompute(
         @Body() initData: InitDto,
@@ -245,7 +245,18 @@ import {
     async getWorkflowExecutionLogs(
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
-        return "Logs of workflow: " + workflowID;
+
+        //const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, "publishing", undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+         //   undefined, undefined,undefined, this.getAuthorizationHeaderOption())
+
+
+        const response = await this.argoWorkflowApi.workflowServicePodLogs(this.argoNamespace, workflowID, "publishing", undefined, undefined, undefined, undefined, undefined,
+            undefined, undefined, undefined, undefined, true, undefined, undefined, this.getAuthorizationHeaderOption())
+
+        Logger.debug(`LOGS: ${JSON.stringify(response.data)}`)
+
+
+        return JSON.stringify(response.data)
     }
 
 
