@@ -21,8 +21,7 @@ export interface CryptoConfig {
 
 export interface ComputeConfig {
   enable_compute: boolean,
-  local_tools_compute: boolean,
-  local_tools_host_name: string,
+  gethlocal_host_name: string,
   argo_host: string,
   argo_namespace: string,
   argo_auth_token: string,
@@ -35,6 +34,7 @@ export interface ComputeConfig {
 const configProfile = require('../../../config');
 
 const DOTENV_SCHEMA = Joi.object({
+  NETWORK_NAME: Joi.string(),
   NODE_ENV: Joi.string().valid('development', 'production', 'test', 'staging').default('development'),
   JWT_SECRET_KEY: Joi.string().required().error(new Error('JWT_SECRET_KEY is required!')),
   JWT_EXPIRY_KEY: Joi.string().default('60m'),
@@ -66,7 +66,6 @@ const DOTENV_SCHEMA = Joi.object({
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
-  LOCAL_TOOLS_COMPUTE: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default("http:localhost:2746/"),
   ARGO_NAMESPACE: Joi.string().default("argo"),
   ARGO_AUTH_TOKEN: Joi.string(),
@@ -77,6 +76,7 @@ const DOTENV_SCHEMA = Joi.object({
 });
 
 type DotenvSchemaKeys =
+  | 'NETWORK_NAME'
   | 'NODE_ENV'
   | 'server.port'
   | 'database.url'
@@ -102,7 +102,6 @@ type DotenvSchemaKeys =
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
   | 'ENABLE_COMPUTE'
-  | 'LOCAL_TOOLS_COMPUTE'
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE'
   | 'ARGO_AUTH_TOKEN'
@@ -126,8 +125,7 @@ export class ConfigService {
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
-      local_tools_compute: this.get('LOCAL_TOOLS_COMPUTE'),
-      local_tools_host_name: "host.docker.internal",
+      gethlocal_host_name: "host.docker.internal",
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
       argo_auth_token: this.get('ARGO_AUTH_TOKEN'),

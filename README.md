@@ -82,7 +82,6 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **ENABLE_PROVENANCE** | If `true` it will enable the integration with the provenance registry | `true` or `false`
 | **ARTIFACTS_FOLDER** | Path where the Node will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder
 | **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false`
-| **LOCAL_TOOLS_COMPUTE** | If `true `indicates that the Compute stack is running in Nevermined's Tools. `false` by default | `true`
 | **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance`
 | **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo`
 | **ARGO_AUTH_TOKEN**      | Authorization Token for Argo Workflows.  Requires ENABLE_COMPUTE = true  | 'Bearer sdfsdfsdfvxcvVVSDFSDFSDFsdf...'

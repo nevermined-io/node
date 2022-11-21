@@ -246,15 +246,10 @@ import {
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
-        //const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, "publishing", undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-         //   undefined, undefined,undefined, this.getAuthorizationHeaderOption())
+        const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, "nevermined-compute-xk7fv.configurator", "neverminedio/compute-pods-config:latest", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
+          undefined, undefined,undefined, this.getAuthorizationHeaderOption())
 
-
-        const response = await this.argoWorkflowApi.workflowServicePodLogs(this.argoNamespace, workflowID, "publishing", undefined, undefined, undefined, undefined, undefined,
-            undefined, undefined, undefined, undefined, true, undefined, undefined, this.getAuthorizationHeaderOption())
-
-        Logger.debug(`LOGS: ${JSON.stringify(response.data)}`)
-
+        Logger.debug(`LOGS: ${response.data}`)
 
         return JSON.stringify(response.data)
     }

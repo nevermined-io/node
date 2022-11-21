@@ -146,9 +146,9 @@ export class ComputeService {
     Logger.debug(`transformation container: ${image}`);
     Logger.debug(`transformation tag: ${tag}`);
 
-    const localTools = this.configService.computeConfig().local_tools_compute
-    if (localTools)
-        Logger.debug(`Compute Stack running in Nevermined Tools. Using ${this.configService.computeConfig().local_tools_host_name} as host for NVM services`)
+    const gethLocal = this.configService.get<string>('NETWORK_NAME') === 'geth-localnet'
+    if (gethLocal)
+        Logger.debug(`Compute Stack running in Nevermined Tools. Using ${this.configService.computeConfig().gethlocal_host_name} as host for NVM services`)
 
     return [
             {
@@ -165,11 +165,11 @@ export class ComputeService {
             },
             {
                 name: "marketplace_api_url",
-                value: localTools?`http://${this.configService.computeConfig().local_tools_host_name}:3100`:this.configService.nvm().marketplaceUri
+                value: gethLocal?`http://${this.configService.computeConfig().gethlocal_host_name}:3100`:this.configService.nvm().marketplaceUri
             },
             {
                 name: "web3_provider_url",
-                value:  localTools?`http://${this.configService.computeConfig().local_tools_host_name}:8545`:this.configService.nvm().web3ProviderUri
+                value: gethLocal?`http://${this.configService.computeConfig().gethlocal_host_name}:8545`:this.configService.nvm().web3ProviderUri
             },
             {
                 name: "node_address",
@@ -177,7 +177,7 @@ export class ComputeService {
             },
             {
                 name: "node_url",
-                value:  localTools?`http://${this.configService.computeConfig().local_tools_host_name}:8030`:this.configService.nvm().neverminedNodeUri
+                value: gethLocal?`http://${this.configService.computeConfig().gethlocal_host_name}:8030`:this.configService.nvm().neverminedNodeUri
             },
             {
                 name: "workflow_did",
@@ -189,7 +189,7 @@ export class ComputeService {
             },
             {
                 name: "minio_host",
-                value: localTools?`${this.configService.computeConfig().local_tools_host_name}`:this.configService.computeConfig().minio_host
+                value: gethLocal?`${this.configService.computeConfig().gethlocal_host_name}`:this.configService.computeConfig().minio_host
             },
             {
                 name: "minio_port",

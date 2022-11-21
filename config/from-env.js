@@ -1,5 +1,7 @@
 
 const keys = [
+    'NETWORK_NAME',
+
     'JWT_SECRET_KEY',
     'JWT_EXPIRY_KEY',
   
@@ -27,7 +29,6 @@ const keys = [
     'ENABLE_PROVENANCE',
     'ARTIFACTS_FOLDER',
     'ENABLE_COMPUTE',
-    'LOCAL_TOOLS_COMPUTE',
     'ARGO_HOST',
     'ARGO_NAMESPACE',
     'ARGO_AUTH_TOKEN',
