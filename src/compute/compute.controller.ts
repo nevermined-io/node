@@ -166,10 +166,10 @@ import {
         
     }
 
-    @Post('init')
+    @Post('execute')
     @ApiOperation({
-        description: 'Compute Init',
-        summary: 'Start the execution of a compute workflow',
+        description: 'Execute compute',
+        summary: 'Starts the execution of a compute workflow',
     })
     @ApiResponse({
         status: 200,
@@ -246,7 +246,7 @@ import {
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
-        const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, "nevermined-compute-xk7fv.configurator", "neverminedio/compute-pods-config:latest", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
+        const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
           undefined, undefined,undefined, this.getAuthorizationHeaderOption())
 
         Logger.debug(`LOGS: ${response.data}`)
