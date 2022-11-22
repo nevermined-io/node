@@ -5,8 +5,7 @@ import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
 import { utils } from '@nevermined-io/nevermined-sdk-js';
 import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
 import AWS from 'aws-sdk';
-import { FormData } from 'formdata-node';
-import { Blob } from 'buffer';
+import { default as FormData } from 'form-data';
 import { Logger } from '../logger/logger.service';
 import { ConfigService } from '../config/config.service';
 import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
@@ -14,13 +13,7 @@ import { ethers } from 'ethers';
 import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import { HttpModuleOptions, HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-
-const _importDynamic = new Function('modulePath', 'return import(modulePath)');
-
-async function fetch(...args) {
-  const { default: fetch } = await _importDynamic('node-fetch');
-  return fetch(...args);
-}
+import { AxiosError } from 'axios';
 
 @Injectable()
 export class NeverminedService {
@@ -197,24 +190,39 @@ export class NeverminedService {
   async uploadFilecoin(file: Buffer, filename: string): Promise<string> {
     try {
       Logger.debug(`Uploading to filecoin ${filename}`);
+
       const formData = new FormData();
-      const blob = new Blob([file]);
-      formData.append('data', blob);
-      const res = await fetch(this.config.get('ESTUARY_ENDPOINT'), {
+      formData.append('data', file, filename);
+      formData.append('filename', filename);
+
+      const url = new URL('/content/add', this.config.get('ESTUARY_ENDPOINT'));
+      const config: HttpModuleOptions = {
+        url: url.toString(),
         method: 'POST',
         headers: {
           Authorization: `Bearer ${this.config.get('ESTUARY_TOKEN')}`,
+          'Content-Type': formData.getHeaders()['content-type'],
         },
-        body: formData as any,
-      });
-      const obj = (await res.json()) as any;
+        data: formData,
+      };
+
+      const response = await firstValueFrom(this.httpService.request(config));
+      const obj = response.data;
+
       if (obj.error) {
+        Logger.error('Estuary returned an error message:', obj.error);
         throw new InternalServerErrorException(obj.error);
       }
+
       return 'cid://' + obj.cid;
     } catch (e) {
-      Logger.error(`Uploading ${filename}: Filecoin error ${e.response}`);
-      throw new InternalServerErrorException(e.response);
+      if (e instanceof AxiosError) {
+        Logger.error('Axios Error: ', e.response);
+        throw new InternalServerErrorException('There was a problem uploading file to filecoin');
+      } else {
+        Logger.error(`Uploading ${filename}: Filecoin error ${e}`);
+        throw new InternalServerErrorException(e);
+      }
     }
   }
 

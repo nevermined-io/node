@@ -154,22 +154,22 @@ export class AccessController {
     let data = file.buffer;
     if (uploadData.encrypt) {
       // generate password
-      Logger.debug(`Uploading with password, filename ${file.filename}`);
+      Logger.debug(`Uploading with password, filename ${file.originalname}`);
       const password = crypto.randomBytes(32).toString('base64url');
       data = Buffer.from(aes_encryption_256(data, password), 'binary');
       if (backend === 's3') {
-        const url = await this.nvmService.uploadS3(data, file.filename);
+        const url = await this.nvmService.uploadS3(data, file.originalname);
         return { url, password };
       } else if (backend === 'filecoin') {
-        const url = await this.nvmService.uploadFilecoin(data, file.filename);
+        const url = await this.nvmService.uploadFilecoin(data, file.originalname);
         return { url, password };
       }
     }
     if (backend === 's3') {
-      const url = await this.nvmService.uploadS3(data, file.filename);
+      const url = await this.nvmService.uploadS3(data, file.originalname);
       return { url };
     } else if (backend === 'filecoin') {
-      const url = await this.nvmService.uploadFilecoin(data, file.filename);
+      const url = await this.nvmService.uploadFilecoin(data, file.originalname);
       return { url };
     }
   }
