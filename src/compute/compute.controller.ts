@@ -168,7 +168,7 @@ import {
         
     }
 
-    @Post('execute')
+    @Post('execute/:agreementId')
     @ApiOperation({
         description: 'Execute compute',
         summary: 'Starts the execution of a compute workflow',
@@ -182,14 +182,17 @@ import {
    @Public()
     async initCompute(
         @Body() initData: InitDto,
+        @Param('agreementId') agreementId: string
     ): Promise<string> {
 
        try {
 
+            Logger.debug(`Executing compute for agreement id ${agreementId}`)
+
             const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
         
-            Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
+            Logger.debug("Argo Workflow created: " + JSON.stringify(response.data))
             return response.data.metadata.name   
 
         }catch(e) {
