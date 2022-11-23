@@ -100,7 +100,7 @@ export class ComputeService {
     return yaml.load(templateContent); 
   }
 
-  async createArgoWorkflow(initData: InitDto): Promise<any> {
+  async createArgoWorkflow(initData: InitDto, agreementId: string): Promise<any> {
  
     const workflow = this.readWorkflowTemplate();
 
@@ -110,7 +110,7 @@ export class ComputeService {
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
     workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer);
-    workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId;
+    workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId;
 
     workflow.spec.entrypoint= "compute-workflow";
 

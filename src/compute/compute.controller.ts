@@ -189,7 +189,7 @@ import {
 
             Logger.debug(`Executing compute for agreement id ${agreementId}`)
 
-            const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
+            const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId)
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
         
             Logger.debug("Argo Workflow created with id: " + JSON.stringify(response.data.metadata.name))
