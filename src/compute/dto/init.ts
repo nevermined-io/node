@@ -21,5 +21,5 @@ export class InitDto {
       example: '0xe2DD09d719Da89e5a3D0F2549c7E24566e947260'
     })
     @IsString()
-    consumerAddress: string;
+    consumer: string;
   }

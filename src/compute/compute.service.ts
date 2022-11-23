@@ -109,7 +109,7 @@ export class ComputeService {
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`);
    
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
-    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumerAddress);
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer);
     workflow.spec.workflowMetadata.labels.serviceAgreement = initData.agreementId;
 
     workflow.spec.entrypoint= "compute-workflow";
