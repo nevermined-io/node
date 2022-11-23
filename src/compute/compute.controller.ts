@@ -100,7 +100,7 @@ import {
         }           
     }
 
-    @Get('info/:agreementId/:workflowID')
+    @Get('info/:agreement_id/:workflowID')
     @ApiOperation({
         description: 'Info',
         summary: 'Returns info about a workflow',
@@ -113,7 +113,7 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowInfo(
-        @Param('agreementId') agreementId: string,
+        @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
@@ -130,7 +130,7 @@ import {
         }   
     }
 
-    @Get('status/:agreementId/:workflowID')
+    @Get('status/:agreement_id/:workflowID')
     @ApiOperation({
         description: 'Status',
         summary: 'Returns the complete status about a workflow',
@@ -143,7 +143,7 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowStatus(
-        @Param('agreementId') agreementId: string,
+        @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
         
@@ -168,7 +168,7 @@ import {
         
     }
 
-    @Post('execute/:agreementId')
+    @Post('execute/:agreement_id')
     @ApiOperation({
         description: 'Execute compute',
         summary: 'Starts the execution of a compute workflow',
@@ -182,7 +182,7 @@ import {
    @Public()
     async initCompute(
         @Body() initData: InitDto,
-        @Param('agreementId') agreementId: string
+        @Param('agreement_id') agreementId: string
     ): Promise<string> {
 
        try {
@@ -235,7 +235,7 @@ import {
         }   
     }
 
-    @Get('logs/:agreementId/:workflowID')
+    @Get('logs/:agreement_id/:workflowID')
     @ApiOperation({
         description: 'Logs',
         summary: 'Returns the logs of the execution of a workflow',
@@ -248,7 +248,7 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowExecutionLogs(
-        @Param('agreementId') agreementId: string,
+        @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
