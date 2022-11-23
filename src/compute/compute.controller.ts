@@ -192,12 +192,12 @@ import {
             const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
         
-            Logger.debug("Argo Workflow created: " + JSON.stringify(response.data))
+            Logger.debug("Argo Workflow created with id: " + JSON.stringify(response.data.metadata.name))
             return response.data.metadata.name   
 
         }catch(e) {
-            Logger.error(`Problem initialing workflow for service Agreement ${initData.agreementId}. Error: ${e}`);
-            throw new InternalServerErrorException(`Problem initialing workflow for service Agreement ${initData.agreementId}`);
+            Logger.error(`Problem initialing workflow for service Agreement ${agreementId}. Error: ${e}`);
+            throw new InternalServerErrorException(`Problem initialing workflow for service Agreement ${agreementId}`);
         }         
     }
     
