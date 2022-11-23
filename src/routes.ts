@@ -14,4 +14,4 @@ export const routes: Routes = [
   { path: '/', module: InfoModule },
 ];
 
-if (exposeCompute) routes.push({ path: '/api/v1/node/compute', module: ComputeModule })
+if (exposeCompute) routes.push({ path: '/api/v1/node/services/compute', module: ComputeModule })
