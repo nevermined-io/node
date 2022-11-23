@@ -100,7 +100,7 @@ import {
         }           
     }
 
-    @Get('info/:workflowID')
+    @Get('info/:agreementId/:workflowID')
     @ApiOperation({
         description: 'Info',
         summary: 'Returns info about a workflow',
@@ -113,10 +113,11 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowInfo(
+        @Param('agreementId') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
 
-        Logger.debug(`Getting information about workflow ${workflowID}`);
+        Logger.debug(`Getting information about workflow ${workflowID} with agreement ${agreementId}`);
 
         try {
             const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
@@ -129,7 +130,7 @@ import {
         }   
     }
 
-    @Get('status/:workflowID')
+    @Get('status/:agreementId/:workflowID')
     @ApiOperation({
         description: 'Status',
         summary: 'Returns the complete status about a workflow',
@@ -142,10 +143,11 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowStatus(
+        @Param('agreementId') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
         
-        Logger.debug(`Getting status about workflow ${workflowID}`);
+        Logger.debug(`Getting status about workflow ${workflowID} with agreement ${agreementId}`);
         let response;
 
         try {
@@ -230,7 +232,7 @@ import {
         }   
     }
 
-    @Get('logs/:workflowID')
+    @Get('logs/:agreementId/:workflowID')
     @ApiOperation({
         description: 'Logs',
         summary: 'Returns the logs of the execution of a workflow',
@@ -243,8 +245,11 @@ import {
     // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowExecutionLogs(
+        @Param('agreementId') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
+
+        Logger.debug(`Getting logs for workflow ${workflowID} with agreement ${agreementId}`);
 
         const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
           undefined, undefined,undefined, this.getAuthorizationHeaderOption())
