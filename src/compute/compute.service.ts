@@ -31,11 +31,11 @@ async createWorkflowStatus(responseBody:any, workflowID: string):Promise<Workflo
     let result; 
     const pods = [];
                
-    // Transform from tuple objects to array
-    const nodesTuples = responseBody.status.nodes;
+    // Transform from pairs of id:object to array of objects
+    const nodesPairs = responseBody.status.nodes;
     const nodesArray = [];
-    for (const i in nodesTuples){
-        nodesArray.push(nodesTuples[i]);
+    for (const i in nodesPairs){
+        nodesArray.push(nodesPairs[i]);
     }
 
     nodesArray.forEach((element) => {
