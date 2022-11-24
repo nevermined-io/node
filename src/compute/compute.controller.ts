@@ -26,14 +26,12 @@ import {
     
     private argoNamespace = this.configService.computeConfig().argo_namespace;
     private argoWorkflowApi= new WorkflowServiceApi({ basePath: this.configService.computeConfig().argo_host}); 
-    private getAuthorizationHeaderOption():{headers: {Authorization:string}} | any {
-        return this.configService.computeConfig().argo_auth_token?{
+    private getAuthorizationHeaderOption:{headers: {Authorization:string}} | any =
+        this.configService.computeConfig().argo_auth_token?{
             headers: { Authorization: this.configService.computeConfig().argo_auth_token }
         }:{}
 
-    }
-
-
+    
     @Post('test')
     @ApiOperation({
         description: 'Compute Init',
@@ -50,7 +48,7 @@ import {
        try {
 
             const argoWorkflow = await this.computeService.readExample()
-            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
+            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
         
             Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
             return response.data.metadata.name   
@@ -81,7 +79,7 @@ import {
         try {
             
             const response = await this.argoWorkflowApi.workflowServiceListWorkflows(this.argoNamespace, undefined,
-                undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, this.getAuthorizationHeaderOption());
+                undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, this.getAuthorizationHeaderOption);
             const result = [];
 
             if (response.data.items){
@@ -117,7 +115,7 @@ import {
         Logger.debug(`Getting information about workflow ${workflowID} with agreement ${agreementId}`);
 
         try {
-            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
+            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
             console.log(JSON.stringify(response.data))
             return JSON.stringify(response.data.metadata);
             
@@ -147,7 +145,7 @@ import {
         let response;
 
         try {
-            response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption());
+            response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
             throw new NotFoundException(`Workflow ${workflowID} not found`);
@@ -185,7 +183,7 @@ import {
             Logger.debug(`Executing compute for agreement id ${agreementId}`)
 
             const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId)
-            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption())
+            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
         
             Logger.debug("Argo Workflow created with id: " + JSON.stringify(response.data.metadata.name))
             return JSON.stringify({workflowId: response.data.metadata.name})   
@@ -219,7 +217,7 @@ import {
             const deleteOptionsOrphanDependents = true;
             const deleteOptionsPropagationPolicy= 'propagation_policy_example';
             const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, 
-                deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy, undefined, undefined, this.getAuthorizationHeaderOption());
+                deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy, undefined, undefined, this.getAuthorizationHeaderOption);
            
             return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`});
 
@@ -248,7 +246,7 @@ import {
         Logger.debug(`Getting logs for workflow ${workflowID} with agreement ${agreementId}`);
 
         const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
-          undefined, undefined,undefined, this.getAuthorizationHeaderOption())
+          undefined, undefined,undefined, this.getAuthorizationHeaderOption)
 
         Logger.debug(`LOGS: ${response.data}`)
 
