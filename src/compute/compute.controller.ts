@@ -109,7 +109,6 @@ import {
         type: String,
     })
    @ApiBearerAuth('Authorization')
-   @Public()
     async getWorkflowInfo(
         @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
@@ -139,7 +138,6 @@ import {
         type: String,
     })
    @ApiBearerAuth('Authorization')
-   @Public()
     async getWorkflowStatus(
         @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
@@ -177,7 +175,6 @@ import {
         type: String,
     })
    @ApiBearerAuth('Authorization')
-   @Public()
     async initCompute(
         @Body() initData: ExecuteWorkflowDto,
         @Param('agreement_id') agreementId: string
@@ -243,7 +240,6 @@ import {
         type: String,
     })
    @ApiBearerAuth('Authorization')
-   @Public()
     async getWorkflowExecutionLogs(
         @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
