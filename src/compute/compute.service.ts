@@ -60,7 +60,7 @@ export class ComputeService {
         }          
     });
 
-    result = {...result, pods};
+    result.pods = pods
    
     if (result.status === 'Succeeded'){
 
@@ -77,7 +77,7 @@ export class ComputeService {
 
         if (queryResult.totalResults.value > 0){
             const did = queryResult.results[0].id
-            result = {...result, did:did}    
+            result.did = did    
         }
     }
 
