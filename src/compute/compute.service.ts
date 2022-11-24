@@ -54,7 +54,7 @@ export class ComputeService {
                 podName: podName,
                 status: element.phase,
                 startedAt: element.startedAt,
-                finishedAt: element.finishedAt || undefined            
+                finishedAt: element.finishedAt            
             };
             pods.push(statusMessage);
         }          
