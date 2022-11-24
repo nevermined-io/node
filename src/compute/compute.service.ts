@@ -4,7 +4,7 @@ import { NeverminedService } from '../shared/nevermined/nvm.service';
 import yaml from 'js-yaml';
 import { readFileSync } from 'fs';
 import path from 'path';
-import { InitDto } from "./dto/init";
+import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
 import { DDO } from "@nevermined-io/nevermined-sdk-js";
 import { ConfigService } from  '../shared/config/config.service';
 import { Logger } from '../shared/logger/logger.service';
@@ -100,7 +100,7 @@ export class ComputeService {
     return yaml.load(templateContent); 
   }
 
-  async createArgoWorkflow(initData: InitDto, agreementId: string): Promise<any> {
+  async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
  
     const workflow = this.readWorkflowTemplate();
 

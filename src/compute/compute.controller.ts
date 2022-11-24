@@ -11,7 +11,7 @@ import {
   import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { ComputeService } from './compute.service';
-  import { InitDto } from "./dto/init";
+  import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service';
   import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api';
@@ -179,7 +179,7 @@ import {
    @ApiBearerAuth('Authorization')
    @Public()
     async initCompute(
-        @Body() initData: InitDto,
+        @Body() initData: ExecuteWorkflowDto,
         @Param('agreement_id') agreementId: string
     ): Promise<string> {
 
