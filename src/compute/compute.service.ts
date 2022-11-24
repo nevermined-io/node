@@ -26,7 +26,7 @@ export class ComputeService {
       private configService: ConfigService,
       private nvmService: NeverminedService) {}
 
- async createWorkflowStatus(responseBody:any, workflowID: string):Promise<WorkflowStatus> {
+async createWorkflowStatus(responseBody:any, workflowID: string):Promise<WorkflowStatus> {
 
     let result; 
     const pods = [];
@@ -85,14 +85,14 @@ export class ComputeService {
 
  }
 
- readExample(): any {
+readExample(): any {
     const templatePath = path.join(__dirname, '/', 'test-workflow.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
 
     return yaml.load(templateContent); 
  }
 
- readWorkflowTemplate(): any  {
+ private readWorkflowTemplate(): any  {
     
     const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
@@ -125,7 +125,7 @@ export class ComputeService {
 
   }
 
-  async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<{name: string, value: string}[]>{
+ private async createArguments(workflowDdo: DDO, consumerAddress: string):Promise<{name: string, value: string}[]>{
    
     const metadata = workflowDdo.findServiceByType('metadata');
     const workflow = metadata.attributes.main.workflow;
