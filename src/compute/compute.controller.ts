@@ -8,7 +8,7 @@ import {
     NotFoundException,
     InternalServerErrorException,
   } from "@nestjs/common";
-  import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+  import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { ComputeService } from './compute.service';
   import { InitDto } from "./dto/init";
@@ -44,7 +44,6 @@ import {
         description: 'Returns the Workflow ID',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
    @Public()
     async initTest(): Promise<string> {
 
@@ -74,7 +73,6 @@ import {
         description: 'Returns an object that contains the list of workflows IDs',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowsList(): Promise<string> {
 
@@ -110,7 +108,7 @@ import {
         description: 'Returns an info object',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
+   @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowInfo(
         @Param('agreement_id') agreementId: string,
@@ -140,7 +138,7 @@ import {
         description: 'Returns a status object',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
+   @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowStatus(
         @Param('agreement_id') agreementId: string,
@@ -178,7 +176,7 @@ import {
         description: 'Returns the Workflow ID',
         type: String,
     })
-   // @ApiBearerAuth('Authorization')
+   @ApiBearerAuth('Authorization')
    @Public()
     async initCompute(
         @Body() initData: InitDto,
@@ -211,7 +209,6 @@ import {
         description: 'Returns a success message',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
    @Public()
     async stopWorkflowExecution(
         @Param('workflowID') workflowID: string,
@@ -245,7 +242,7 @@ import {
         description: 'Returns an object that contains the execution logs',
         type: String,
     })
-    // @ApiBearerAuth('Authorization')
+   @ApiBearerAuth('Authorization')
    @Public()
     async getWorkflowExecutionLogs(
         @Param('agreement_id') agreementId: string,
