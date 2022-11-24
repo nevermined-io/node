@@ -5,7 +5,7 @@ import { InfoModule } from './info/info.module';
 import { AccessModule } from './access/access.module';
 import { ComputeModule } from './compute/compute.module'
 
-const exposeCompute: boolean = Boolean(process.env.ENABLE_COMPUTE) === true || false
+const exposeCompute: boolean = process.env.ENABLE_COMPUTE === 'true'
 
 export const routes: Routes = [
   { path: '/api/v1/node/services/encrypt', module: EncryptModule },
