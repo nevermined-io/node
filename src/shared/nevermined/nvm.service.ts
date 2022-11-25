@@ -47,7 +47,10 @@ export class NeverminedService {
     return this.config.nvm().web3ProviderUri;
   }
 
-  async getAssetUrl(did: string, index: number): Promise<{ url: string; content_type: string; dtp: boolean }> {
+  async getAssetUrl(
+    did: string,
+    index: number
+  ): Promise<{ url: string; content_type: string; dtp: boolean; name?: string }> {
     // get url for DID
     let asset: DDO;
     try {
@@ -59,6 +62,7 @@ export class NeverminedService {
     const service = asset.findServiceByType('metadata');
     const file_attributes = service.attributes.main.files[index];
     const content_type = file_attributes.contentType;
+    const name = file_attributes.name;
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP';
     if (auth_method === 'RSAES-OAEP') {
       const filelist = JSON.parse(
@@ -66,7 +70,7 @@ export class NeverminedService {
       );
       // download url or what?
       const url: string = filelist[index].url;
-      return { url, content_type, dtp: this.isDTP(service.attributes.main) };
+      return { url, content_type, dtp: this.isDTP(service.attributes.main), name };
     }
     Logger.error(`Auth METHOD wasn't RSAES-OAEP`);
     throw new BadRequestException();
@@ -76,7 +80,7 @@ export class NeverminedService {
     Logger.debug(`Downloading asset from ${did} index ${index}`);
     try {
       // eslint-disable-next-line prefer-const
-      let { url, content_type, dtp } = await this.getAssetUrl(did, index);
+      let { url, content_type, dtp, name } = await this.getAssetUrl(did, index);
       if (!url) {
         Logger.error(`URL for did ${did} not found`);
         throw new NotFoundException(`URL for did ${did} not found`);
@@ -86,8 +90,14 @@ export class NeverminedService {
       }
       Logger.debug(`Serving URL ${url}`);
 
-      const param = url.split('/').slice(-1)[0];
-      const filename = param.split('?')[0];
+      // If filename is on the ddo we will use that by default
+      let filename: string;
+      if (name) {
+        filename = name;
+      } else {
+        const param = url.split('/').slice(-1)[0];
+        filename = param.split('?')[0];
+      }
 
       let response;
 
