@@ -66,35 +66,6 @@ import {
         }           
     }
 
-    @Get('info/:agreement_id/:workflowID')
-    @ApiOperation({
-        description: 'Info',
-        summary: 'Returns info about a workflow',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Returns an info object',
-        type: String,
-    })
-   @ApiBearerAuth('Authorization')
-    async getWorkflowInfo(
-        @Param('agreement_id') agreementId: string,
-        @Param('workflowID') workflowID: string,
-    ): Promise<string> {
-
-        Logger.debug(`Getting information about workflow ${workflowID} with agreement ${agreementId}`);
-
-        try {
-            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
-            console.log(JSON.stringify(response.data))
-            return JSON.stringify(response.data.metadata);
-            
-        }catch(e) {
-            Logger.error(`Error trying to get information about workflow ${workflowID}. Error: ${e}`);
-            throw new NotFoundException(`Workflow ${workflowID} not found`);
-        }   
-    }
-
     @Get('status/:agreement_id/:workflowID')
     @ApiOperation({
         description: 'Status',
