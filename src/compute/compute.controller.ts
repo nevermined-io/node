@@ -31,36 +31,6 @@ import {
             headers: { Authorization: this.configService.computeConfig().argo_auth_token }
         }:{}
 
-    
-    @Post('test')
-    @ApiOperation({
-        description: 'Compute Init',
-        summary: 'Start the execution of a compute workflow',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Returns the Workflow ID',
-        type: String,
-    })
-   @Public()
-    async initTest(): Promise<string> {
-
-       try {
-
-            const argoWorkflow = await this.computeService.readExample()
-            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
-        
-            Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
-            return response.data.metadata.name   
-
-        }catch(e) {
-            Logger.error(`Problem initialing test workflow. Error: ${e}`);
-            throw new InternalServerErrorException(`Problem initialing  test workflow`);
-        }         
-    }
-
-
-
     @Get('list')
     @ApiOperation({
         description: 'List of workflows',
