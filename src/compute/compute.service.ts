@@ -85,13 +85,6 @@ async createWorkflowStatus(responseBody:any, workflowID: string):Promise<Workflo
 
  }
 
-readExample(): any {
-    const templatePath = path.join(__dirname, '/', './argo-workflows-templates/test-workflow.yaml');
-    const templateContent = readFileSync(templatePath, 'utf8');
-
-    return yaml.load(templateContent); 
- }
-
  private readWorkflowTemplate(): any  {
     
     const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
