@@ -66,7 +66,7 @@ import {
         }           
     }
 
-    @Get('status/:agreement_id/:workflowID')
+    @Get('status/:workflowID')
     @ApiOperation({
         description: 'Status',
         summary: 'Returns the complete status about a workflow',
@@ -78,13 +78,10 @@ import {
     })
    @ApiBearerAuth('Authorization')
     async getWorkflowStatus(
-        @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
         
-        Logger.debug(`Getting status about workflow ${workflowID} with agreement ${agreementId}`);
         let response;
-
         try {
             response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
         }catch(e) {
@@ -168,7 +165,7 @@ import {
         }   
     }
 
-    @Get('logs/:agreement_id/:workflowID')
+    @Get('logs/:workflowID')
     @ApiOperation({
         description: 'Logs',
         summary: 'Returns the logs of the execution of a workflow',
@@ -180,11 +177,8 @@ import {
     })
    @ApiBearerAuth('Authorization')
     async getWorkflowExecutionLogs(
-        @Param('agreement_id') agreementId: string,
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
-
-        Logger.debug(`Getting logs for workflow ${workflowID} with agreement ${agreementId}`);
 
         const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
           undefined, undefined,undefined, this.getAuthorizationHeaderOption)
