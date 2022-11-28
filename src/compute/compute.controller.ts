@@ -145,7 +145,7 @@ import {
         description: 'Returns a success message',
         type: String,
     })
-   @Public()
+    @ApiBearerAuth('Authorization')
     async stopWorkflowExecution(
         @Param('workflowID') workflowID: string,
     ): Promise<string> {
