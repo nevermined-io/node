@@ -8,7 +8,7 @@ import {
     NotFoundException,
     InternalServerErrorException,
   } from "@nestjs/common";
-  import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+  import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
   import { Public } from "../common/decorators/auth.decorator";
   import { ComputeService } from './compute.service';
   import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
