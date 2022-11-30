@@ -12,6 +12,9 @@ import {
   import { Public } from "../common/decorators/auth.decorator";
   import { ComputeService } from './compute.service';
   import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
+  import { WorkflowListResultDto } from './dto/workflowListResultDto'
+  import { ExecuteWorkflowResultDto} from './dto/executeWorkflowResultDto'
+  import {StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service';
   import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api';
@@ -39,10 +42,10 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns an object that contains the list of workflows IDs',
-        type: String,
+        type: WorkflowListResultDto,
     })
    @Public()
-    async getWorkflowsList(): Promise<string> {
+    async getWorkflowsList(): Promise<WorkflowListResultDto> {
 
         Logger.debug(`Getting list of workflows`);
        
@@ -58,7 +61,7 @@ import {
                 });
             }
 
-            return JSON.stringify(result);       
+            return {workflows:result}       
             
         }catch(e) {
             Logger.error(`Error trying to get the list of workflows: ${e}`);
@@ -74,12 +77,12 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns a status object',
-        type: String,
+        type: StatusWorkflowResultDto,
     })
    @ApiBearerAuth('Authorization')
     async getWorkflowStatus(
         @Param('workflowID') workflowID: string,
-    ): Promise<string> {
+    ): Promise<StatusWorkflowResultDto> {
         
         let response;
         try {
@@ -91,7 +94,7 @@ import {
 
         try{     
             const status = await this.computeService.createWorkflowStatus(response.data, workflowID);
-            return JSON.stringify(status);
+            return {workflowStatus:status}
 
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
@@ -108,13 +111,13 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns the Workflow ID',
-        type: String,
+        type: ExecuteWorkflowResultDto,
     })
    @ApiBearerAuth('Authorization')
     async initCompute(
         @Body() initData: ExecuteWorkflowDto,
         @Param('agreement_id') agreementId: string
-    ): Promise<string> {
+    ): Promise<ExecuteWorkflowResultDto> {
 
        try {
 
@@ -124,7 +127,7 @@ import {
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
         
             Logger.debug("Argo Workflow created with id: " + JSON.stringify(response.data.metadata.name))
-            return JSON.stringify({workflowId: response.data.metadata.name})   
+            return {workflowId: response.data.metadata.name}   
 
         }catch(e) {
             Logger.error(`Problem initialing workflow for service Agreement ${agreementId}. Error: ${e}`);
