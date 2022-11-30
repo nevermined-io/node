@@ -14,6 +14,8 @@ import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
 import { HttpModuleOptions, HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import IpfsHttpClientLite from 'ipfs-http-client-lite';
+import { UploadBackends } from 'src/access/access.controller';
 
 @Injectable()
 export class NeverminedService {
@@ -224,7 +226,7 @@ export class NeverminedService {
         throw new InternalServerErrorException(obj.error);
       }
 
-      return 'cid://' + obj.cid;
+      return `cid://${obj.cid}`;
     } catch (e) {
       if (e instanceof AxiosError) {
         Logger.error('Axios Error: ', e.response);
@@ -234,6 +236,47 @@ export class NeverminedService {
         throw new InternalServerErrorException(e);
       }
     }
+  }
+
+  async uploadIPFS(content: Buffer, filename: string): Promise<string> {
+    try {
+      Logger.debug(`Uploading to IPFS ${filename}`);
+      const ipfsAuthToken = this.getIPFSAuthToken();
+
+      const ipfs = IpfsHttpClientLite({
+        apiUrl: this.config.get('IPFS_GATEWAY'),
+        ...(ipfsAuthToken && {
+          headers: { Authorization: `Basic ${ipfsAuthToken}` }
+        })
+      });
+      const addResult = await ipfs.add(content);
+      return `cid://${addResult[0].hash}`;
+    } catch (e) {
+      Logger.error(`Uploading ${filename}: IPFS error ${e}`);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async uploadToBackend(backend: UploadBackends, data: Buffer, fileName: string): Promise<string> {
+    if (backend === 's3') {
+      return await this.uploadS3(data, fileName);      
+    } else if (backend === 'filecoin') {
+      return await this.uploadFilecoin(data, fileName);      
+    } else if (backend === 'ipfs') {
+      return await this.uploadIPFS(data, fileName);      
+    }  
+  }
+
+  private getIPFSAuthToken(): string | undefined {
+
+    if (!this.config.get('IPFS_PROJECT_ID') || !this.config.get('IPFS_PROJECT_SECRET')) {
+      Logger.warn(`Infura IPFS_PROJECT_ID or IPFS_PROJECT_SECRET are not set - disabling ipfs auth`)      
+      return undefined
+    } else {
+        return Buffer.from(
+          `${this.config.get('IPFS_PROJECT_ID')}:${this.config.get('IPFS_PROJECT_SECRET')}`
+        ).toString('base64')
+    }    
   }
 
   private isDTP(main: MetaDataMain): boolean {

@@ -72,6 +72,9 @@ The Nevermined Node reads the following environment variables allowing the confi
 
 | **GRAPH_URL** | Public URL of the Nevermined subgraphs |
 | **NO_GRAPH** | If `true` the node will read events from the blockchain node instead of from the subgraphs. Depending on the network there could be a limit on the number of blocks to scan. | `false`
+| **IPFS_GATEWAY** | Public IPFS gateway that can be used to fech or upload content. | https://ipfs.infura.io:5001
+| **IPFS_PROJECT_ID** | Ipfs Project Id | `2DSADASD4234234234`
+| **IPFS_PROJECT_SECRET** | Ipfs Project Secret | `ccdafda55666dada`
 | **FILECOIN_GATEWAY** | Public Filecoin gateway that can be used to fech content. The `:cid` part of the url will be replace by the file `cid` | https://dweb.link/ipfs/:cid
 | **ESTUARY_TOKEN** | Estuary is a service that facilitates the interaction with Filecoin. This variable must include the token to use their API. See more here: https://estuary.tech/ | `EST651aa3a7-4756-4bd9-a563-1cdd565894645`
 | **AWS_S3_ACCESS_KEY_ID** | Amazon S3 Access Key Id | `4535hnj43`
