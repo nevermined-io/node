@@ -8,7 +8,7 @@
     "lint": "eslint ./",
     "clean": "rm -rf ./dist/ ./doc/ ./.nyc_output",
     "lint:fix": "yarn run lint -- --fix",
-    "format:check": "yarn prettier --check src/",
+    "format:check": "yarn prettier --check src scripts",
     "setup:dev": "cp ./config/local.js.sample ./config/local.js && cp .env.sample .env",
     "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp package.json ./dist",
     "prestart": "yarn run build",
