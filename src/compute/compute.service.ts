@@ -22,12 +22,23 @@ export type WorkflowStatus = {
 @Injectable()
 export class ComputeService {
 
+  private networkName: string
+
   constructor(
       private configService: ConfigService,
       private nvmService: NeverminedService) {}
 
+private async getNetworkName(): Promise<string>{
+
+    if (!this.networkName)
+        this.networkName= await this.nvmService.getNevermined().keeper.getNetworkName()
+    
+    return this.networkName
+}
+
 async createWorkflowStatus(responseBody:any, workflowID: string):Promise<WorkflowStatus> {
 
+    
     let result; 
     const pods = [];
                
@@ -139,7 +150,8 @@ async createWorkflowStatus(responseBody:any, workflowID: string):Promise<Workflo
     Logger.debug(`transformation container: ${image}`);
     Logger.debug(`transformation tag: ${tag}`);
 
-    const gethLocal = this.configService.get<string>('NETWORK_NAME') === 'geth-localnet'
+    const gethLocal = await this.getNetworkName() === 'geth-localnet'
+
     if (gethLocal)
         Logger.debug(`Compute Stack running in Nevermined Tools. Using ${this.configService.computeConfig().gethlocal_host_name} as host for NVM services`)
 
