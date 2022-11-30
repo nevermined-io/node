@@ -1,115 +1,125 @@
-import { Injectable } from '@nestjs/common';
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp';
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract';
-import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js';
-import { utils } from '@nevermined-io/nevermined-sdk-js';
-import { BadRequestException, InternalServerErrorException, NotFoundException, StreamableFile } from '@nestjs/common';
-import AWS from 'aws-sdk';
-import { default as FormData } from 'form-data';
-import { Logger } from '../logger/logger.service';
-import { ConfigService } from '../config/config.service';
-import { decrypt } from '@nevermined-io/nevermined-sdk-dtp';
-import { ethers } from 'ethers';
-import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
-import { HttpModuleOptions, HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
-import IpfsHttpClientLite from 'ipfs-http-client-lite';
-import { UploadBackends } from 'src/access/access.controller';
+import { Injectable } from '@nestjs/common'
+import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
+import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
+import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
+import { utils } from '@nevermined-io/nevermined-sdk-js'
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+  StreamableFile,
+} from '@nestjs/common'
+import AWS from 'aws-sdk'
+import { default as FormData } from 'form-data'
+import { Logger } from '../logger/logger.service'
+import { ConfigService } from '../config/config.service'
+import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
+import { ethers } from 'ethers'
+import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
+import { HttpModuleOptions, HttpService } from '@nestjs/axios'
+import { firstValueFrom } from 'rxjs'
+import { AxiosError } from 'axios'
+import IpfsHttpClientLite from 'ipfs-http-client-lite'
+import { UploadBackends } from 'src/access/access.controller'
 
 @Injectable()
 export class NeverminedService {
-  nevermined: Nevermined;
-  dtp: Dtp;
+  nevermined: Nevermined
+  dtp: Dtp
   constructor(private config: ConfigService, private readonly httpService: HttpService) {}
   // TODO: handle configuration properly
   async onModuleInit() {
-    const config = this.config.nvm();
-    this.nevermined = await Nevermined.getInstance(config);
+    const config = this.config.nvm()
+    this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
       nevermined: this.nevermined,
-    };
-    this.dtp = await Dtp.getInstance(instanceConfig, this.config.cryptoConfig());
+    }
+    this.dtp = await Dtp.getInstance(instanceConfig, this.config.cryptoConfig())
   }
   getNevermined() {
-    return this.nevermined;
+    return this.nevermined
   }
   getDtp() {
-    return this.dtp;
+    return this.dtp
   }
   instanceConfig() {
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(this.config.nvm()),
       nevermined: this.nevermined,
-    };
-    return instanceConfig;
+    }
+    return instanceConfig
   }
   web3ProviderUri(): string {
-    return this.config.nvm().web3ProviderUri;
+    return this.config.nvm().web3ProviderUri
   }
 
   async getAssetUrl(
     did: string,
-    index: number
+    index: number,
   ): Promise<{ url: string; content_type: string; dtp: boolean; name?: string }> {
     // get url for DID
-    let asset: DDO;
+    let asset: DDO
     try {
-      asset = await this.nevermined.assets.resolve(did);
+      asset = await this.nevermined.assets.resolve(did)
     } catch (e) {
-      Logger.error(`Cannot resolve DID ${did}`);
-      throw new BadRequestException(`No such DID ${did}`);
+      Logger.error(`Cannot resolve DID ${did}`)
+      throw new BadRequestException(`No such DID ${did}`)
     }
-    const service = asset.findServiceByType('metadata');
-    const file_attributes = service.attributes.main.files[index];
-    const content_type = file_attributes.contentType;
-    const name = file_attributes.name;
-    const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP';
+    const service = asset.findServiceByType('metadata')
+    const file_attributes = service.attributes.main.files[index]
+    const content_type = file_attributes.contentType
+    const name = file_attributes.name
+    const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
       const filelist = JSON.parse(
-        await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA')
-      );
+        await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA'),
+      )
       // download url or what?
-      const url: string = filelist[index].url;
-      return { url, content_type, dtp: this.isDTP(service.attributes.main), name };
+      const url: string = filelist[index].url
+      return { url, content_type, dtp: this.isDTP(service.attributes.main), name }
     }
-    Logger.error(`Auth METHOD wasn't RSAES-OAEP`);
-    throw new BadRequestException();
+    Logger.error(`Auth METHOD wasn't RSAES-OAEP`)
+    throw new BadRequestException()
   }
 
-  async downloadAsset(did: string, index: number, res: any, userAddress: string): Promise<StreamableFile | string> {
-    Logger.debug(`Downloading asset from ${did} index ${index}`);
+  async downloadAsset(
+    did: string,
+    index: number,
+    res: any,
+    userAddress: string,
+  ): Promise<StreamableFile | string> {
+    Logger.debug(`Downloading asset from ${did} index ${index}`)
     try {
       // eslint-disable-next-line prefer-const
-      let { url, content_type, dtp, name } = await this.getAssetUrl(did, index);
+      let { url, content_type, dtp, name } = await this.getAssetUrl(did, index)
       if (!url) {
-        Logger.error(`URL for did ${did} not found`);
-        throw new NotFoundException(`URL for did ${did} not found`);
+        Logger.error(`URL for did ${did} not found`)
+        throw new NotFoundException(`URL for did ${did} not found`)
       }
       if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
-        return url;
+        return url
       }
-      Logger.debug(`Serving URL ${url}`);
+      Logger.debug(`Serving URL ${url}`)
 
       // If filename is on the ddo we will use that by default
-      let filename: string;
+      let filename: string
       if (name) {
-        filename = name;
+        filename = name
       } else {
-        const param = url.split('/').slice(-1)[0];
-        filename = param.split('?')[0];
+        const param = url.split('/').slice(-1)[0]
+        filename = param.split('?')[0]
       }
 
-      let response;
+      let response
 
       // Download from filecoin or ipfs
       if (url.startsWith('cid://')) {
-        const ipfsProjectId = this.config.get<string>('IPFS_PROJECT_ID');
-        const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET');
+        const ipfsProjectId = this.config.get<string>('IPFS_PROJECT_ID')
+        const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET')
 
-        const cid = url.replace('cid://', '');
-        url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`;
+        const cid = url.replace('cid://', '')
+        url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`
 
         const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
@@ -122,22 +132,22 @@ export class NeverminedService {
           params: {
             arg: cid,
           },
-        };
+        }
 
-        response = await firstValueFrom(this.httpService.request(config));
+        response = await firstValueFrom(this.httpService.request(config))
       } else {
         const config: HttpModuleOptions = {
           responseType: 'arraybuffer',
-        };
-        response = await firstValueFrom(this.httpService.get(url, config));
+        }
+        response = await firstValueFrom(this.httpService.get(url, config))
       }
 
-      const contents: Buffer = response.data;
+      const contents: Buffer = response.data
 
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
-          const [from] = await this.nevermined.accounts.list();
-          const provId = utils.generateId();
+          const [from] = await this.nevermined.accounts.list()
+          const provId = utils.generateId()
           await this.nevermined.provenance.used(
             provId,
             didZeroX(did),
@@ -145,33 +155,33 @@ export class NeverminedService {
             utils.generateId(),
             ethers.utils.hexZeroPad('0x0', 32),
             'download',
-            from
-          );
-          Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`);
+            from,
+          )
+          Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }
       } catch (error) {
-        Logger.warn(`Unable to register on-chain provenance: ${error.toString()}`);
+        Logger.warn(`Unable to register on-chain provenance: ${error.toString()}`)
       }
 
       res.set({
         'Content-Type': content_type,
         'Content-Disposition': `attachment;filename=${filename}`,
-      });
-      return new StreamableFile(contents);
+      })
+      return new StreamableFile(contents)
     } catch (e) {
       if (e instanceof NotFoundException) {
-        Logger.error(e);
-        throw e;
+        Logger.error(e)
+        throw e
       } else {
-        Logger.error(e);
-        throw new InternalServerErrorException(e.toString());
+        Logger.error(e)
+        throw new InternalServerErrorException(e.toString())
       }
     }
   }
 
   async uploadS3(file: Buffer, filename: string): Promise<string> {
-    Logger.debug(`Uploading to S3 ${filename}`);
-    filename = filename || 'data';
+    Logger.debug(`Uploading to S3 ${filename}`)
+    filename = filename || 'data'
     try {
       const s3 = new AWS.S3({
         accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
@@ -179,35 +189,35 @@ export class NeverminedService {
         endpoint: this.config.get('AWS_S3_ENDPOINT'),
         s3ForcePathStyle: true,
         signatureVersion: 'v4',
-      });
+      })
       await s3
         .upload({
           Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
           Key: filename,
           Body: file,
         })
-        .promise();
+        .promise()
       const url = s3.getSignedUrl('getObject', {
         Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
         Key: filename,
         Expires: 3600 * 24,
-      });
-      return url;
+      })
+      return url
     } catch (e) {
-      Logger.error(`Uploading ${filename}: AWS error ${e.response}`);
-      throw new InternalServerErrorException(e.response);
+      Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
+      throw new InternalServerErrorException(e.response)
     }
   }
 
   async uploadFilecoin(file: Buffer, filename: string): Promise<string> {
     try {
-      Logger.debug(`Uploading to filecoin ${filename}`);
+      Logger.debug(`Uploading to filecoin ${filename}`)
 
-      const formData = new FormData();
-      formData.append('data', file, filename);
-      formData.append('filename', filename);
+      const formData = new FormData()
+      formData.append('data', file, filename)
+      formData.append('filename', filename)
 
-      const url = new URL('/content/add', this.config.get('ESTUARY_ENDPOINT'));
+      const url = new URL('/content/add', this.config.get('ESTUARY_ENDPOINT'))
       const config: HttpModuleOptions = {
         url: url.toString(),
         method: 'POST',
@@ -216,70 +226,69 @@ export class NeverminedService {
           'Content-Type': formData.getHeaders()['content-type'],
         },
         data: formData,
-      };
-
-      const response = await firstValueFrom(this.httpService.request(config));
-      const obj = response.data;
-
-      if (obj.error) {
-        Logger.error('Estuary returned an error message:', obj.error);
-        throw new InternalServerErrorException(obj.error);
       }
 
-      return `cid://${obj.cid}`;
+      const response = await firstValueFrom(this.httpService.request(config))
+      const obj = response.data
+
+      if (obj.error) {
+        Logger.error('Estuary returned an error message:', obj.error)
+        throw new InternalServerErrorException(obj.error)
+      }
+
+      return `cid://${obj.cid}`
     } catch (e) {
       if (e instanceof AxiosError) {
-        Logger.error('Axios Error: ', e.response);
-        throw new InternalServerErrorException('There was a problem uploading file to filecoin');
+        Logger.error('Axios Error: ', e.response)
+        throw new InternalServerErrorException('There was a problem uploading file to filecoin')
       } else {
-        Logger.error(`Uploading ${filename}: Filecoin error ${e}`);
-        throw new InternalServerErrorException(e);
+        Logger.error(`Uploading ${filename}: Filecoin error ${e}`)
+        throw new InternalServerErrorException(e)
       }
     }
   }
 
   async uploadIPFS(content: Buffer, filename: string): Promise<string> {
     try {
-      Logger.debug(`Uploading to IPFS ${filename}`);
-      const ipfsAuthToken = this.getIPFSAuthToken();
+      Logger.debug(`Uploading to IPFS ${filename}`)
+      const ipfsAuthToken = this.getIPFSAuthToken()
 
       const ipfs = IpfsHttpClientLite({
         apiUrl: this.config.get('IPFS_GATEWAY'),
         ...(ipfsAuthToken && {
-          headers: { Authorization: `Basic ${ipfsAuthToken}` }
-        })
-      });
-      const addResult = await ipfs.add(content);
-      return `cid://${addResult[0].hash}`;
+          headers: { Authorization: `Basic ${ipfsAuthToken}` },
+        }),
+      })
+      const addResult = await ipfs.add(content)
+      return `cid://${addResult[0].hash}`
     } catch (e) {
-      Logger.error(`Uploading ${filename}: IPFS error ${e}`);
-      throw new InternalServerErrorException(e);
+      Logger.error(`Uploading ${filename}: IPFS error ${e}`)
+      throw new InternalServerErrorException(e)
     }
   }
 
   async uploadToBackend(backend: UploadBackends, data: Buffer, fileName: string): Promise<string> {
     if (backend === 's3') {
-      return await this.uploadS3(data, fileName);      
+      return await this.uploadS3(data, fileName)
     } else if (backend === 'filecoin') {
-      return await this.uploadFilecoin(data, fileName);      
+      return await this.uploadFilecoin(data, fileName)
     } else if (backend === 'ipfs') {
-      return await this.uploadIPFS(data, fileName);      
-    }  
+      return await this.uploadIPFS(data, fileName)
+    }
   }
 
   private getIPFSAuthToken(): string | undefined {
-
     if (!this.config.get('IPFS_PROJECT_ID') || !this.config.get('IPFS_PROJECT_SECRET')) {
-      Logger.warn(`Infura IPFS_PROJECT_ID or IPFS_PROJECT_SECRET are not set - disabling ipfs auth`)      
+      Logger.warn(`Infura IPFS_PROJECT_ID or IPFS_PROJECT_SECRET are not set - disabling ipfs auth`)
       return undefined
     } else {
-        return Buffer.from(
-          `${this.config.get('IPFS_PROJECT_ID')}:${this.config.get('IPFS_PROJECT_SECRET')}`
-        ).toString('base64')
-    }    
+      return Buffer.from(
+        `${this.config.get('IPFS_PROJECT_ID')}:${this.config.get('IPFS_PROJECT_SECRET')}`,
+      ).toString('base64')
+    }
   }
 
   private isDTP(main: MetaDataMain): boolean {
-    return main.files && main.files.some((f) => f.encryption === 'dtp');
+    return main.files && main.files.some((f) => f.encryption === 'dtp')
   }
 }

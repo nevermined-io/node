@@ -4,7 +4,7 @@ metadata:
   generateName: testing-argo-
   namespace: nvm-disc
   labels:
-    workflows.argoproj.io/archive-strategy: "false"
+    workflows.argoproj.io/archive-strategy: 'false'
   annotations:
     workflows.argoproj.io/description: |
       This is a simple hello world example.
@@ -12,8 +12,8 @@ metadata:
 spec:
   entrypoint: whalesay
   templates:
-  - name: whalesay
-    container:
-      image: docker/whalesay:latest
-      command: [cowsay]
-      args: ["TESTING.."]
+    - name: whalesay
+      container:
+        image: docker/whalesay:latest
+        command: [cowsay]
+        args: ['TESTING..']

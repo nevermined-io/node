@@ -19,6 +19,8 @@ jobs:
       run: |
         yarn run build
         yarn run lint
+    - name: Check code formatting
+      run: yarn format:check
     - name: Setup NVM
       run: |
         docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
