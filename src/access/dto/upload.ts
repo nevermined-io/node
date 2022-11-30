@@ -7,7 +7,7 @@ export class UploadDto {
       example: 'false',
       required: false,
     })
-    encrypt: string;
+    encrypt: string;    
     @ApiProperty({
       type: string,
       example: 'Hello!',

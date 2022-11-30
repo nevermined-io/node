@@ -30,9 +30,16 @@ import { UploadResult } from './dto/upload-result';
 import { AgreementData } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers';
 import { utils } from '@nevermined-io/nevermined-sdk-js';
 
+export enum UploadBackends {
+  IPFS = 'ipfs',
+  Filecoin = 'filecoin',
+  AmazonS3 = 's3',
+}
+
 @ApiTags('Access')
 @Controller()
 export class AccessController {
+
   constructor(private nvmService: NeverminedService) {}
 
   @Get('access/:agreement_id/:index')
@@ -148,7 +155,7 @@ export class AccessController {
   })
   async doUpload(
     @Body() uploadData: UploadDto,
-    @Param('backend') backend: string,
+    @Param('backend') backend: UploadBackends,
     @UploadedFile() file: Express.Multer.File
   ): Promise<UploadResult> {
     let data: Buffer
@@ -162,35 +169,23 @@ export class AccessController {
     } else {
       throw new BadRequestException('No file or message in request');
     }
-    if (backend !== 's3' && backend !== 'filecoin' && backend !== 'ipfs')
+    console.log(`Backend ${backend}`)
+    if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`);
     try {
+      let url: string
       if (uploadData.encrypt) {
         // generate password
         Logger.debug(`Uploading with password, filename ${fileName}`);
         const password = crypto.randomBytes(32).toString('base64url');
         data = Buffer.from(aes_encryption_256(data, password), 'binary');
-        if (backend === 's3') {
-          const url = await this.nvmService.uploadS3(data, fileName);
-          return { url, password };
-        } else if (backend === 'filecoin') {
-          const url = await this.nvmService.uploadFilecoin(data, fileName);
-          return { url, password };
-        } else if (backend === 'ipfs') {
-          const url = await this.nvmService.uploadIPFS(data, fileName);
-          return { url, password };
-        }
+        url = await this.nvmService.uploadToBackend(backend, data, fileName);
+        return { url, password };
       }
-      if (backend === 's3') {
-        const url = await this.nvmService.uploadS3(data, fileName);
-        return { url };
-      } else if (backend === 'filecoin') {
-        const url = await this.nvmService.uploadFilecoin(data, fileName);
-        return { url };
-      } else if (backend === 'ipfs') {
-        const url = await this.nvmService.uploadIPFS(data, fileName);
-        return { url };
-      }
+      
+      url = await this.nvmService.uploadToBackend(backend, data, fileName);
+      return { url };
+      
     } catch (error) {
       Logger.error(`Error processing upload: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

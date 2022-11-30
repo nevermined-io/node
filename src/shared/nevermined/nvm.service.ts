@@ -15,6 +15,7 @@ import { HttpModuleOptions, HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import IpfsHttpClientLite from 'ipfs-http-client-lite';
+import { UploadBackends } from 'src/access/access.controller';
 
 @Injectable()
 export class NeverminedService {
@@ -254,6 +255,16 @@ export class NeverminedService {
       Logger.error(`Uploading ${filename}: IPFS error ${e}`);
       throw new InternalServerErrorException(e);
     }
+  }
+
+  async uploadToBackend(backend: UploadBackends, data: Buffer, fileName: string): Promise<string> {
+    if (backend === 's3') {
+      return await this.uploadS3(data, fileName);      
+    } else if (backend === 'filecoin') {
+      return await this.uploadFilecoin(data, fileName);      
+    } else if (backend === 'ipfs') {
+      return await this.uploadIPFS(data, fileName);      
+    }  
   }
 
   private getIPFSAuthToken(): string | undefined {
