@@ -12,6 +12,8 @@ import {
   import { Public } from "../common/decorators/auth.decorator";
   import { ComputeService } from './compute.service';
   import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
+  import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto'
+  import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service';
   import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api';
@@ -34,35 +36,33 @@ import {
             headers: { Authorization: this.configService.computeConfig().argo_auth_token }
         }:{}
 
-    
+
     @Post('test')
     @ApiOperation({
-        description: 'Compute Init',
-        summary: 'Start the execution of a compute workflow',
+            description: 'Compute Init',
+            summary: 'Start the execution of a compute workflow',
     })
     @ApiResponse({
-        status: 200,
-        description: 'Returns the Workflow ID',
-        type: String,
+            status: 200,
+            description: 'Returns the Workflow ID',
+            type: String,
     })
-   @Public()
+    @Public()
     async initTest(): Promise<string> {
-
-       try {
-
-            const argoWorkflow = await this.computeService.readExample()
-            const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
-        
-            Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
-            return response.data.metadata.name   
-
-        }catch(e) {
-            Logger.error(`Problem initialing test workflow. Error: ${e}`);
-            throw new InternalServerErrorException(`Problem initialing  test workflow`);
-        }         
+    
+           try {
+    
+                const argoWorkflow = await this.computeService.readExample()
+                const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
+            
+                Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
+                return response.data.metadata.name   
+    
+            }catch(e) {
+                Logger.error(`Problem initialing test workflow. Error: ${e}`);
+                throw new InternalServerErrorException(`Problem initialing  test workflow`);
+            }         
     }
-
-
 
     @Get('list')
     @ApiOperation({
@@ -72,7 +72,7 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns an object that contains the list of workflows IDs',
-        type: WorkflowListResultDto ,
+        type: WorkflowListResultDto,
     })
    @Public()
     async getWorkflowsList(): Promise<WorkflowListResultDto> {
@@ -99,34 +99,6 @@ import {
         }           
     }
 
-    @Get('info/:workflowID')
-    @ApiOperation({
-        description: 'Info',
-        summary: 'Returns info about a workflow',
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Returns an info object',
-        type: String,
-    })
-    @Public()
-    async getWorkflowInfo(
-        @Param('workflowID') workflowID: string,
-    ): Promise<string> {
-
-        Logger.debug(`Getting information about workflow ${workflowID}`);
-
-        try {
-            const response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
-            console.log(JSON.stringify(response.data))
-            return JSON.stringify(response.data.metadata);
-            
-        }catch(e) {
-            Logger.error(`Error trying to get information about workflow ${workflowID}. Error: ${e}`);
-            throw new NotFoundException(`Workflow ${workflowID} not found`);
-        }   
-    }
-
     @Get('status/:workflowID')
     @ApiOperation({
         description: 'Status',
@@ -142,9 +114,7 @@ import {
         @Param('workflowID') workflowID: string,
     ): Promise<StatusWorkflowResultDto> {
         
-        Logger.debug(`Getting status about workflow ${workflowID}`);
         let response;
-
         try {
             console.log("AUTH: " + JSON.stringify(this.getAuthorizationHeaderOption))
             response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
@@ -155,7 +125,7 @@ import {
 
         try{     
             const status = await this.computeService.createWorkflowStatus(response.data, workflowID);
-            return {workflowStatus:status};
+            return {workflowStatus:status}
 
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
@@ -188,7 +158,7 @@ import {
             const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
         
             Logger.debug("Argo Workflow created with id: " + JSON.stringify(response.data.metadata.name))
-            return {workflowId: response.data.metadata.name}
+            return {workflowId: response.data.metadata.name}   
 
         }catch(e) {
             Logger.error(`Problem initialing workflow for service Agreement ${agreementId}. Error: ${e}`);
@@ -204,12 +174,12 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns a success message',
-        type: String,
+        type: StopWorkflowResultDto,
     })
-   @Public()
+    @Public()
     async stopWorkflowExecution(
         @Param('workflowID') workflowID: string,
-    ): Promise<string> {
+    ): Promise<StopWorkflowResultDto> {
 
         Logger.debug(`Deleting workflow ${workflowID}`);
 
@@ -221,7 +191,7 @@ import {
             const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, 
                 deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy, undefined, undefined, this.getAuthorizationHeaderOption);
            
-            return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`});
+            return {status: response.status, text: `workflow ${workflowID} successfuly deleted`}
 
         }catch(e) {
             Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`);
@@ -237,21 +207,13 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns an object that contains the execution logs',
-        type: String,
+        type: LogsWorkflowResultDto,
     })
     @Public()
     async getWorkflowExecutionLogs(
         @Param('workflowID') workflowID: string,
-    ): Promise<string> {
-
-        Logger.debug(`Getting logs for workflow ${workflowID}`);
-
-        const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
-          undefined, undefined,undefined, this.getAuthorizationHeaderOption)
-
-        Logger.debug(`LOGS: ${response.data}`)
-
-        return JSON.stringify(response.data)
+    ): Promise<LogsWorkflowResultDto> {
+        return {logs:""}
     }
 
 

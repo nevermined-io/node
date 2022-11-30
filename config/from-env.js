@@ -1,7 +1,5 @@
 
 const keys = [
-    'NETWORK_NAME',
-
     'JWT_SECRET_KEY',
     'JWT_EXPIRY_KEY',
   

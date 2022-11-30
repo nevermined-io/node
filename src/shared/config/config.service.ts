@@ -34,7 +34,6 @@ export interface ComputeConfig {
 const configProfile = require('../../../config');
 
 const DOTENV_SCHEMA = Joi.object({
-  NETWORK_NAME: Joi.string(),
   NODE_ENV: Joi.string().valid('development', 'production', 'test', 'staging').default('development'),
   JWT_SECRET_KEY: Joi.string().required().error(new Error('JWT_SECRET_KEY is required!')),
   JWT_EXPIRY_KEY: Joi.string().default('60m'),
@@ -76,7 +75,6 @@ const DOTENV_SCHEMA = Joi.object({
 });
 
 type DotenvSchemaKeys =
-  | 'NETWORK_NAME'
   | 'NODE_ENV'
   | 'server.port'
   | 'database.url'

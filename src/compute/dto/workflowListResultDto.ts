@@ -7,4 +7,4 @@ export class WorkflowListResultDto {
       example: '["workflowId": "nevermined-compute-q9rld", "workflowId": "nevermined-compute-jf9gf"]'
     })
     workflows: {workflowId:string}[]
-  }
+}

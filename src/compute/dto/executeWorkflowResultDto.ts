@@ -8,4 +8,4 @@ export class ExecuteWorkflowResultDto {
     })
     workflowId: string
 
-  }
+}
