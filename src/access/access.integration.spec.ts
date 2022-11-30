@@ -93,8 +93,26 @@ describe('Info', () => {
   });
   it('upload / no params', async () => {
     const response = await request(app.getHttpServer())
-      .post(`/upload/method`);
+      .post(`/upload/ipfs`);
     expect(response.statusCode).toBe(400);
-    expect((response.error as any).text).toContain('No file');
+    expect((response.error as any).text).toContain('No file or message');
   });
+  it('upload wrong backend', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/upload/wrong`)
+      .send({
+        message: 'hi there'
+      });
+    expect(response.statusCode).toBe(400);
+    expect((response.error as any).text).toContain('Backend wrong not supported');
+  });
+  it('upload ipfs', async () => {
+    const response = await request(app.getHttpServer())
+      .post(`/upload/ipfs`)
+      .send({
+        message: 'hi there'
+      });
+    expect(response.statusCode).toBe(201);
+    expect(response.body.url).toContain('cid://');
+  });  
 });

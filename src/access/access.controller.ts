@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -26,6 +28,7 @@ import { TransferDto } from './dto/transfer';
 import { UploadDto } from './dto/upload';
 import { UploadResult } from './dto/upload-result';
 import { AgreementData } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers';
+import { utils } from '@nevermined-io/nevermined-sdk-js';
 
 @ApiTags('Access')
 @Controller()
@@ -134,43 +137,64 @@ export class AccessController {
 
   @Post('upload/:backend')
   @ApiOperation({
-    description: 'Access asset',
+    description: 'Uploads a file or some content to a remote storage',
     summary: 'Public',
   })
   @Public()
   @UseInterceptors(FileInterceptor('file'))
   @ApiResponse({
     status: 200,
-    description: 'Return the url of asset',
+    description: 'Return the url of the file uploaded',
   })
   async doUpload(
     @Body() uploadData: UploadDto,
     @Param('backend') backend: string,
     @UploadedFile() file: Express.Multer.File
   ): Promise<UploadResult> {
-    if (!file) {
-      throw new BadRequestException('No file in request');
+    let data: Buffer
+    let fileName: string
+    if (file) {
+      data = file.buffer;
+      fileName = file.originalname
+    } else if (uploadData.message)  {
+      data = Buffer.from(uploadData.message)
+      fileName = `fileUpload_${utils.generateId()}.data${uploadData.encrypt?'.encrypted':''}`
+    } else {
+      throw new BadRequestException('No file or message in request');
     }
-    let data = file.buffer;
-    if (uploadData.encrypt) {
-      // generate password
-      Logger.debug(`Uploading with password, filename ${file.originalname}`);
-      const password = crypto.randomBytes(32).toString('base64url');
-      data = Buffer.from(aes_encryption_256(data, password), 'binary');
-      if (backend === 's3') {
-        const url = await this.nvmService.uploadS3(data, file.originalname);
-        return { url, password };
-      } else if (backend === 'filecoin') {
-        const url = await this.nvmService.uploadFilecoin(data, file.originalname);
-        return { url, password };
+    if (backend !== 's3' && backend !== 'filecoin' && backend !== 'ipfs')
+      throw new BadRequestException(`Backend ${backend} not supported`);
+    try {
+      if (uploadData.encrypt) {
+        // generate password
+        Logger.debug(`Uploading with password, filename ${fileName}`);
+        const password = crypto.randomBytes(32).toString('base64url');
+        data = Buffer.from(aes_encryption_256(data, password), 'binary');
+        if (backend === 's3') {
+          const url = await this.nvmService.uploadS3(data, fileName);
+          return { url, password };
+        } else if (backend === 'filecoin') {
+          const url = await this.nvmService.uploadFilecoin(data, fileName);
+          return { url, password };
+        } else if (backend === 'ipfs') {
+          const url = await this.nvmService.uploadIPFS(data, fileName);
+          return { url, password };
+        }
       }
+      if (backend === 's3') {
+        const url = await this.nvmService.uploadS3(data, fileName);
+        return { url };
+      } else if (backend === 'filecoin') {
+        const url = await this.nvmService.uploadFilecoin(data, fileName);
+        return { url };
+      } else if (backend === 'ipfs') {
+        const url = await this.nvmService.uploadIPFS(data, fileName);
+        return { url };
+      }
+    } catch (error) {
+      Logger.error(`Error processing upload: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    if (backend === 's3') {
-      const url = await this.nvmService.uploadS3(data, file.originalname);
-      return { url };
-    } else if (backend === 'filecoin') {
-      const url = await this.nvmService.uploadFilecoin(data, file.originalname);
-      return { url };
-    }
+
   }
 }
