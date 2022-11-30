@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EncryptModule } from './encrypt/encrypt.module';
 import { AccessModule } from './access/access.module';
 import { NeverminedModule } from './shared/nevermined/nvm.module';
+import { ComputeModule } from './compute/compute.module';
 import { HttpLoggerMiddleware } from './common/middlewares/http-logger/http-logger.middleware';
 
 @Module({
@@ -21,6 +22,7 @@ import { HttpLoggerMiddleware } from './common/middlewares/http-logger/http-logg
     AccessModule,
     AuthModule,
     NeverminedModule,
+    ComputeModule
   ],
 })
 export class ApplicationModule {

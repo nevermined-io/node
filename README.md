@@ -56,8 +56,7 @@ The Nevermined Node reads the following environment variables allowing the confi
 | Variable Name | Information | Example
 
 | Variable Name                | Description                                                                                                                                                      | Example                                                              |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| **NETWORK_NAME**             | Network where the Gateway will be connected                                                                                                                      | `mumbai`                                                             |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |                                                          |
 | **WEB3_PROVIDER_URL**        | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx                                    |
 | **MARKETPLACE_API_URL**      | HTTP url to the Marketplace API                                                                                                                                  | https://marketplace-api.mumbai.public.nevermined.rocks               |
 | **NODE_URL**                 | Public HTTP url where this node is exposed                                                                                                                       | https://node.mumbai.public.nevermined.rocks                          |
@@ -84,6 +83,14 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **AWS_S3_BUCKET_NAME** | Name of the S3 Bucket | `metadata`
 | **ENABLE_PROVENANCE** | If `true` it will enable the integration with the provenance registry | `true` or `false`
 | **ARTIFACTS_FOLDER** | Path where the Node will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder
+| **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false`
+| **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance`
+| **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo`
+| **ARGO_AUTH_TOKEN**      | Authorization Token for Argo Workflows.  Requires ENABLE_COMPUTE = true  | 'Bearer sdfsdfsdfvxcvVVSDFSDFSDFsdf...'
+| **MINIO_HOST**       | Host of the MinIO server. Requires ENABLE_COMPUTE = true | `https://minio-server.nevermined.rocks`
+| **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000`
+| **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE`
+| **MINIO_SECRET_KEY**       | Secret Key for MinIO.Requires ENABLE_COMPUTE = true | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
 
 ## Install and run:
 

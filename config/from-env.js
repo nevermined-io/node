@@ -25,8 +25,15 @@ const keys = [
     'IPFS_PROJECT_SECRET',
     'ESTUARY_ENDPOINT',
     'ENABLE_PROVENANCE',
-    'ARTIFACTS_FOLDER'
-
+    'ARTIFACTS_FOLDER',
+    'ENABLE_COMPUTE',
+    'ARGO_HOST',
+    'ARGO_NAMESPACE',
+    'ARGO_AUTH_TOKEN',
+    'MINIO_HOST',
+    'MINIO_PORT',
+    'MINIO_ACCESS_KEY',
+    'MINIO_SECRET_KEY'
 ]
 
 const config = {}
