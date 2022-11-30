@@ -14,7 +14,9 @@ import {
   import { ExecuteWorkflowDto } from "./dto/executeWorkflowDto";
   import { WorkflowListResultDto } from './dto/workflowListResultDto'
   import { ExecuteWorkflowResultDto} from './dto/executeWorkflowResultDto'
-  import {StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
+  import { StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
+  import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto'
+  import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
   import { Logger } from '../shared/logger/logger.service';
   import { ConfigService } from  '../shared/config/config.service';
   import {WorkflowServiceApi} from '@nevermined-io/argo-workflows-api';
@@ -143,12 +145,12 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns a success message',
-        type: String,
+        type: StopWorkflowResultDto,
     })
     @ApiBearerAuth('Authorization')
     async stopWorkflowExecution(
         @Param('workflowID') workflowID: string,
-    ): Promise<string> {
+    ): Promise<StopWorkflowResultDto> {
 
         Logger.debug(`Deleting workflow ${workflowID}`);
 
@@ -160,7 +162,7 @@ import {
             const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(this.argoNamespace, workflowID, deleteOptionsGracePeriodSeconds, undefined, undefined, 
                 deleteOptionsOrphanDependents, deleteOptionsPropagationPolicy, undefined, undefined, this.getAuthorizationHeaderOption);
            
-            return JSON.stringify({status: response.status, text: `workflow ${workflowID} successfuly deleted`});
+            return {status: response.status, text: `workflow ${workflowID} successfuly deleted`}
 
         }catch(e) {
             Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`);
@@ -176,19 +178,19 @@ import {
     @ApiResponse({
         status: 200,
         description: 'Returns an object that contains the execution logs',
-        type: String,
+        type: LogsWorkflowResultDto,
     })
    @ApiBearerAuth('Authorization')
     async getWorkflowExecutionLogs(
         @Param('workflowID') workflowID: string,
-    ): Promise<string> {
+    ): Promise<LogsWorkflowResultDto> {
 
         const response = await this.argoWorkflowApi.workflowServiceWorkflowLogs(this.argoNamespace, workflowID, undefined, "main", undefined, true, undefined, undefined, undefined, undefined, undefined, undefined,
           undefined, undefined,undefined, this.getAuthorizationHeaderOption)
 
         Logger.debug(`LOGS: ${response.data}`)
 
-        return JSON.stringify(response.data)
+        return {logs:response.data}
     }
 
 
