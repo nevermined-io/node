@@ -151,7 +151,7 @@ spec:
 
   - name: publishing-pod
     container:
-      image: neverminedio/compute-pods-publish:latest
+      image: neverminedio/compute-pods-publish:develop
       imagePullPolicy: IfNotPresent
       name: publishing-pod
       command:
