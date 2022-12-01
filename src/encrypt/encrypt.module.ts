@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '../shared/config/config.module';
-import { EncryptController } from './encrypt.controller';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '../shared/config/config.module'
+import { EncryptController } from './encrypt.controller'
 
 @Module({
   imports: [ConfigModule],
