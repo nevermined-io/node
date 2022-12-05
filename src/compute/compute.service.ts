@@ -12,12 +12,18 @@ require('js-yaml');
 
 export type WorkflowStatus = {
     status: string
-    startedAt : string
-    finishedAt: string         
-    did: string,
-    pods: string[]
+    startedAt: string
+    finishedAt: string
+    did: string
+    pods: PodStatus[]
+  }
+
+export type PodStatus = {
     podName: string
-}
+    status: string
+    startedAt: string
+    finishedAt: string
+  }
 
 @Injectable()
 export class ComputeService {
@@ -43,65 +49,68 @@ readExample(): any {
     return yaml.load(templateContent); 
  }
 
-async createWorkflowStatus(responseBody:any, workflowID: string):Promise<WorkflowStatus> {
+ async createWorkflowStatus(responseBody: any, workflowID: string): Promise<WorkflowStatus> {
+    const result: WorkflowStatus = {
+      startedAt: 'null',
+      finishedAt: 'null',
+      status: 'null',
+      did: undefined,
+      pods: [],
+    }
+    const pods = []
 
-    
-    let result; 
-    const pods = [];
-               
     // Transform from pairs of id:object to array of objects
-    const nodesPairs = responseBody.status.nodes;
-    const nodesArray = [];
-    for (const i in nodesPairs){
-        nodesArray.push(nodesPairs[i]);
-    }
+    const nodesPairs = responseBody.status.nodes
 
-    nodesArray.forEach((element) => {
-        const podName = element.displayName;
-        if (podName === workflowID){
-            result = {
-                status: element.phase,
-                startedAt: element.startedAt,
-                finishedAt: element.finishedAt,         
-                did: undefined,
-                pods: []
-            };
+    if (nodesPairs) {
+      const nodesArray = []
+      for (const i in nodesPairs) {
+        nodesArray.push(nodesPairs[i])
+      }
+
+      nodesArray.forEach((element) => {
+        const podName = element.displayName
+        if (podName === workflowID) {
+          result.status = element.phase
+          result.startedAt = element.startedAt
+          result.finishedAt = element.finishedAt
+        } else {
+          const podStatus: PodStatus = {
+            podName: podName,
+            status: element.phase,
+            startedAt: element.startedAt,
+            finishedAt: element.finishedAt,
+          }
+          pods.push(podStatus)
         }
-        else {
-            const statusMessage = {
-                podName: podName,
-                status: element.phase,
-                startedAt: element.startedAt,
-                finishedAt: element.finishedAt            
-            };
-            pods.push(statusMessage);
-        }          
-    });
+      })
 
-    result.pods = pods
-   
-    if (result.status === 'Succeeded'){
+      result.pods = pods
 
+      if (result.status === 'Succeeded') {
         const query = {
-            nested: {
-                path: "service",
-                query: {
-                    match: { 'service.attributes.additionalInformation.customData.workflowID': workflowID }
-                }
-            }
+          nested: {
+            path: 'service',
+            query: {
+              match: {
+                'service.attributes.additionalInformation.customData.workflowID': workflowID,
+              },
+            },
+          },
         }
 
-        const queryResult = await this.nvmService.getNevermined().assets.query({query: query})
+        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
 
-        if (queryResult.totalResults.value > 0){
-            const did = queryResult.results[0].id
-            result.did = did    
+        if (queryResult.totalResults.value > 0) {
+          const did = queryResult.results[0].id
+          result.did = did
         }
+      }
     }
 
-    return result;
+    return result
+  }
 
- }
 
  private readWorkflowTemplate(): any  {
     
