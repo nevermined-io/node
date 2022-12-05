@@ -17,5 +17,7 @@ COPY accounts ./accounts
 RUN yarn run setup:dev
 RUN yarn run build
 
+ADD src/compute/argo-workflows-templates ./dist/src/compute/
+
 ENTRYPOINT ["yarn", "run", "start:prod"]
 
