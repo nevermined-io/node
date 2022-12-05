@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import yaml from 'js-yaml'
 import { readFileSync } from 'fs'
@@ -39,7 +38,7 @@ export class ComputeService {
   }
 
   async createWorkflowStatus(responseBody: any, workflowID: string): Promise<WorkflowStatus> {
-    let result: WorkflowStatus = {
+    const result: WorkflowStatus = {
       startedAt: 'null',
       finishedAt: 'null',
       status: 'null',
