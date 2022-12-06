@@ -116,7 +116,7 @@ import {
         
         let response;
         try {
-            console.log("AUTH: " + JSON.stringify(this.getAuthorizationHeaderOption))
+            Logger.debug("AUTH: " + JSON.stringify(this.getAuthorizationHeaderOption))
             response = await this.argoWorkflowApi.workflowServiceGetWorkflow(this.argoNamespace, workflowID, undefined, undefined, this.getAuthorizationHeaderOption);
         }catch(e) {
             Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
@@ -213,6 +213,7 @@ import {
     async getWorkflowExecutionLogs(
         @Param('workflowID') workflowID: string,
     ): Promise<LogsWorkflowResultDto> {
+        Logger.debug("logs for " + workflowID)
         return {logs:""}
     }
 
