@@ -43,7 +43,7 @@ private async getNetworkName(): Promise<string>{
 }
 
 readExample(): any {
-    const templatePath = path.join(__dirname, '/', './argo-workflows-templates/test-workflow.yaml');
+    const templatePath = path.join(__dirname, '/', '../../argo-workflows-templates/test-workflow.yaml')
     const templateContent = readFileSync(templatePath, 'utf8');
 
     return yaml.load(templateContent); 
@@ -114,7 +114,7 @@ readExample(): any {
 
  private readWorkflowTemplate(): any  {
     
-    const templatePath = path.join(__dirname, '/', './argo-workflows-templates/nvm-compute-template.yaml');
+    const templatePath = path.join(__dirname, '/', '../../argo-workflows-templates/nvm-compute-template.yaml');
     const templateContent = readFileSync(templatePath, 'utf8');
 
     return yaml.load(templateContent); 

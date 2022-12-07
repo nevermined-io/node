@@ -19,6 +19,5 @@
       "composite": true,
       "allowJs": true
     },
-    "include": ["next-env.d.ts", "**/*.ts", "./src/compute/argo-workflows-templates/*.yaml"],
     "exclude": ["node_modules"]
 }
