@@ -13,6 +13,7 @@ COPY package.json ./
 COPY tsconfig* ./
 COPY .env.sample ./.env.sample
 COPY accounts ./accounts
+COPY argo-workflows-templates ./argo-workflows-templates
 
 RUN yarn run setup:dev
 RUN yarn run build
