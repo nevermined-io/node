@@ -145,7 +145,7 @@ export class NeverminedService {
       let contents: Buffer = response.data
 
       if (index != 0) {
-        let { url, dtp } = await this.getAssetUrl(did, 0)
+        const { url, dtp } = await this.getAssetUrl(did, 0)
         if (dtp) {
           const password = Buffer.from(url, 'hex')
           contents = Buffer.from(aes_decryption_256(contents.toString('binary'), password), 'binary')
