@@ -58,8 +58,8 @@ The Nevermined Node reads the following environment variables allowing the confi
 | Variable Name                | Description                                                                                                                                                      | Example                                                              |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |                                                          |
 | **WEB3_PROVIDER_URL**        | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx                                    |
-| **MARKETPLACE_API_URL**      | HTTP url to the Marketplace API                                                                                                                                  | https://marketplace-api.mumbai.public.nevermined.rocks               |
-| **NODE_URL**                 | Public HTTP url where this node is exposed                                                                                                                       | https://node.mumbai.public.nevermined.rocks                          |
+| **MARKETPLACE_URI**      | HTTP url to the Marketplace API                                                                                                                                  | https://marketplace-api.mumbai.public.nevermined.rocks               |
+| **NODE_URI**                 | Public HTTP url where this node is exposed                                                                                                                       | https://node.mumbai.public.nevermined.rocks                          |
 | **PORT**                     | Local Port the server will be listen to                                                                                                                          | `8030`                                                               |
 | **NODE_ADDRESS**             | Public address of the Node used to send transactions to the blockchain                                                                                           | `0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0`                         |
 | **PROVIDER_KEYFILE**         | Path to the file where is store the private key of the Node credentials                                                                                          | `/mnt/credentials/keyfile.json`                                      |
@@ -91,6 +91,8 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000`
 | **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE`
 | **MINIO_SECRET_KEY**       | Secret Key for MinIO.Requires ENABLE_COMPUTE = true | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
+| **COMPUTE_PROVIDER_KEYFILE**       | Path to a Compute Provider file. Optional, use only if you want to use a different provider for computing. Requires ENABLE_COMPUTE = true | `/mnt/credentials/compute_keyfile.json`
+| **COMPUTE_PROVIDER_PASSWORD**       | Password Compute Provider file. Optional, use only if you want to use a different provider for computing. Requires ENABLE_COMPUTE = true  | `pass`
 
 ## Install and run:
 
