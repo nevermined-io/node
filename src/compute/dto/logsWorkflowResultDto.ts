@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger';
 
 export class LogsWorkflowResultDto {
   @ApiProperty({
@@ -6,5 +6,5 @@ export class LogsWorkflowResultDto {
     example: '200',
   })
   // TODO. Pending to define until fix bug with logs
-  logs: any
+  logs: any;
 }

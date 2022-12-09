@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { string } from 'joi'
+import { ApiProperty } from '@nestjs/swagger';
+import { string } from 'joi';
 
 export class UploadDto {
   @ApiProperty({
@@ -7,12 +7,12 @@ export class UploadDto {
     example: 'false',
     required: false,
   })
-  encrypt: string
+  encrypt: string;
   @ApiProperty({
     type: string,
     example: 'Hello!',
     description: 'Message to upload',
     required: false,
   })
-  message: string
+  message: string;
 }

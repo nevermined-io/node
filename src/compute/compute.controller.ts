@@ -7,35 +7,35 @@ import {
   Delete,
   NotFoundException,
   InternalServerErrorException,
-} from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger'
-import { Public } from '../common/decorators/auth.decorator'
-import { ComputeService } from './compute.service'
-import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
-import { WorkflowListResultDto } from './dto/workflowListResultDto'
-import { ExecuteWorkflowResultDto } from './dto/executeWorkflowResultDto'
-import { StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
-import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto'
-import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
-import { Logger } from '../shared/logger/logger.service'
-import { ConfigService } from '../shared/config/config.service'
-import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
+} from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Public } from '../common/decorators/auth.decorator';
+import { ComputeService } from './compute.service';
+import { ExecuteWorkflowDto } from './dto/executeWorkflowDto';
+import { WorkflowListResultDto } from './dto/workflowListResultDto';
+import { ExecuteWorkflowResultDto } from './dto/executeWorkflowResultDto';
+import { StatusWorkflowResultDto } from './dto/statusWorkflowResultDto';
+import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto';
+import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto';
+import { Logger } from '../shared/logger/logger.service';
+import { ConfigService } from '../shared/config/config.service';
+import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api';
 
 @ApiTags('Compute')
 @Controller()
 export class ComputeController {
   constructor(private computeService: ComputeService, private configService: ConfigService) {}
 
-  private argoNamespace = this.configService.computeConfig().argo_namespace
+  private argoNamespace = this.configService.computeConfig().argo_namespace;
   private argoWorkflowApi = new WorkflowServiceApi({
     basePath: this.configService.computeConfig().argo_host,
-  })
+  });
   private getAuthorizationHeaderOption: { headers: { Authorization: string } } | any =
     this.configService.computeConfig().argo_auth_token
       ? {
           headers: { Authorization: this.configService.computeConfig().argo_auth_token },
         }
-      : {}
+      : {};
 
   @Get('list')
   @ApiOperation({
@@ -49,7 +49,7 @@ export class ComputeController {
   })
   @Public()
   async getWorkflowsList(): Promise<WorkflowListResultDto> {
-    Logger.debug(`Getting list of workflows`)
+    Logger.debug(`Getting list of workflows`);
 
     try {
       const response = await this.argoWorkflowApi.workflowServiceListWorkflows(
@@ -65,21 +65,21 @@ export class ComputeController {
         undefined,
         undefined,
         this.getAuthorizationHeaderOption,
-      )
-      const result = []
+      );
+      const result = [];
 
       if (response.data.items) {
         response.data.items.forEach((element) => {
-          result.push(element.metadata.name)
-        })
+          result.push(element.metadata.name);
+        });
       }
 
-      return { workflows: result }
+      return { workflows: result };
     } catch (e) {
-      Logger.error(`Error trying to get the list of workflows: ${e}`)
+      Logger.error(`Error trying to get the list of workflows: ${e}`);
       throw new InternalServerErrorException(
         `There was an error trying to get the list of workflows of namespace ${this.argoNamespace}`,
-      )
+      );
     }
   }
 
@@ -97,7 +97,7 @@ export class ComputeController {
   async getWorkflowStatus(
     @Param('workflowID') workflowID: string,
   ): Promise<StatusWorkflowResultDto> {
-    let response
+    let response;
     try {
       response = await this.argoWorkflowApi.workflowServiceGetWorkflow(
         this.argoNamespace,
@@ -105,18 +105,18 @@ export class ComputeController {
         undefined,
         undefined,
         this.getAuthorizationHeaderOption,
-      )
+      );
     } catch (e) {
-      Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`)
-      throw new NotFoundException(`Workflow ${workflowID} not found`)
+      Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
+      throw new NotFoundException(`Workflow ${workflowID} not found`);
     }
 
     try {
-      const status = await this.computeService.createWorkflowStatus(response.data, workflowID)
-      return { workflowStatus: status }
+      const status = await this.computeService.createWorkflowStatus(response.data, workflowID);
+      return { workflowStatus: status };
     } catch (e) {
-      Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`)
-      throw new InternalServerErrorException(`Workflow ${workflowID} not found`)
+      Logger.error(`Error trying to get status about workflow ${workflowID}. Error: ${e}`);
+      throw new InternalServerErrorException(`Workflow ${workflowID} not found`);
     }
   }
 
@@ -136,22 +136,22 @@ export class ComputeController {
     @Param('agreement_id') agreementId: string,
   ): Promise<ExecuteWorkflowResultDto> {
     try {
-      Logger.debug(`Executing compute for agreement id ${agreementId}`)
+      Logger.debug(`Executing compute for agreement id ${agreementId}`);
 
-      const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId)
+      const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId);
       const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow(
         { serverDryRun: false, namespace: this.argoNamespace, workflow: argoWorkflow },
         this.argoNamespace,
         this.getAuthorizationHeaderOption,
-      )
+      );
 
-      Logger.debug('Argo Workflow created with id: ' + JSON.stringify(response.data.metadata.name))
-      return { workflowId: response.data.metadata.name }
+      Logger.debug('Argo Workflow created with id: ' + JSON.stringify(response.data.metadata.name));
+      return { workflowId: response.data.metadata.name };
     } catch (e) {
-      Logger.error(`Problem initialing workflow for service Agreement ${agreementId}. Error: ${e}`)
+      Logger.error(`Problem initialing workflow for service Agreement ${agreementId}. Error: ${e}`);
       throw new InternalServerErrorException(
         `Problem initialing workflow for service Agreement ${agreementId}`,
-      )
+      );
     }
   }
 
@@ -169,12 +169,12 @@ export class ComputeController {
   async stopWorkflowExecution(
     @Param('workflowID') workflowID: string,
   ): Promise<StopWorkflowResultDto> {
-    Logger.debug(`Deleting workflow ${workflowID}`)
+    Logger.debug(`Deleting workflow ${workflowID}`);
 
     try {
-      const deleteOptionsGracePeriodSeconds = '60'
-      const deleteOptionsOrphanDependents = true
-      const deleteOptionsPropagationPolicy = 'propagation_policy_example'
+      const deleteOptionsGracePeriodSeconds = '60';
+      const deleteOptionsOrphanDependents = true;
+      const deleteOptionsPropagationPolicy = 'propagation_policy_example';
       const response = await this.argoWorkflowApi.workflowServiceDeleteWorkflow(
         this.argoNamespace,
         workflowID,
@@ -186,12 +186,12 @@ export class ComputeController {
         undefined,
         undefined,
         this.getAuthorizationHeaderOption,
-      )
+      );
 
-      return { status: response.status, text: `workflow ${workflowID} successfuly deleted` }
+      return { status: response.status, text: `workflow ${workflowID} successfuly deleted` };
     } catch (e) {
-      Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`)
-      throw new InternalServerErrorException(`Error trying delete workflow  ${workflowID}`)
+      Logger.error(`Error trying delete workflow ${workflowID}. Error: ${e}`);
+      throw new InternalServerErrorException(`Error trying delete workflow  ${workflowID}`);
     }
   }
 
@@ -226,10 +226,10 @@ export class ComputeController {
       undefined,
       undefined,
       this.getAuthorizationHeaderOption,
-    )
+    );
 
-    Logger.debug(`LOGS: ${response.data}`)
+    Logger.debug(`LOGS: ${response.data}`);
 
-    return { logs: response.data }
+    return { logs: response.data };
   }
 }
