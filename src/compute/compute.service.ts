@@ -103,7 +103,7 @@ export class ComputeService {
     const templatePath = path.join(
       __dirname,
       '/',
-      './argo-workflows-templates/nvm-compute-template.yaml',
+      '../../argo-workflows-templates/nvm-compute-template.yaml',
     )
     const templateContent = readFileSync(templatePath, 'utf8')
 
