@@ -28,6 +28,6 @@ const bootstrap = async () => {
   writeFileSync('docs/openapi.json', JSON.stringify(document), { encoding: 'utf8' })
 
   await app.close()
-};
+}
 
 bootstrap()

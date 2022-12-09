@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { decodeJwt, JWTPayload } from 'jose';
-import { CLIENT_ASSERTION_TYPE, EthSignJWT } from '../common/guards/shared/jwt.utils';
-import { ethers } from 'ethers';
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { decodeJwt, JWTPayload } from 'jose'
+import { CLIENT_ASSERTION_TYPE, EthSignJWT } from '../common/guards/shared/jwt.utils'
+import { ethers } from 'ethers'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
@@ -12,17 +12,17 @@ export class AuthService {
 
   validateClaim(clientAssertionType: string, clientAssertion: string) {
     if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
-      throw new UnauthorizedException('Invalid "assertion_type"');
+      throw new UnauthorizedException('Invalid "assertion_type"')
     }
 
-    const payload: JWTPayload = decodeJwt(clientAssertion);
-    delete payload.exp;
+    const payload: JWTPayload = decodeJwt(clientAssertion)
+    delete payload.exp
     return {
       access_token: this.jwtService.sign(payload),
-    };
+    }
   }
   async createToken(obj: any) {
-    const wallet = ethers.Wallet.createRandom();
+    const wallet = ethers.Wallet.createRandom()
     const clientAssertion = await new EthSignJWT({
       ...obj,
       iss: wallet.address,
@@ -30,8 +30,8 @@ export class AuthService {
       .setProtectedHeader({ alg: 'ES256K' })
       .setIssuedAt()
       .setExpirationTime('60m')
-      .ethSign(wallet);
+      .ethSign(wallet)
 
-    return this.validateClaim(CLIENT_ASSERTION_TYPE, clientAssertion).access_token;
+    return this.validateClaim(CLIENT_ASSERTION_TYPE, clientAssertion).access_token
   }
 }

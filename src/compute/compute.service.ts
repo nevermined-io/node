@@ -1,40 +1,40 @@
-import { Injectable } from '@nestjs/common';
-import { NeverminedService } from '../shared/nevermined/nvm.service';
-import yaml from 'js-yaml';
-import { readFileSync } from 'fs';
-import path from 'path';
-import { ExecuteWorkflowDto } from './dto/executeWorkflowDto';
-import { DDO } from '@nevermined-io/nevermined-sdk-js';
-import { ConfigService } from '../shared/config/config.service';
-import { Logger } from '../shared/logger/logger.service';
-require('js-yaml');
+import { Injectable } from '@nestjs/common'
+import { NeverminedService } from '../shared/nevermined/nvm.service'
+import yaml from 'js-yaml'
+import { readFileSync } from 'fs'
+import path from 'path'
+import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
+import { DDO } from '@nevermined-io/nevermined-sdk-js'
+import { ConfigService } from '../shared/config/config.service'
+import { Logger } from '../shared/logger/logger.service'
+require('js-yaml')
 
 export type WorkflowStatus = {
-  status: string;
-  startedAt: string;
-  finishedAt: string;
-  did: string;
-  pods: PodStatus[];
-};
+  status: string
+  startedAt: string
+  finishedAt: string
+  did: string
+  pods: PodStatus[]
+}
 
 export type PodStatus = {
-  podName: string;
-  status: string;
-  startedAt: string;
-  finishedAt: string;
-};
+  podName: string
+  status: string
+  startedAt: string
+  finishedAt: string
+}
 
 @Injectable()
 export class ComputeService {
-  private networkName: string;
+  private networkName: string
 
   constructor(private configService: ConfigService, private nvmService: NeverminedService) {}
 
   private async getNetworkName(): Promise<string> {
     if (!this.networkName)
-      this.networkName = await this.nvmService.getNevermined().keeper.getNetworkName();
+      this.networkName = await this.nvmService.getNevermined().keeper.getNetworkName()
 
-    return this.networkName;
+    return this.networkName
   }
 
   async createWorkflowStatus(responseBody: any, workflowID: string): Promise<WorkflowStatus> {
@@ -44,36 +44,36 @@ export class ComputeService {
       status: 'null',
       did: undefined,
       pods: [],
-    };
-    const pods = [];
+    }
+    const pods = []
 
     // Transform from pairs of id:object to array of objects
-    const nodesPairs = responseBody.status.nodes;
+    const nodesPairs = responseBody.status.nodes
 
     if (nodesPairs) {
-      const nodesArray = [];
+      const nodesArray = []
       for (const i in nodesPairs) {
-        nodesArray.push(nodesPairs[i]);
+        nodesArray.push(nodesPairs[i])
       }
 
       nodesArray.forEach((element) => {
-        const podName = element.displayName;
+        const podName = element.displayName
         if (podName === workflowID) {
-          result.status = element.phase;
-          result.startedAt = element.startedAt;
-          result.finishedAt = element.finishedAt;
+          result.status = element.phase
+          result.startedAt = element.startedAt
+          result.finishedAt = element.finishedAt
         } else {
           const podStatus: PodStatus = {
             podName: podName,
             status: element.phase,
             startedAt: element.startedAt,
             finishedAt: element.finishedAt,
-          };
-          pods.push(podStatus);
+          }
+          pods.push(podStatus)
         }
-      });
+      })
 
-      result.pods = pods;
+      result.pods = pods
 
       if (result.status === 'Succeeded') {
         const query = {
@@ -85,18 +85,18 @@ export class ComputeService {
               },
             },
           },
-        };
+        }
 
-        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query });
+        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
 
         if (queryResult.totalResults.value > 0) {
-          const did = queryResult.results[0].id;
-          result.did = did;
+          const did = queryResult.results[0].id
+          result.did = did
         }
       }
     }
 
-    return result;
+    return result
   }
 
   private readWorkflowTemplate(): any {
@@ -104,77 +104,77 @@ export class ComputeService {
       __dirname,
       '/',
       '../../argo-workflows-templates/nvm-compute-template.yaml',
-    );
-    const templateContent = readFileSync(templatePath, 'utf8');
+    )
+    const templateContent = readFileSync(templatePath, 'utf8')
 
-    return yaml.load(templateContent);
+    return yaml.load(templateContent)
   }
 
   async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
-    const workflow = this.readWorkflowTemplate();
+    const workflow = this.readWorkflowTemplate()
 
-    Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`);
-    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid);
-    Logger.debug(`workflow DDO ${initData.workflowDid} resolved`);
+    Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
+    const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
+    Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
-    workflow.metadata.namespace = this.configService.computeConfig().argo_namespace;
-    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer);
-    workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId;
+    workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
+    workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
 
-    workflow.spec.entrypoint = 'compute-workflow';
+    workflow.spec.entrypoint = 'compute-workflow'
 
     Logger.debug(
       `workflow arguments parameters ${JSON.stringify(workflow.spec.arguments.parameters)}`,
-    );
+    )
     /*
     TODO -  FEDERATED LEARNING USE CASES
     if  (( metadata.attributes.main.type) === 'fl-coordinator')
         workflow.spec.entrypoint= "coordinator-workflow"
 */
 
-    return workflow;
+    return workflow
   }
 
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
   ): Promise<{ name: string; value: string }[]> {
-    const metadata = workflowDdo.findServiceByType('metadata');
-    const workflow = metadata.attributes.main.workflow;
+    const metadata = workflowDdo.findServiceByType('metadata')
+    const workflow = metadata.attributes.main.workflow
 
     // TODO: Currently this only supports one stage
-    const transformationDid = workflow.stages[0].transformation.id;
-    Logger.debug(`Resolving transformation Did ${transformationDid}`);
+    const transformationDid = workflow.stages[0].transformation.id
+    Logger.debug(`Resolving transformation Did ${transformationDid}`)
 
     const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(
       transformationDid,
-    );
-    const transformationMetadata = transformationDdo.findServiceByType('metadata');
+    )
+    const transformationMetadata = transformationDdo.findServiceByType('metadata')
 
     // get args and container
-    const args = transformationMetadata.attributes.main.algorithm.entrypoint;
-    const image = transformationMetadata.attributes.main.algorithm.requirements.container.image;
-    const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag;
+    const args = transformationMetadata.attributes.main.algorithm.entrypoint
+    const image = transformationMetadata.attributes.main.algorithm.requirements.container.image
+    const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag
 
-    Logger.debug(`transformation args: ${args}`);
-    Logger.debug(`transformation container: ${image}`);
-    Logger.debug(`transformation tag: ${tag}`);
+    Logger.debug(`transformation args: ${args}`)
+    Logger.debug(`transformation container: ${image}`)
+    Logger.debug(`transformation tag: ${tag}`)
 
-    const gethLocal = (await this.getNetworkName()) === 'geth-localnet';
+    const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
 
     if (gethLocal)
       Logger.debug(
         `Compute Stack running in Nevermined Tools. Using ${
           this.configService.computeConfig().gethlocal_host_name
         } as host for NVM services`,
-      );
+      )
 
-    let providerKey = this.configService.cryptoConfig().provider_key;
-    let providerPassword = this.configService.cryptoConfig().provider_password;
+    let providerKey = this.configService.cryptoConfig().provider_key
+    let providerPassword = this.configService.cryptoConfig().provider_password
 
     if (this.configService.computeConfig().compute_provider_keyfile) {
-      providerKey = this.configService.computeConfig().compute_provider_key;
-      providerPassword = this.configService.computeConfig().compute_provider_password;
+      providerKey = this.configService.computeConfig().compute_provider_key
+      providerPassword = this.configService.computeConfig().compute_provider_password
     }
 
     return [
@@ -270,6 +270,6 @@ export class ComputeService {
         name: 'verbose',
         value: 'true',
       },
-    ];
+    ]
   }
 }

@@ -1,44 +1,44 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { JWTPayload } from 'jose';
-import { LoginDto } from './dto/login.dto';
-import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils';
-import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer';
-import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer';
+import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
+import { JWTPayload } from 'jose'
+import { LoginDto } from './dto/login.dto'
+import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
+import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer'
+import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer'
 import {
   ServiceType,
   ValidationParams,
-} from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service';
-import { NeverminedService } from '../shared/nevermined/nvm.service';
-import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils';
-import { Logger } from '@nevermined-io/nevermined-sdk-js';
+} from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
+import { NeverminedService } from '../shared/nevermined/nvm.service'
+import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
+import { Logger } from '@nevermined-io/nevermined-sdk-js'
 
-const BASE_URL = '/api/v1/node/services/';
+const BASE_URL = '/api/v1/node/services/'
 
 @Injectable()
 export class AuthService {
   constructor(private jwtService: JwtService, private nvmService: NeverminedService) {}
 
   async validateOwner(did: string, consumer_address: string): Promise<void> {
-    const nevermined = this.nvmService.getNevermined();
+    const nevermined = this.nvmService.getNevermined()
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
       consumer_address,
       did,
-    );
+    )
     if (!granted) {
       throw new UnauthorizedException(
         `Address ${consumer_address} has no permission to access ${did}`,
-      );
+      )
     }
   }
 
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
-    const nevermined = this.nvmService.getNevermined();
-    const plugin = nevermined.assets.servicePlugin[service];
-    const granted = await plugin.accept(params);
+    const nevermined = this.nvmService.getNevermined()
+    const plugin = nevermined.assets.servicePlugin[service]
+    const granted = await plugin.accept(params)
     if (!granted) {
-      const [from] = await nevermined.accounts.list();
-      await plugin.process(params, from, undefined);
+      const [from] = await nevermined.accounts.list()
+      await plugin.process(params, from, undefined)
     }
   }
 
@@ -49,13 +49,13 @@ export class AuthService {
     buyer: string,
     babysig: Babysig,
   ): Promise<void> {
-    const dtp = this.nvmService.getDtp();
+    const dtp = this.nvmService.getDtp()
     const buyerPub = new BabyjubPublicKey(
       zeroX(buyer.substring(0, 64)),
       zeroX(buyer.substring(64, 128)),
-    );
+    )
     if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig))) {
-      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`);
+      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`)
     }
   }
 
@@ -70,12 +70,12 @@ export class AuthService {
    **/
   async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
     if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
-      throw new UnauthorizedException('Invalid "assertion_type"');
+      throw new UnauthorizedException('Invalid "assertion_type"')
     }
 
-    let payload: JWTPayload;
+    let payload: JWTPayload
     try {
-      payload = jwtEthVerify(clientAssertion);
+      payload = jwtEthVerify(clientAssertion)
 
       const params: ValidationParams = {
         consumer_address: payload.iss,
@@ -83,25 +83,25 @@ export class AuthService {
         agreement_id: payload.sub,
         buyer: payload.buyer as string,
         babysig: payload.babysig as Babysig,
-      };
-
-      if (payload.aud === BASE_URL + 'access') {
-        await this.validateAccess(params, 'access');
-      } else if (payload.aud === BASE_URL + 'download') {
-        await this.validateOwner(payload.did as string, payload.iss);
-      } else if (payload.aud === BASE_URL + 'nft-access') {
-        await this.validateAccess(params, 'nft-access');
       }
 
-      delete payload.exp;
+      if (payload.aud === BASE_URL + 'access') {
+        await this.validateAccess(params, 'access')
+      } else if (payload.aud === BASE_URL + 'download') {
+        await this.validateOwner(payload.did as string, payload.iss)
+      } else if (payload.aud === BASE_URL + 'nft-access') {
+        await this.validateAccess(params, 'nft-access')
+      }
+
+      delete payload.exp
       return {
         access_token: this.jwtService.sign(payload),
-      };
+      }
     } catch (error) {
-      Logger.error(error);
+      Logger.error(error)
       throw new UnauthorizedException(
         `The 'client_assertion' is invalid: ${(error as Error).message}`,
-      );
+      )
     }
   }
 }
