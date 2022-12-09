@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   generateName: testing-argo-
-  namespace: nvm-disc
+  namespace: argo
   labels:
     workflows.argoproj.io/archive-strategy: "false"
   annotations:
