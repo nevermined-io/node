@@ -88,6 +88,8 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000`
 | **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE`
 | **MINIO_SECRET_KEY**       | Secret Key for MinIO.Requires ENABLE_COMPUTE = true | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
+| **COMPUTE_PROVIDER_KEYFILE**       | Path to a Compute Provider file. Optional, use only if you want to use a different provider for computing. Requires ENABLE_COMPUTE = true | `/mnt/credentials/compute_keyfile.json`
+| **COMPUTE_PROVIDER_PASSWORD**       | Password Compute Provider file. Optional, use only if you want to use a different provider for computing. Requires ENABLE_COMPUTE = true  | `pass`
 
 ## Install and run:
 

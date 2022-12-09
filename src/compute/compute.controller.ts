@@ -78,6 +78,14 @@ import {
     async getWorkflowsList(): Promise<WorkflowListResultDto> {
 
         Logger.debug(`Getting list of workflows`);
+
+        if (this.configService.computeConfig().compute_provider_keyfile){
+            console.log("using compute provider")
+            console.log("keyfile path: " + this.configService.computeConfig().compute_provider_keyfile)
+            console.log("keyfile pass: " + this.configService.computeConfig().compute_provider_password)
+            
+        }
+        else console.log("using nvm provider")
        
         try {
             

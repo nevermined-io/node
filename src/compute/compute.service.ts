@@ -171,6 +171,15 @@ readExample(): any {
     if (gethLocal)
         Logger.debug(`Compute Stack running in Nevermined Tools. Using ${this.configService.computeConfig().gethlocal_host_name} as host for NVM services`)
 
+    
+    let providerKey = this.configService.cryptoConfig().provider_key
+    let providerPassword =  this.configService.cryptoConfig().provider_password
+
+    if (this.configService.computeConfig().compute_provider_keyfile){
+        providerKey = this.configService.computeConfig().compute_provider_key
+        providerPassword = this.configService.computeConfig().compute_provider_password
+    }
+
     return [
             {
                 name: "volume",
@@ -178,11 +187,11 @@ readExample(): any {
             },
             {
                 name: "provider_key_file",
-                value: this.configService.cryptoConfig().provider_key
+                value: providerKey
             },
             {
                 name: "provider_password",
-                value: this.configService.cryptoConfig().provider_password
+                value: providerPassword
             },
             {
                 name: "marketplace_api_url",
