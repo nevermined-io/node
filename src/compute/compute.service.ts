@@ -43,6 +43,7 @@ private async getNetworkName(): Promise<string>{
 }
 
 readExample(): any {
+    Logger.error("reading example")
     const templatePath = path.join(__dirname, '/', '../../argo-workflows-templates/test-workflow.yaml')
     const templateContent = readFileSync(templatePath, 'utf8');
 

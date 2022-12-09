@@ -53,9 +53,11 @@ import {
            try {
     
                 const argoWorkflow = await this.computeService.readExample()
+                Logger.error("sending Argo Workflow: " + JSON.stringify(argoWorkflow))
+                
                 const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow( { serverDryRun:false, namespace: this.argoNamespace, workflow: argoWorkflow}, this.argoNamespace, this.getAuthorizationHeaderOption)
             
-                Logger.debug("Argo Workflow created:: " + JSON.stringify(response.data))
+                Logger.error("Argo Workflow created:: " + JSON.stringify(response.data))
                 return response.data.metadata.name   
     
             }catch(e) {
