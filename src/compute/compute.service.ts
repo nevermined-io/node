@@ -99,11 +99,13 @@ export class ComputeService {
     return result
   }
 
-  private readWorkflowTemplate(): any {
+  private readWorkflowTemplate(gethLocal: boolean): any {
+
+    const workflowFile = gethLocal?'nvm-compute-template-geth-localnet.yaml':'nvm-compute-template.yaml'
     const templatePath = path.join(
       __dirname,
       '/',
-      '../../argo-workflows-templates/nvm-compute-template.yaml',
+      `../../argo-workflows-templates/${workflowFile}`,
     )
     const templateContent = readFileSync(templatePath, 'utf8')
 
@@ -111,14 +113,17 @@ export class ComputeService {
   }
 
   async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
-    const workflow = this.readWorkflowTemplate()
+
+    const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
+
+    const workflow = this.readWorkflowTemplate(gethLocal)
 
     Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
     const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
-    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer, gethLocal)
     workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
 
     workflow.spec.entrypoint = 'compute-workflow'
@@ -138,6 +143,7 @@ export class ComputeService {
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
+    gethLocal: boolean
   ): Promise<{ name: string; value: string }[]> {
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
@@ -159,8 +165,6 @@ export class ComputeService {
     Logger.debug(`transformation args: ${args}`)
     Logger.debug(`transformation container: ${image}`)
     Logger.debug(`transformation tag: ${tag}`)
-
-    const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
 
     if (gethLocal)
       Logger.debug(

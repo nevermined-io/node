@@ -120,7 +120,7 @@ spec:
         volumeMounts:
           - mountPath: /data
             name: workdir
-          - name: artifacts
+          - name: minikube-mount
             mountPath: /artifacts
 
     - name: transformation-pod-compute
@@ -203,7 +203,7 @@ spec:
         volumeMounts:
           - mountPath: /data
             name: workdir
-          - name: artifacts
+          - name: minikube-mount
             mountPath: /artifacts
 
   volumeClaimTemplates:
@@ -215,10 +215,10 @@ spec:
         resources:
           requests:
             storage: 2Gi
-
   volumes:
-    - name: artifacts
-      persistentVolumeClaim:
-        claimName: minio
+    - name: minikube-mount
+      hostPath:
+        path: /nevermined-artifacts
+        type: Directory
 
 status: {}
