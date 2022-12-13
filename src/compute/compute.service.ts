@@ -100,20 +100,16 @@ export class ComputeService {
   }
 
   private readWorkflowTemplate(gethLocal: boolean): any {
-
-    const workflowFile = gethLocal?'nvm-compute-template-geth-localnet.yaml':'nvm-compute-template.yaml'
-    const templatePath = path.join(
-      __dirname,
-      '/',
-      `../../argo-workflows-templates/${workflowFile}`,
-    )
+    const workflowFile = gethLocal
+      ? 'nvm-compute-template-geth-localnet.yaml'
+      : 'nvm-compute-template.yaml'
+    const templatePath = path.join(__dirname, '/', `../../argo-workflows-templates/${workflowFile}`)
     const templateContent = readFileSync(templatePath, 'utf8')
 
     return yaml.load(templateContent)
   }
 
   async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
-
     const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
 
     const workflow = this.readWorkflowTemplate(gethLocal)
@@ -123,7 +119,11 @@ export class ComputeService {
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
-    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer, gethLocal)
+    workflow.spec.arguments.parameters = await this.createArguments(
+      ddo,
+      initData.consumer,
+      gethLocal,
+    )
     workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
 
     workflow.spec.entrypoint = 'compute-workflow'
@@ -143,7 +143,7 @@ export class ComputeService {
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
-    gethLocal: boolean
+    gethLocal: boolean,
   ): Promise<{ name: string; value: string }[]> {
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
