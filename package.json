@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "0.5.4",
+  "version": "0.5.2",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
@@ -8,6 +8,7 @@
     "lint": "eslint ./",
     "clean": "rm -rf ./dist/ ./doc/ ./.nyc_output",
     "lint:fix": "yarn run lint -- --fix",
+    "format:check": "yarn prettier --check src scripts",
     "setup:dev": "cp ./config/local.js.sample ./config/local.js && cp .env.sample .env",
     "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp -r ./argo-workflows-templates ./dist/argo-workflows-templates && cp package.json ./dist",
     "prestart": "yarn run build",
@@ -19,11 +20,11 @@
   },
   "dependencies": {
     "@nestjs/axios": "^1.0.0",
-    "@nestjs/common": "^8.4.0",
-    "@nestjs/core": "^8.4.0",
-    "@nestjs/jwt": "^8.0.0",
+    "@nestjs/common": "^8.4.5",
+    "@nestjs/core": "^8.4.5",
+    "@nestjs/jwt": "^8.0.1",
     "@nestjs/passport": "^8.2.1",
-    "@nestjs/platform-express": "^8.4.1",
+    "@nestjs/platform-express": "^8.4.5",
     "@nestjs/swagger": "^5.2.0",
     "@nestjs/typeorm": "^8.0.3",
     "@nevermined-io/argo-workflows-api": "^0.1.3",
@@ -41,6 +42,7 @@
     "cli-color": "^2.0.1",
     "dotenv": "^16.0.0",
     "eciesjs": "^0.3.15",
+    "ipfs-http-client-lite": "^0.3.0",
     "ethers": "^5.6.3",
     "fetch-blob": "^3.2.0",
     "form-data": "^4.0.0",
@@ -79,7 +81,7 @@
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",
     "eslint": "^8.11.0",
-    "eslint-config-nevermined": "^0.1.0",
+    "eslint-config-nevermined": "^0.2.0",
     "eslint-config-next": "^12.3.1",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
@@ -107,11 +109,6 @@
       "prettier --write",
       "git add"
     ]
-  },
-  "prettier": {
-    "printWidth": 120,
-    "singleQuote": true,
-    "trailingComma": "es5"
   },
   "jest": {
     "moduleFileExtensions": [

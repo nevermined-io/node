@@ -1,22 +1,22 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
-import { Config } from '@nevermined-io/nevermined-sdk-js';
-import { readFileSync } from 'fs';
-import * as Joi from 'joi';
-import { get as loGet } from 'lodash';
-import { Logger } from '../logger/logger.service';
+import { Config } from '@nevermined-io/nevermined-sdk-js'
+import { readFileSync } from 'fs'
+import * as Joi from 'joi'
+import { get as loGet } from 'lodash'
+import { Logger } from '../logger/logger.service'
 
 export interface EnvConfig {
-  [key: string]: string;
-  nvm: any;
+  [key: string]: string
+  nvm: any
 }
 
 export interface CryptoConfig {
-  provider_key: string;
-  provider_password: string;
-  provider_rsa_public: string;
-  provider_rsa_private: string;
+  provider_key: string
+  provider_password: string
+  provider_rsa_public: string
+  provider_rsa_private: string
 }
 
 export interface ComputeConfig {
@@ -34,10 +34,12 @@ export interface ComputeConfig {
   compute_provider_password: string
 }
 
-const configProfile = require('../../../config');
+const configProfile = require('../../../config')
 
 const DOTENV_SCHEMA = Joi.object({
-  NODE_ENV: Joi.string().valid('development', 'production', 'test', 'staging').default('development'),
+  NODE_ENV: Joi.string()
+    .valid('development', 'production', 'test', 'staging')
+    .default('development'),
   JWT_SECRET_KEY: Joi.string().required().error(new Error('JWT_SECRET_KEY is required!')),
   JWT_EXPIRY_KEY: Joi.string().default('60m'),
   server: Joi.object({
@@ -68,8 +70,8 @@ const DOTENV_SCHEMA = Joi.object({
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
-  ARGO_HOST: Joi.string().default("http:localhost:2746/"),
-  ARGO_NAMESPACE: Joi.string().default("argo"),
+  ARGO_HOST: Joi.string().default('http:localhost:2746/'),
+  ARGO_NAMESPACE: Joi.string().default('argo'),
   ARGO_AUTH_TOKEN: Joi.string(),
   MINIO_HOST: Joi.string().default('127.0.0.1'),
   MINIO_PORT: Joi.string().default('9000'),
@@ -77,7 +79,7 @@ const DOTENV_SCHEMA = Joi.object({
   MINIO_SECRET_KEY: Joi.string().default('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'),
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
-});
+})
 
 type DotenvSchemaKeys =
   | 'NODE_ENV'
@@ -116,12 +118,12 @@ type DotenvSchemaKeys =
   | 'COMPUTE_PROVIDER_PASSWORD'
 
 export class ConfigService {
-  private readonly envConfig: EnvConfig;
+  private readonly envConfig: EnvConfig
   private readonly crypto: CryptoConfig
   private readonly compute: ComputeConfig
 
   constructor() {
-    this.envConfig = this.validateInput(configProfile);
+    this.envConfig = this.validateInput(configProfile)
     this.crypto = {
       provider_password: this.get('PROVIDER_PASSWORD'),
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
@@ -130,7 +132,7 @@ export class ConfigService {
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
-      gethlocal_host_name: "host.docker.internal",
+      gethlocal_host_name: 'host.docker.internal',
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
       argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
@@ -139,21 +141,23 @@ export class ConfigService {
       minio_access_key: this.get('MINIO_ACCESS_KEY'),
       minio_secret_key: this.get('MINIO_SECRET_KEY'),
       compute_provider_keyfile: this.get('COMPUTE_PROVIDER_KEYFILE'),
-      compute_provider_key: this.get('COMPUTE_PROVIDER_KEYFILE') && readFileSync(this.get('COMPUTE_PROVIDER_KEYFILE')).toString(),
-      compute_provider_password: this.get('COMPUTE_PROVIDER_PASSWORD')
+      compute_provider_key:
+        this.get('COMPUTE_PROVIDER_KEYFILE') &&
+        readFileSync(this.get('COMPUTE_PROVIDER_KEYFILE')).toString(),
+      compute_provider_password: this.get('COMPUTE_PROVIDER_PASSWORD'),
     }
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
-    return loGet(this.envConfig, path) as unknown as T | undefined;
+    return loGet(this.envConfig, path) as unknown as T | undefined
   }
 
   nvm(): Config {
-    return this.envConfig.nvm;
+    return this.envConfig.nvm
   }
 
   cryptoConfig(): CryptoConfig {
-    return this.crypto;
+    return this.crypto
   }
 
   computeConfig(): ComputeConfig {
@@ -165,19 +169,19 @@ export class ConfigService {
       x: this.envConfig.PROVIDER_BABYJUB_PUBLIC1 || '',
       y: this.envConfig.PROVIDER_BABYJUB_PUBLIC2 || '',
       secret: this.envConfig.PROVIDER_BABYJUB_SECRET || '',
-    };
+    }
   }
 
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const { error, value: validatedEnvConfig } = DOTENV_SCHEMA.validate(envConfig, {
       allowUnknown: true,
       stripUnknown: true,
-    });
+    })
     if (error) {
-      Logger.error('Missing configuration please provide followed variable!\n\n', 'ConfigService');
-      Logger.error(error.message, 'ConfigService');
-      process.exit(2);
+      Logger.error('Missing configuration please provide followed variable!\n\n', 'ConfigService')
+      Logger.error(error.message, 'ConfigService')
+      process.exit(2)
     }
-    return validatedEnvConfig as EnvConfig;
+    return validatedEnvConfig as EnvConfig
   }
 }
