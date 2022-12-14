@@ -87,7 +87,7 @@ export class ComputeService {
           },
         }
 
-        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
+        const queryResult = await this.nvmService.getNevermined().search.query({ query: query })
 
         if (queryResult.totalResults.value > 0) {
           const did = queryResult.results[0].id
