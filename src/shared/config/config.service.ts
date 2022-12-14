@@ -20,17 +20,17 @@ export interface CryptoConfig {
 }
 
 export interface ComputeConfig {
-  enable_compute: boolean,
-  gethlocal_host_name: string,
-  argo_host: string,
-  argo_namespace: string,
-  argo_auth_token: string,
-  minio_host: string,
-  minio_port: string,
-  minio_access_key: string,
-  minio_secret_key: string,
-  compute_provider_keyfile: string,
-  compute_provider_key: string,
+  enable_compute: boolean
+  gethlocal_host_name: string
+  argo_host: string
+  argo_namespace: string
+  argo_auth_token: string
+  minio_host: string
+  minio_port: string
+  minio_access_key: string
+  minio_secret_key: string
+  compute_provider_keyfile: string
+  compute_provider_key: string
   compute_provider_password: string
 }
 

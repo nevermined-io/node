@@ -5,8 +5,8 @@ description: Nevermined Node Overview
 
 # Node Overview
 
-In the Nevermined ecosystem, the [Node](https://github.com/nevermined-io/node-ts/) is 
-the technical component executed by the Publishers and/or Content Providers allowing them 
+In the Nevermined ecosystem, the [Node](https://github.com/nevermined-io/node-ts/) is
+the technical component executed by the Publishers and/or Content Providers allowing them
 to offer extended data services (e.g. storage and compute).
 
 Nevermined Node, as part of the Publisher ecosystem, includes the credentials to interact
@@ -15,17 +15,15 @@ that consumers are able to execute certain actions via the Nevermined Decentrali
 
 In the Nevermined architecture a content publisher or provider defines the rules about how their
 content can be used (transfered, accessed, sold) by the rest of the world. And consumers knowing
-that can make use (or not) of these contents. All this transactions are recorded via the 
+that can make use (or not) of these contents. All this transactions are recorded via the
 Nevermined Smart Contracts, and the node use them to authorize users to do certain actions.
 
-A typical scenario of the node is for example give access to off-chain data (data sharing) 
+A typical scenario of the node is for example give access to off-chain data (data sharing)
 stored in a cloud provider, when a consumer paid for that access. The node is specially designed
-to facilitate this level of authorization bringing the gap between the permissions reflected 
+to facilitate this level of authorization bringing the gap between the permissions reflected
 in the Smart Contracts and off-chain data and computation.
 
-The Node allows also the encryption and decryption of content using RSA and ECDSA. 
+The Node allows also the encryption and decryption of content using RSA and ECDSA.
 
-To interact with it, the node exposes a HTTP REST Api using OpenAPI. The file including the 
+To interact with it, the node exposes a HTTP REST Api using OpenAPI. The file including the
 API specification can be found in the [openapi.json file](https://github.com/nevermined-io/node-ts/blob/main/docs/openapi.json).
-
-

@@ -51,7 +51,7 @@ export class InfoController {
     const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
     const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
 
-    const providerURL = new URL(this.nvmService.web3ProviderUri())    
+    const providerURL = new URL(this.nvmService.web3ProviderUri())
 
     return {
       APIversion: packageJson.version,
