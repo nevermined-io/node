@@ -1189,12 +1189,12 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc0":
-  version "0.3.0-rc0"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc0.tgz#e734b50759bf92ddf26dad2688916638f4ae42e9"
-  integrity sha512-kxdtAdixILETfohKpcEC3XW1LgPP8K+8pxmViO3uBKqVKN1nQInSTbL0FxGkzf4+9XH+4br+05ycZhXn+Rw64g==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc1":
+  version "0.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc1.tgz#198641da849c99db9c3225de94a0f70104e1a9d6"
+  integrity sha512-f4HH0ehX/hj3Za5d1VG+NVONSemSeEm4Ry7rxnX4kCAu3Mgs9Z1JTiczGuZtlTyTfx5e9KcuvSwAGmDH83jn1A==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc0"
+    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc2"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1202,10 +1202,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc0":
-  version "1.0.0-rc0"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc0.tgz#888631bf416258efe01c06b2f296fcc100478e3d"
-  integrity sha512-oxlZkH7NcLnDItwWHTo08Xb5sQhcXXryqCyy9StrgLETBgtdqdLBJtSR1XBb52fo/VywMWfkQTpO5uKDNde/vw==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc2":
+  version "1.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc2.tgz#cad2989f61a287cf1b4f7b519a3d56c3f57789df"
+  integrity sha512-wO7FonB1/xo9n3tJMZuibEW3OqxbmpGU+jFfbdrNPrZUTJSnuLR/hEM+O5cpUOPPvaCCt3iIueE5rKoIl/+iLQ==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
