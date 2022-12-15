@@ -1,0 +1,105 @@
+name: Unit and integration Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - name: Install dependencies
+        run: |
+          yarn
+      - name: Compile and lint
+        run: |
+          yarn run build
+          yarn run lint
+      - name: Check code formatting
+        run: yarn format:check
+      - name: Setup NVM
+        run: |
+          docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
+          sudo chmod go+r /etc/hosts
+          sudo echo "127.0.0.1  nevermined-metadata" | sudo tee -a /etc/hosts
+          git clone https://github.com/nevermined-io/tools
+
+          cd tools
+          export KEEPER_OWNER_ROLE_ADDRESS="0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
+          rm -rf "${HOME}/.nevermined/nevermined-contracts/artifacts"
+
+          export KEEPER_VERSION=develop
+          export SUBGRAPH_VERSION=develop
+
+          ./start_nevermined.sh --no-graph --no-node --opengsn 2>&1 | tee nevermined_tools.txt &
+          cd ..
+          ./scripts/wait-nevermined.sh
+      - name: Run tests
+        run: |
+          export PROVIDER_KEYFILE=accounts/provider.json
+          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
+          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
+          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
+          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
+          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
+          export NO_GRAPH=true
+          export SEED_WORDS=${{ secrets.seedWords }}
+          export PROVIDER_PASSWORD=secret
+          yarn run setup:dev
+          # HDWalletProvider keeps jest from exiting
+          yarn run test:cov -- --forceExit
+      - name: Start node
+        run: |
+          export PROVIDER_KEYFILE=accounts/provider.json
+          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
+          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
+          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
+          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
+          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
+          export NO_GRAPH=true
+          export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
+          export PROVIDER_PASSWORD=secret
+          export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
+          export IPFS_GATEWAY="https://ipfs.infura.io:5001"
+          export IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
+          export IPFS_PROJECT_SECRET=${{ secrets.IPFS_PROJECT_SECRET }}
+          yarn run start &
+      - uses: actions/checkout@v3
+        with:
+          repository: nevermined-io/sdk-dtp
+          ref: 'develop' # TODO: Remove this when ready to use main branch
+          path: sdk-dtp
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Run tests from SDK-DTP
+        env:
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          NO_GRAPH: true
+        run: |
+          cd sdk-dtp
+          yarn
+          ./scripts/wait-nevermined.sh
+          yarn test
+      - uses: actions/checkout@v3
+        with:
+          repository: nevermined-io/sdk-js
+          ref: 'develop' # TODO: Remove this when ready to use main branch
+          path: sdk-js
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Run tests from SDK
+        env:
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          NO_GRAPH: true
+        run: |
+          cd sdk-js
+          yarn
+          ./scripts/wait-nevermined.sh
+          yarn run integration

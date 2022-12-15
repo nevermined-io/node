@@ -1189,12 +1189,12 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.2.3":
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.2.3.tgz#83b7153dd42e444580af85fd50a6d504146662ee"
-  integrity sha512-xjk8y+f50PO9MGljNpKwUVUn5XjTLz5N4wgeSv029SBN0DkMPhZSLIa/YfKrT9BBDHQPFtcnG7cnyJ7fI9NBwA==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc1":
+  version "0.3.0-rc1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc1.tgz#198641da849c99db9c3225de94a0f70104e1a9d6"
+  integrity sha512-f4HH0ehX/hj3Za5d1VG+NVONSemSeEm4Ry7rxnX4kCAu3Mgs9Z1JTiczGuZtlTyTfx5e9KcuvSwAGmDH83jn1A==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "0.27.0"
+    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc2"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1202,12 +1202,12 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-0.27.0.tgz#415c7d0381b45ba28a56da93ce3c66991e796f30"
-  integrity sha512-pwA2bphWHm076/EhElIHAJHT65kq8gKHJFPRZIH3kh7O0jqxnN9/H5sILSCdDeFu6c4faH6d0rSeYcMfdHWehg==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc2":
+  version "1.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc2.tgz#cad2989f61a287cf1b4f7b519a3d56c3f57789df"
+  integrity sha512-wO7FonB1/xo9n3tJMZuibEW3OqxbmpGU+jFfbdrNPrZUTJSnuLR/hEM+O5cpUOPPvaCCt3iIueE5rKoIl/+iLQ==
   dependencies:
-    "@nevermined-io/subgraphs" "0.4.1"
+    "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
     codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
     crypto-browserify "^3.12.0"
@@ -1226,10 +1226,10 @@
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
 
-"@nevermined-io/subgraphs@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/subgraphs/-/subgraphs-0.4.1.tgz#98eebe969b378eb59d82934db8ded0415cf96327"
-  integrity sha512-GiE7PyVu2KVMbc1ltcC5+4I+YmZjQ8HbJ8jrZ/FeMKctflpSnSoY70gNhEt33wNgC5c4MWouRmFRJQttLC1Pxw==
+"@nevermined-io/subgraphs@0.5.0-rc1":
+  version "0.5.0-rc1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/subgraphs/-/subgraphs-0.5.0-rc1.tgz#ff8b6ef79512ee642eba8895bc98810a0f3a83c3"
+  integrity sha512-MRRX+U+EhofhXuHLOGkwaI8J0tkwtV0sPttuHnPSnCWb3Rn6rpqJAqqlFJhDmWPzXSORWSVp92nR6tuLC/N04g==
   dependencies:
     codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
     glob "^7.2.0"

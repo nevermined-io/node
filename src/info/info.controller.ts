@@ -51,11 +51,13 @@ export class InfoController {
     const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
     const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
 
+    const providerURL = new URL(this.nvmService.web3ProviderUri())
+
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
-      'keeper-url': this.nvmService.web3ProviderUri(),
+      'keeper-url': `${providerURL.protocol}//${providerURL.host}`,
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
       contracts: [],
