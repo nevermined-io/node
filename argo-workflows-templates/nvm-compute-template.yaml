@@ -237,7 +237,6 @@ spec:
     - name: artifacts
       persistentVolumeClaim:
         claimName: minio
-  volumes:
     - name: workdir
       persistentVolumeClaim:
         claimName: nfs-pvc-1
