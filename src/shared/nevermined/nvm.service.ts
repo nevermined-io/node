@@ -21,6 +21,7 @@ import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
+import { aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
 
 @Injectable()
 export class NeverminedService {
@@ -119,7 +120,6 @@ export class NeverminedService {
         const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET')
 
         const cid = url.replace('cid://', '')
-        url = `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat?arg=${cid}`
 
         const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
@@ -142,7 +142,18 @@ export class NeverminedService {
         response = await firstValueFrom(this.httpService.get(url, config))
       }
 
-      const contents: Buffer = response.data
+      let contents: Buffer = response.data
+
+      if (index != 0) {
+        const { url, dtp } = await this.getAssetUrl(did, 0)
+        if (dtp) {
+          const password = Buffer.from(url, 'hex')
+          contents = Buffer.from(
+            aes_decryption_256(contents.toString('binary'), password),
+            'binary',
+          )
+        }
+      }
 
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
