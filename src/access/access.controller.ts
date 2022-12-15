@@ -84,7 +84,7 @@ export class AccessController {
 
   @Post('nft-transfer')
   @ApiOperation({
-    description: 'Access asset',
+    description: 'Transfer an NFT',
     summary: 'Public',
   })
   @Public()
