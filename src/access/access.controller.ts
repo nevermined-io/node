@@ -173,7 +173,6 @@ export class AccessController {
     } else {
       throw new BadRequestException('No file or message in request')
     }
-    console.log(`Backend ${backend}`)
     if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`)
     try {

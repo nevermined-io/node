@@ -101,7 +101,6 @@ export class NeverminedService {
       if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
         return url
       }
-      Logger.debug(`Serving URL ${url}`)
 
       // If filename is on the ddo we will use that by default
       let filename: string
