@@ -9,6 +9,7 @@
     "clean": "rm -rf ./dist/ ./doc/ ./.nyc_output",
     "lint:fix": "yarn run lint -- --fix",
     "format:check": "yarn prettier --check src scripts",
+    "format:fix": "yarn prettier --check src scripts -w",
     "setup:dev": "cp ./config/local.js.sample ./config/local.js && cp .env.sample .env",
     "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp -r ./argo-workflows-templates ./dist/argo-workflows-templates && cp package.json ./dist",
     "prestart": "yarn run build",
