@@ -232,7 +232,7 @@ export class ComputeService {
       },
       {
         name: 'minio_port',
-        value: this.configService.computeConfig().minio_port,
+        value: this.configService.computeConfig().minio_port || '',
       },
       {
         name: 'minio_access_key',
