@@ -78,7 +78,7 @@ spec:
 
     - name: configurator-pod
       container:
-        image: neverminedio/compute-pods-config:hairdapoc
+        image: neverminedio/compute-pods-config:hairdaopoc
         imagePullPolicy: Always
         name: configurator-pod
         command:
@@ -151,7 +151,7 @@ spec:
 
     - name: publishing-pod
       container:
-        image: neverminedio/compute-pods-publish:hairdapoc
+        image: neverminedio/compute-pods-publish:hairdaopoc
         imagePullPolicy: Always
         name: publishing-pod
         command:
