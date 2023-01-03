@@ -131,7 +131,7 @@ export class NeverminedService {
         const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET')
 
         const cid = url.replace('cid://', '')
-        console.log('Getting', `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`)
+        Logger.debug('Getting', `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`)
 
         const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
