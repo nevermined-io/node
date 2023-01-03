@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
   Response,
   StreamableFile,
@@ -22,7 +23,7 @@ import crypto from 'crypto'
 import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
 import { ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
-import { NeverminedService } from '../shared/nevermined/nvm.service'
+import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
 import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
@@ -56,11 +57,12 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -78,8 +80,9 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Post('nft-transfer')
@@ -139,11 +142,12 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Post('upload/:backend')
@@ -173,7 +177,7 @@ export class AccessController {
     } else {
       throw new BadRequestException('No file or message in request')
     }
-    console.log(`Backend ${backend}`)
+    Logger.debug(`Backend ${backend}`)
     if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`)
     try {
