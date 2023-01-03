@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import yaml from 'js-yaml'
 import { readFileSync } from 'fs'
@@ -15,8 +14,14 @@ export type WorkflowStatus = {
   startedAt: string
   finishedAt: string
   did: string
-  pods: string[]
+  pods: PodStatus[]
+}
+
+export type PodStatus = {
   podName: string
+  status: string
+  startedAt: string
+  finishedAt: string
 }
 
 @Injectable()
@@ -33,80 +38,92 @@ export class ComputeService {
   }
 
   async createWorkflowStatus(responseBody: any, workflowID: string): Promise<WorkflowStatus> {
-    let result
+    const result: WorkflowStatus = {
+      startedAt: 'null',
+      finishedAt: 'null',
+      status: 'null',
+      did: undefined,
+      pods: [],
+    }
     const pods = []
 
     // Transform from pairs of id:object to array of objects
     const nodesPairs = responseBody.status.nodes
-    const nodesArray = []
-    for (const i in nodesPairs) {
-      nodesArray.push(nodesPairs[i])
-    }
 
-    nodesArray.forEach((element) => {
-      const podName = element.displayName
-      if (podName === workflowID) {
-        result = {
-          status: element.phase,
-          startedAt: element.startedAt,
-          finishedAt: element.finishedAt,
-          did: undefined,
-          pods: [],
-        }
-      } else {
-        const statusMessage = {
-          podName: podName,
-          status: element.phase,
-          startedAt: element.startedAt,
-          finishedAt: element.finishedAt,
-        }
-        pods.push(statusMessage)
+    if (nodesPairs) {
+      const nodesArray = []
+      for (const i in nodesPairs) {
+        nodesArray.push(nodesPairs[i])
       }
-    })
 
-    result.pods = pods
+      nodesArray.forEach((element) => {
+        const podName = element.displayName
+        if (podName === workflowID) {
+          result.status = element.phase
+          result.startedAt = element.startedAt
+          result.finishedAt = element.finishedAt
+        } else {
+          const podStatus: PodStatus = {
+            podName: podName,
+            status: element.phase,
+            startedAt: element.startedAt,
+            finishedAt: element.finishedAt,
+          }
+          pods.push(podStatus)
+        }
+      })
 
-    if (result.status === 'Succeeded') {
-      const query = {
-        nested: {
-          path: 'service',
-          query: {
-            match: { 'service.attributes.additionalInformation.customData.workflowID': workflowID },
+      result.pods = pods
+
+      if (result.status === 'Succeeded') {
+        const query = {
+          nested: {
+            path: 'service',
+            query: {
+              match: {
+                'service.attributes.additionalInformation.customData.workflowID': workflowID,
+              },
+            },
           },
-        },
-      }
+        }
 
-      const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
+        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
 
-      if (queryResult.totalResults.value > 0) {
-        const did = queryResult.results[0].id
-        result.did = did
+        if (queryResult.totalResults.value > 0) {
+          const did = queryResult.results[0].id
+          result.did = did
+        }
       }
     }
 
     return result
   }
 
-  private readWorkflowTemplate(): any {
-    const templatePath = path.join(
-      __dirname,
-      '/',
-      './argo-workflows-templates/nvm-compute-template.yaml',
-    )
+  private readWorkflowTemplate(gethLocal: boolean): any {
+    const workflowFile = gethLocal
+      ? 'nvm-compute-template-geth-localnet.yaml'
+      : 'nvm-compute-template.yaml'
+    const templatePath = path.join(__dirname, '/', `../../argo-workflows-templates/${workflowFile}`)
     const templateContent = readFileSync(templatePath, 'utf8')
 
     return yaml.load(templateContent)
   }
 
   async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
-    const workflow = this.readWorkflowTemplate()
+    const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
+
+    const workflow = this.readWorkflowTemplate(gethLocal)
 
     Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
     const ddo: DDO = await this.nvmService.nevermined.assets.resolve(initData.workflowDid)
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
-    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
+    workflow.spec.arguments.parameters = await this.createArguments(
+      ddo,
+      initData.consumer,
+      gethLocal,
+    )
     workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
 
     workflow.spec.entrypoint = 'compute-workflow'
@@ -126,6 +143,7 @@ export class ComputeService {
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
+    gethLocal: boolean,
   ): Promise<{ name: string; value: string }[]> {
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
@@ -148,14 +166,20 @@ export class ComputeService {
     Logger.debug(`transformation container: ${image}`)
     Logger.debug(`transformation tag: ${tag}`)
 
-    const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
-
     if (gethLocal)
       Logger.debug(
         `Compute Stack running in Nevermined Tools. Using ${
           this.configService.computeConfig().gethlocal_host_name
         } as host for NVM services`,
       )
+
+    let providerKey = this.configService.cryptoConfig().provider_key
+    let providerPassword = this.configService.cryptoConfig().provider_password
+
+    if (this.configService.computeConfig().compute_provider_keyfile) {
+      providerKey = this.configService.computeConfig().compute_provider_key
+      providerPassword = this.configService.computeConfig().compute_provider_password
+    }
 
     return [
       {
@@ -164,11 +188,11 @@ export class ComputeService {
       },
       {
         name: 'provider_key_file',
-        value: this.configService.cryptoConfig().provider_key,
+        value: providerKey,
       },
       {
         name: 'provider_password',
-        value: this.configService.cryptoConfig().provider_password,
+        value: providerPassword,
       },
       {
         name: 'marketplace_api_url',

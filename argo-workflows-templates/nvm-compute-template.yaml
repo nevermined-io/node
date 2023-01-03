@@ -1,0 +1,224 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: nevermined-compute-
+  namespace: nevermined-compute
+spec:
+  # To be set by the compute api
+  entrypoint:
+  workflowMetadata:
+    labels:
+      # to be set by the compute api
+      serviceAgreementId:
+  arguments:
+    parameters:
+      - name: volume
+        value: /data
+        # The rest of these parameters is to be set by the compute api
+        # - name: provider_key_file
+        #   value:
+        # - name: provider_password
+        #   value:
+        # - name: consumer_address
+        #   value:
+        # - name: web3_provider_url
+        #   value:
+        # - name: verbose
+        #   value:
+        # - name: workflow_did
+        #   value:
+        # - name: marketplace_api_url
+        #   value:
+        # - name: node_url
+        #   value:
+        # - name: node_address
+        #   value:
+        # - name: transformation_container_image
+        #   value:
+        # - name: transformation_arguments
+        #   value:
+        # - name: artifacts_folder
+        #   value:
+        # - name: input_dir
+        #   value:
+        # - name: output_dir
+        #   value:
+        # - name: transformations_dir
+        #   value:
+        # - name: minio_host
+        #   value:
+        # - name: minio_port
+        #   value:
+        # - name: minio_access_key
+        #   value:
+        # - name: minio_secret_key
+        #   value:
+        # - name: minio_bucket_prefix
+        #   value:
+  dnsPolicy: ClusterFirstWithHostNet
+  hostNetwork: true
+  metadata:
+
+  templates:
+    - name: compute-workflow
+      dag:
+        tasks:
+          - name: configurator
+            template: configurator-pod
+
+          - name: transformation
+            template: transformation-pod-compute
+            dependencies:
+              - configurator
+
+          - name: publishing
+            template: publishing-pod
+            dependencies:
+              - transformation
+
+    - name: configurator-pod
+      container:
+        image: neverminedio/compute-pods-config:latest
+        imagePullPolicy: IfNotPresent
+        name: configurator-pod
+        command:
+          - sh
+          - -cxe
+        args:
+          - |
+            ls -l /artifacts;
+            /bin/pod-config \
+            --workflowDid $WORKFLOW_DID;
+            ls -lR /data
+        env:
+          - name: PROVIDER_KEY_FILE
+            value: '{{workflow.parameters.provider_key_file}}'
+          - name: PROVIDER_PASSWORD
+            value: '{{workflow.parameters.provider_password}}'
+          - name: WEB3_PROVIDER_URL
+            value: '{{workflow.parameters.web3_provider_url}}'
+          - name: WORKFLOW_DID
+            value: '{{workflow.parameters.workflow_did}}'
+          - name: NODE_URL
+            value: '{{workflow.parameters.node_url}}'
+          - name: NODE_ADDRESS
+            value: '{{workflow.parameters.node_address}}'
+          - name: MARKETPLACE_API_URL
+            value: '{{workflow.parameters.marketplace_api_url}}'
+          - name: ARTIFACTS_FOLDER
+            value: '{{workflow.parameters.artifacts_folder}}'
+          - name: BASE_PATH
+            value: '{{workflow.parameters.volume}}'
+          - name: INPUT_DIR
+            value: '{{workflow.parameters.input_dir}}'
+          - name: OUTPUT_DIR
+            value: '{{workflow.parameters.output_dir}}'
+          - name: TRANSFORMATIONS_DIR
+            value: '{{workflow.parameters.transformations_dir}}'
+          - name: VERBOSE
+            value: '{{workflow.parameters.verbose}}'
+        volumeMounts:
+          - mountPath: /data
+            name: workdir
+          - name: artifacts
+            mountPath: /artifacts
+
+    - name: transformation-pod-compute
+      container:
+        image: '{{workflow.parameters.transformation_container_image}}'
+        imagePullPolicy: IfNotPresent
+        name: transformationPod
+        command:
+          - sh
+          - -cxe
+        args:
+          - >-
+            cd $NEVERMINED_TRANSFORMATIONS_PATH;
+            {{workflow.parameters.transformation_arguments}};
+            ls -lR /data/outputs/
+        env:
+          - name: VOLUME
+            value: '{{workflow.parameters.volume}}'
+          - name: NEVERMINED_INPUTS_PATH
+            value: '{{workflow.parameters.volume}}/{{workflow.parameters.input_dir}}'
+          - name: NEVERMINED_OUTPUTS_PATH
+            value: '{{workflow.parameters.volume}}/{{workflow.parameters.output_dir}}'
+          - name: NEVERMINED_TRANSFORMATIONS_PATH
+            value: '{{workflow.parameters.volume}}/{{workflow.parameters.transformations_dir}}'
+        volumeMounts:
+          - mountPath: /data
+            name: workdir
+
+    - name: publishing-pod
+      container:
+        image: neverminedio/compute-pods-publish:latest
+        imagePullPolicy: IfNotPresent
+        name: publishing-pod
+        command:
+          - sh
+          - -cxe
+        args:
+          - |
+            ./bin/pod-publish \
+            --workflowDid $WORKFLOW_DID \
+            --consumerAddress $CONSUMER_ADDRESS;
+            ls -lR /data
+        env:
+          - name: PROVIDER_KEY_FILE
+            value: '{{workflow.parameters.provider_key_file}}'
+          - name: PROVIDER_PASSWORD
+            value: '{{workflow.parameters.provider_password}}'
+          - name: CONSUMER_ADDRESS
+            value: '{{workflow.parameters.consumer_address}}'
+          - name: WEB3_PROVIDER_URL
+            value: '{{workflow.parameters.web3_provider_url}}'
+          - name: WORKFLOW_DID
+            value: '{{workflow.parameters.workflow_did}}'
+          - name: EXECUTION_ID
+            value: '{{workflow.name}}'
+          - name: NODE_URL
+            value: '{{workflow.parameters.node_url}}'
+          - name: NODE_ADDRESS
+            value: '{{workflow.parameters.node_address}}'
+          - name: MARKETPLACE_API_URL
+            value: '{{workflow.parameters.marketplace_api_url}}'
+          - name: ARTIFACTS_FOLDER
+            value: '{{workflow.parameters.artifacts_folder}}'
+          - name: BASE_PATH
+            value: '{{workflow.parameters.volume}}'
+          - name: OUTPUT_DIR
+            value: '{{workflow.parameters.output_dir}}'
+          - name: MINIO_HOST
+            value: '{{workflow.parameters.minio_host}}'
+          - name: MINIO_PORT
+            value: '{{workflow.parameters.minio_port}}'
+          - name: MINIO_ACCESS_KEY
+            value: '{{workflow.parameters.minio_access_key}}'
+          - name: MINIO_SECRET_KEY
+            value: '{{workflow.parameters.minio_secret_key}}'
+          - name: MINIO_BUCKET_PREFIX
+            value: '{{workflow.parameters.minio_bucket_prefix}}'
+          - name: VERBOSE
+            value: '{{workflow.parameters.verbose}}'
+        volumeMounts:
+          - mountPath: /data
+            name: workdir
+          - name: artifacts
+            mountPath: /artifacts
+
+  volumeClaimTemplates:
+    - metadata:
+        name: workdir
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 2Gi
+
+  volumes:
+    - name: artifacts
+      persistentVolumeClaim:
+        claimName: minio
+
+status: {}

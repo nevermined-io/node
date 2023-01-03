@@ -33,7 +33,9 @@ const keys = [
     'MINIO_HOST',
     'MINIO_PORT',
     'MINIO_ACCESS_KEY',
-    'MINIO_SECRET_KEY'
+    'MINIO_SECRET_KEY',
+    'COMPUTE_PROVIDER_KEYFILE',
+    'COMPUTE_PROVIDER_PASSWORD'
 ]
 
 const config = {}

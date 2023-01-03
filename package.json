@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "0.5.1",
+  "version": "0.5.3",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint:fix": "yarn run lint -- --fix",
     "format:check": "yarn prettier --check src scripts",
     "setup:dev": "cp ./config/local.js.sample ./config/local.js && cp .env.sample .env",
-    "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp package.json ./dist",
+    "prebuild": "rm -rf ./dist && mkdir ./dist && cp -r ./config ./dist/config && cp -r ./argo-workflows-templates ./dist/argo-workflows-templates && cp package.json ./dist",
     "prestart": "yarn run build",
     "start": "node -r dotenv/config dist/src/main.js",
     "start:prod": "node -r dotenv/config dist/src/main.js",

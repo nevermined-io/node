@@ -53,13 +53,12 @@ This will leave you with a `local.js` file within the `config` folder that will 
 
 The Nevermined Node reads the following environment variables allowing the configuration of the deployment without modifying any config file:
 
-| Variable Name | Information | Example
 
 | Variable Name                | Description                                                                                                                                                      | Example                                                              |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |                                                          |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |                                           
 | **WEB3_PROVIDER_URL**        | HTTP url of the web3 provider. The most popular providers are Infura & Alchemy, but anyone else can be used. The url depends on the network you want to connect. | http://mumbai.alchemy.io/v2/xxxxx                                    |
-| **MARKETPLACE_API_URL**      | HTTP url to the Marketplace API                                                                                                                                  | https://marketplace-api.mumbai.public.nevermined.rocks               |
-| **NODE_URL**                 | Public HTTP url where this node is exposed                                                                                                                       | https://node.mumbai.public.nevermined.rocks                          |
+| **MARKETPLACE_URI**      | HTTP url to the Marketplace API                                                                                                                                  | https://marketplace-api.mumbai.public.nevermined.rocks               |
+| **NODE_URI**                 | Public HTTP url where this node is exposed                                                                                                                       | https://node.mumbai.public.nevermined.rocks                          |
 | **PORT**                     | Local Port the server will be listen to                                                                                                                          | `8030`                                                               |
 | **NODE_ADDRESS**             | Public address of the Node used to send transactions to the blockchain                                                                                           | `0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0`                         |
 | **PROVIDER_KEYFILE**         | Path to the file where is store the private key of the Node credentials                                                                                          | `/mnt/credentials/keyfile.json`                                      |
@@ -69,28 +68,28 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **PROVIDER_BABYJUB_PUBLIC2** | Babyjub public key #2                                                                                                                                            | `0x0b932f02e59f90cdd761d9d5e7c15c8e620efce4ce018bf54015d68d9cb35561` |
 | **RSA_PUBKEY_FILE**          | File having the RSA public key. The Node RSA credentials can be used for encrypting/decrypting files                                                             | `/accounts/rsa_pub_key.pem`                                          |
 | **RSA_PRIVKEY_FILE**         | File having the RSA private keys                                                                                                                                 | `/accounts/rsa_priv_key.pem`                                         |
+| **GRAPH_URL** | Public URL of the Nevermined subgraphs | |
+| **NO_GRAPH** | If `true` the node will read events from the blockchain node instead of from the subgraphs. Depending on the network there could be a limit on the number of blocks to scan. | `false` |
+| **IPFS_GATEWAY** | Public IPFS gateway that can be used to fech or upload content. | https://ipfs.infura.io:5001 |
+| **IPFS_PROJECT_ID** | Ipfs Project Id | `2DSADASD4234234234` |
+| **IPFS_PROJECT_SECRET** | Ipfs Project Secret | `ccdafda55666dada` |
+| **FILECOIN_GATEWAY** | Public Filecoin gateway that can be used to fech content. The `:cid` part of the url will be replace by the file `cid` | https://dweb.link/ipfs/:cid |
+| **ESTUARY_TOKEN** | Estuary is a service that facilitates the interaction with Filecoin. This variable must include the token to use their API. See more here: https://estuary.tech/ | `EST651aa3a7-4756-4bd9-a563-1cdd565894645` |
+| **AWS_S3_ACCESS_KEY_ID** | Amazon S3 Access Key Id | `4535hnj43` |
+| **AWS_S3_SECRET_ACCESS_KEY** | Amazon S3 Secret Access Key | `4535hnj43` |
+| **AWS_S3_ENDPOINT** | Amazon S3 Endpoint url | `https://s3.eu-west-1.amazonaws.com` |
+| **AWS_S3_BUCKET_NAME** | Name of the S3 Bucket | `metadata` |
+| **ENABLE_PROVENANCE** | If `true` it will enable the integration with the provenance registry | `true` or `false` |
+| **ARTIFACTS_FOLDER** | Path where the Node will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder |
+| **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false` |
+| **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance` |
+| **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo` |
+| **ARGO_AUTH_TOKEN**      | Authorization Token for Argo Workflows.  Requires ENABLE_COMPUTE = true  | 'Bearer sdfsdfsdfvxcvVVSDFSDFSDFsdf...' |
+| **MINIO_HOST**       | Host of the MinIO server. Requires ENABLE_COMPUTE = true | `https://minio-server.nevermined.rocks` |
+| **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000` |
+| **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE` |
+| **MINIO_SECRET_KEY**       | Secret Key for MinIO.Requires ENABLE_COMPUTE = true | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY` |
 
-| **GRAPH_URL** | Public URL of the Nevermined subgraphs |
-| **NO_GRAPH** | If `true` the node will read events from the blockchain node instead of from the subgraphs. Depending on the network there could be a limit on the number of blocks to scan. | `false`
-| **IPFS_GATEWAY** | Public IPFS gateway that can be used to fech or upload content. | https://ipfs.infura.io:5001
-| **IPFS_PROJECT_ID** | Ipfs Project Id | `2DSADASD4234234234`
-| **IPFS_PROJECT_SECRET** | Ipfs Project Secret | `ccdafda55666dada`
-| **FILECOIN_GATEWAY** | Public Filecoin gateway that can be used to fech content. The `:cid` part of the url will be replace by the file `cid` | https://dweb.link/ipfs/:cid
-| **ESTUARY_TOKEN** | Estuary is a service that facilitates the interaction with Filecoin. This variable must include the token to use their API. See more here: https://estuary.tech/ | `EST651aa3a7-4756-4bd9-a563-1cdd565894645`
-| **AWS_S3_ACCESS_KEY_ID** | Amazon S3 Access Key Id | `4535hnj43`
-| **AWS_S3_SECRET_ACCESS_KEY** | Amazon S3 Secret Access Key | `4535hnj43`
-| **AWS_S3_ENDPOINT** | Amazon S3 Endpoint url | `https://s3.eu-west-1.amazonaws.com`
-| **AWS_S3_BUCKET_NAME** | Name of the S3 Bucket | `metadata`
-| **ENABLE_PROVENANCE** | If `true` it will enable the integration with the provenance registry | `true` or `false`
-| **ARTIFACTS_FOLDER** | Path where the Node will look for the Smart Contracts ABIs | A file system path. If not given it will look in the `./artifacts` folder
-| **ENABLE_COMPUTE**       | Enables the Nevermined's compute endpoints | `false`
-| **ARGO_HOST**            | HTTP url of the Argo Workflows instance we want to use for computing capabilities. Requires ENABLE_COMPUTE = true | `https://argo-workflows.instance`
-| **ARGO_NAMESPACE**       | Name of the Argo Workflows namespace where we will deploy the Nevermined's Compute Workflows.  Requires ENABLE_COMPUTE = true | `argo`
-| **ARGO_AUTH_TOKEN**      | Authorization Token for Argo Workflows.  Requires ENABLE_COMPUTE = true  | 'Bearer sdfsdfsdfvxcvVVSDFSDFSDFsdf...'
-| **MINIO_HOST**       | Host of the MinIO server. Requires ENABLE_COMPUTE = true | `https://minio-server.nevermined.rocks`
-| **MINIO_PORT**       | Port of the MinIO server. Requires ENABLE_COMPUTE = true | `9000`
-| **MINIO_ACCESS_KEY**       | Access Key for MinIO. Requires ENABLE_COMPUTE = true | `AKIAIOSFODNN7EXAMPLE`
-| **MINIO_SECRET_KEY**       | Secret Key for MinIO.Requires ENABLE_COMPUTE = true | `wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY`
 
 ## Install and run:
 
