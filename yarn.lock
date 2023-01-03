@@ -1189,12 +1189,12 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc1":
-  version "0.3.0-rc1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc1.tgz#198641da849c99db9c3225de94a0f70104e1a9d6"
-  integrity sha512-f4HH0ehX/hj3Za5d1VG+NVONSemSeEm4Ry7rxnX4kCAu3Mgs9Z1JTiczGuZtlTyTfx5e9KcuvSwAGmDH83jn1A==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc2":
+  version "0.3.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc2.tgz#cae9ecd8818488bcc2901dbc8f3e46b0ec1f4930"
+  integrity sha512-5vQeuxXjlBIOwUxF14JehdDm/cEUzM7VNwKQGVhHxEGijN73ANqVs/2XjMcBFzosJBYsJJWaByW9/Oq2nRb0zA==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc2"
+    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc4"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1202,10 +1202,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc2":
-  version "1.0.0-rc2"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc2.tgz#cad2989f61a287cf1b4f7b519a3d56c3f57789df"
-  integrity sha512-wO7FonB1/xo9n3tJMZuibEW3OqxbmpGU+jFfbdrNPrZUTJSnuLR/hEM+O5cpUOPPvaCCt3iIueE5rKoIl/+iLQ==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc4":
+  version "1.0.0-rc4"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc4.tgz#cb8ed7772cf68982d8972f26f34d2298c3db4fe6"
+  integrity sha512-raoKusk5BgMQm/pHBUKUsIHu0JSjDK1w0U2ZglXxnM5TKxFCbSQzAj/excs8QsFrS/vZnsJyaBHNlDnd8YkOgw==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
@@ -4127,10 +4127,15 @@ flatten-vertex-data@^1.0.2:
   dependencies:
     dtype "^2.0.0"
 
-follow-redirects@^1.14.0, follow-redirects@^1.14.4, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
+follow-redirects@^1.14.0, follow-redirects@^1.14.9, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
+
+follow-redirects@^1.14.4:
+  version "1.15.1"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.1.tgz"
+  integrity sha512-yLAMQs+k0b2m7cVxpS1VKJVvoz7SS9Td1zss3XRwXj+ZDH00RJgnuLx7E44wx02kQLrdM3aOOy+FpzS7+8OizA==
 
 for-each@^0.3.3:
   version "0.3.3"
