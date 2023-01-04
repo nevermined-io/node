@@ -20,6 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       address: payload.iss,
       roles: payload.roles,
       did: payload.did,
+      buyer: payload.buyer,
     }
   }
 }

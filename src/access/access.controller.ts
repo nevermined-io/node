@@ -127,6 +127,50 @@ export class AccessController {
     return 'success'
   }
 
+  @Post('nft-sales')
+  @ApiOperation({
+    description: 'Transfer an NFT',
+    summary: 'Public',
+  })
+  @ApiBearerAuth('Authorization')
+  @ApiResponse({
+    status: 200,
+    description: 'Return "success" if transfer worked',
+  })
+  async doNftSales(
+    @Body() transferData: TransferDto,
+    @Req() req: Request<unknown>,
+  ): Promise<string> {
+    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
+    console.log(req.user)
+    const nevermined = this.nvmService.getNevermined()
+    let agreement: AgreementData
+    try {
+      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
+        transferData.agreementId,
+      )
+    } catch (e) {
+      Logger.error(`Error resolving agreement ${transferData.agreementId}`)
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+    }
+    if (!agreement) {
+      Logger.error(`Agreement ${transferData.agreementId} not found`)
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+    }
+    const params: ValidationParams = {
+      consumer_address: transferData.nftReceiver,
+      did: agreement.did,
+      agreement_id: transferData.agreementId,
+      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
+      buyer: (req.user || {}).buyer,
+    }
+    const plugin = nevermined.assets.servicePlugin['nft-sales']
+    const [from] = await nevermined.accounts.list()
+    console.log(params)
+    await plugin.process(params, from, undefined)
+    return 'success'
+  }
+
   @Get('download/:index')
   @ApiOperation({
     description: 'Download asset',

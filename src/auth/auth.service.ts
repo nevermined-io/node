@@ -43,19 +43,15 @@ export class AuthService {
   }
 
   async validateTransferProof(
-    agreement_id: string,
-    did: string,
-    consumer_address: string,
-    buyer: string,
-    babysig: Babysig,
+    params: ValidationParams,
   ): Promise<void> {
     const dtp = this.nvmService.getDtp()
     const buyerPub = new BabyjubPublicKey(
-      zeroX(buyer.substring(0, 64)),
-      zeroX(buyer.substring(64, 128)),
+      zeroX(params.buyer.substring(0, 64)),
+      zeroX(params.buyer.substring(64, 128)),
     )
-    if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig))) {
-      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`)
+    if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(params.consumer_address), params.babysig))) {
+      throw new UnauthorizedException(`Bad signature for address ${params.consumer_address}`)
     }
   }
 
@@ -91,6 +87,8 @@ export class AuthService {
         await this.validateOwner(payload.did as string, payload.iss)
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateAccess(params, 'nft-access')
+      } else if (payload.aud === BASE_URL + 'nft-sales') {
+        await this.validateTransferProof(params)
       }
 
       delete payload.exp
