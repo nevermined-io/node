@@ -26,6 +26,9 @@ export class AuthService {
       did,
     )
     if (!granted) {
+      if ((await nevermined.keeper.nftUpgradeable.balance(consumer_address, didZeroX(did))).gt(0)) {
+        return
+      }
       throw new UnauthorizedException(
         `Address ${consumer_address} has no permission to access ${did}`,
       )

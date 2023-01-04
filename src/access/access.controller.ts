@@ -142,7 +142,6 @@ export class AccessController {
     @Req() req: Request<unknown>,
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
-    console.log(req.user)
     const nevermined = this.nvmService.getNevermined()
     let agreement: AgreementData
     try {
@@ -166,7 +165,6 @@ export class AccessController {
     }
     const plugin = nevermined.assets.servicePlugin['nft-sales']
     const [from] = await nevermined.accounts.list()
-    console.log(params)
     await plugin.process(params, from, undefined)
     return 'success'
   }
