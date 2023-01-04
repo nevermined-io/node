@@ -45,15 +45,19 @@ export class AuthService {
     }
   }
 
-  async validateTransferProof(
-    params: ValidationParams,
-  ): Promise<void> {
+  async validateTransferProof(params: ValidationParams): Promise<void> {
     const dtp = this.nvmService.getDtp()
     const buyerPub = new BabyjubPublicKey(
       zeroX(params.buyer.substring(0, 64)),
       zeroX(params.buyer.substring(64, 128)),
     )
-    if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(params.consumer_address), params.babysig))) {
+    if (
+      !(await dtp.keytransfer.verifyBabyjub(
+        buyerPub,
+        BigInt(params.consumer_address),
+        params.babysig,
+      ))
+    ) {
       throw new UnauthorizedException(`Bad signature for address ${params.consumer_address}`)
     }
   }
