@@ -163,6 +163,7 @@ export class AccessController {
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
     }
+    console.log(params)
     const plugin = nevermined.assets.servicePlugin['nft-sales']
     const [from] = await nevermined.accounts.list()
     await plugin.process(params, from, undefined)

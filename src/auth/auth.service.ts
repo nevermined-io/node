@@ -10,8 +10,9 @@ import {
   ValidationParams,
 } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
+import { didZeroX, zeroX, findServiceConditionByName } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import { Logger } from '@nevermined-io/nevermined-sdk-js'
+import { BigNumber } from 'ethers'
 
 const BASE_URL = '/api/v1/node/services/'
 
@@ -21,17 +22,35 @@ export class AuthService {
 
   async validateOwner(did: string, consumer_address: string): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
+    const getNftAccess = async () => {
+      const ddo = await nevermined.assets.resolve(did)
+      if (!ddo) {
+        return null
+      }
+      const service = ddo.findServiceByType('nft-access')
+      if (!service) {
+        return null
+      }
+      const holder = findServiceConditionByName(service, 'nftHolder')
+      if (!service) {
+        return BigNumber.from(1)
+      }
+      const num = holder.parameters.find(p => p.name === '_numberNfts').value
+      return BigNumber.from(num)
+    }
+    
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
       consumer_address,
       did,
     )
     if (!granted) {
-      if ((await nevermined.keeper.nftUpgradeable.balance(consumer_address, didZeroX(did))).gt(0)) {
-        return
+      const limit = await getNftAccess()
+      const balance = await nevermined.keeper.nftUpgradeable.balance(consumer_address, didZeroX(did))
+      if (!limit || !balance.gte(limit)) {
+        throw new UnauthorizedException(
+          `Address ${consumer_address} has no permission to access ${did}`,
+        )
       }
-      throw new UnauthorizedException(
-        `Address ${consumer_address} has no permission to access ${did}`,
-      )
     }
   }
 
