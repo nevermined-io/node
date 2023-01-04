@@ -108,8 +108,8 @@ export class NeverminedService {
       if (result === AssetResult.URL) {
         return url
       }
-      if (dtp && (!url.startsWith('cid://') || !url.startsWith('http'))) {
-        Logger.error(`password should be returned as URL`)
+      if (dtp && (!url.startsWith('cid://') && !url.startsWith('http'))) {
+        Logger.error(`password should be returned as URL ${url}`)
         throw new BadRequestException(`URL for did ${did} not found`)
       }
       Logger.debug(`Serving URL ${url}`)
