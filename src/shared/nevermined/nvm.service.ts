@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
-import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
-import { utils } from '@nevermined-io/nevermined-sdk-js'
+import {
+  generateId,
+  generateIntantiableConfigFromConfig,
+  didZeroX,
+  DDO,
+  MetaDataMain,
+  Nevermined,
+} from '@nevermined-io/nevermined-sdk-js'
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -15,7 +20,6 @@ import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
 import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
 import { ethers } from 'ethers'
-import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
@@ -157,12 +161,12 @@ export class NeverminedService {
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
           const [from] = await this.nevermined.accounts.list()
-          const provId = utils.generateId()
+          const provId = generateId()
           await this.nevermined.provenance.used(
             provId,
             didZeroX(did),
             userAddress,
-            utils.generateId(),
+            generateId(),
             ethers.utils.hexZeroPad('0x0', 32),
             'download',
             from,

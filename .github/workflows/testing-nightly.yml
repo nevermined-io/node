@@ -1,6 +1,8 @@
-name: Unit and integration Tests
+name: Tests Nightly
 
-on: [push]
+on:
+  schedule:
+    - cron: '30 5 * * *'
 
 jobs:
   build:
@@ -14,12 +16,9 @@ jobs:
       - name: Install dependencies
         run: |
           yarn
-      - name: Compile and lint
+      - name: Compile
         run: |
           yarn run build
-          yarn run lint
-      - name: Check code formatting
-        run: yarn format:check
       - name: Setup NVM
         run: |
           docker login -u ${{ secrets.NEVERMINED_DOCKER_USERNAME }} -p ${{ secrets.NEVERMINED_DOCKER_TOKEN}}
@@ -36,7 +35,7 @@ jobs:
           ./start_nevermined.sh --no-graph --no-node --opengsn 2>&1 | tee nevermined_tools.txt &
           cd ..
           ./scripts/wait-nevermined.sh
-      - name: Run tests
+      - name: Start node
         run: |
           export PROVIDER_KEYFILE=accounts/provider.json
           export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
@@ -48,8 +47,40 @@ jobs:
           export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
           export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
           export NO_GRAPH=true
-          export SEED_WORDS=${{ secrets.seedWords }}
+          export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
           export PROVIDER_PASSWORD=secret
-          yarn run setup:dev
-          # HDWalletProvider keeps jest from exiting
-          yarn run test:cov -- --forceExit
+          export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
+          export IPFS_GATEWAY="https://ipfs.infura.io:5001"
+          export IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
+          export IPFS_PROJECT_SECRET=${{ secrets.IPFS_PROJECT_SECRET }}
+          yarn run start &
+      - uses: actions/checkout@v3
+        with:
+          repository: nevermined-io/sdk-dtp
+          ref: 'develop' # TODO: Remove this when ready to use main branch
+          path: sdk-dtp
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Run tests from SDK-DTP
+        env:
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          NO_GRAPH: true
+        run: |
+          cd sdk-dtp
+          yarn
+          ./scripts/wait-nevermined.sh
+          yarn test
+      - uses: actions/checkout@v3
+        with:
+          repository: nevermined-io/sdk-js
+          ref: 'develop' # TODO: Remove this when ready to use main branch
+          path: sdk-js
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Run tests from SDK
+        env:
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          NO_GRAPH: true
+        run: |
+          cd sdk-js
+          yarn
+          ./scripts/wait-nevermined.sh
+          yarn run integration

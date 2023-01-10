@@ -20,15 +20,13 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
-import { ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
-import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
-import { AgreementData } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers'
-import { utils } from '@nevermined-io/nevermined-sdk-js'
+import { AgreementData } from '@nevermined-io/nevermined-sdk-js'
+import { generateId, ValidationParams, BigNumber } from '@nevermined-io/nevermined-sdk-js'
 
 export enum UploadBackends {
   IPFS = 'ipfs',
@@ -169,7 +167,7 @@ export class AccessController {
       fileName = file.originalname
     } else if (uploadData.message) {
       data = Buffer.from(uploadData.message)
-      fileName = `fileUpload_${utils.generateId()}.data${uploadData.encrypt ? '.encrypted' : ''}`
+      fileName = `fileUpload_${generateId()}.data${uploadData.encrypt ? '.encrypted' : ''}`
     } else {
       throw new BadRequestException('No file or message in request')
     }
