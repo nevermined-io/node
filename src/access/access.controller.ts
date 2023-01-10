@@ -99,6 +99,13 @@ export class AccessController {
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
   ): Promise<string> {
+    return this.internalTransfer(transferData, req)
+  }
+
+  private async internalTransfer(
+    @Body() transferData: TransferDto,
+    @Req() req: Request<unknown>,
+  ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
     let agreement: AgreementData
@@ -141,33 +148,7 @@ export class AccessController {
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
   ): Promise<string> {
-    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
-    const nevermined = this.nvmService.getNevermined()
-    let agreement: AgreementData
-    try {
-      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
-        transferData.agreementId,
-      )
-    } catch (e) {
-      Logger.error(`Error resolving agreement ${transferData.agreementId}`)
-      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
-    }
-    if (!agreement) {
-      Logger.error(`Agreement ${transferData.agreementId} not found`)
-      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
-    }
-    const params: ValidationParams = {
-      consumer_address: transferData.nftReceiver,
-      did: agreement.did,
-      agreement_id: transferData.agreementId,
-      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
-      buyer: (req.user || {}).buyer,
-    }
-    console.log(params)
-    const plugin = nevermined.assets.servicePlugin['nft-sales']
-    const [from] = await nevermined.accounts.list()
-    await plugin.process(params, from, undefined)
-    return 'success'
+    return this.internalTransfer(transferData, req)
   }
 
   @Get('download/:index')
