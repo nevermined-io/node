@@ -3,15 +3,16 @@ import { JwtService } from '@nestjs/jwt'
 import { JWTPayload } from 'jose'
 import { LoginDto } from './dto/login.dto'
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
-import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer'
 import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer'
 import {
   ServiceType,
   ValidationParams,
-} from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
+  didZeroX,
+  zeroX,
+  BabyjubPublicKey,
+  Logger,
+} from '@nevermined-io/nevermined-sdk-js'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import { didZeroX, zeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
-import { Logger } from '@nevermined-io/nevermined-sdk-js'
 
 const BASE_URL = '/api/v1/node/services/'
 
