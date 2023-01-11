@@ -19,14 +19,18 @@ import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
-import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
+import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
-import { AgreementData } from '@nevermined-io/nevermined-sdk-js'
-import { generateId, ValidationParams, BigNumber } from '@nevermined-io/nevermined-sdk-js'
+import {
+  generateId,
+  ValidationParams,
+  BigNumber,
+  AgreementData,
+} from '@nevermined-io/nevermined-sdk-js'
 
 export enum UploadBackends {
   IPFS = 'ipfs',
