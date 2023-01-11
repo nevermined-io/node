@@ -99,12 +99,13 @@ export class AccessController {
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
   ): Promise<string> {
-    return this.internalTransfer(transferData, req)
+    return this.internalTransfer(transferData, req, 'nft-sales')
   }
 
   private async internalTransfer(
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
+    template: string,
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
@@ -128,13 +129,13 @@ export class AccessController {
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
     }
-    const plugin = nevermined.assets.servicePlugin['nft-sales']
+    const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
     await plugin.process(params, from, undefined)
     return 'success'
   }
 
-  @Post('nft-sales')
+  @Post('nft-sales-proof')
   @ApiOperation({
     description: 'Transfer an NFT',
     summary: 'Public',
@@ -148,7 +149,7 @@ export class AccessController {
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
   ): Promise<string> {
-    return this.internalTransfer(transferData, req)
+    return this.internalTransfer(transferData, req, 'nft-sales-proof')
   }
 
   @Get('download/:index')

@@ -120,7 +120,7 @@ export class AuthService {
         await this.validateOwner(payload.did as string, payload.iss)
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateAccess(params, 'nft-access')
-      } else if (payload.aud === BASE_URL + 'nft-sales') {
+      } else if (payload.aud === BASE_URL + 'nft-sales-proof') {
         await this.validateTransferProof(params)
       }
 
