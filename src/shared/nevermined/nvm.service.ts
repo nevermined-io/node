@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -18,14 +17,13 @@ import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
 import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
-import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
+import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp'
 import { ethers } from 'ethers'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
-import { aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
 
 @Injectable()
 export class NeverminedService {

@@ -1189,10 +1189,10 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc4":
-  version "0.3.0-rc4"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc4.tgz#b7505f77ca15e28194c571a2751824bdeeb6c9ca"
-  integrity sha512-1brnztZzYwXiJrQoze1bWs8WWEQxBz3eSN5I5Dim/EZ5IjtviBo6ahKileUnDvxxfGDzmjlpM/DUhW3D+GJWJw==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc5":
+  version "0.3.0-rc5"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc5.tgz#811236c977d707c6555b1a74ab4fc4240d8bd609"
+  integrity sha512-/9iGjC4KvRWnRfW097h72LubrTt+diP6hvhM66lnfee8RKWnx7myNd91+ksxqunSX+yziZxp0R2uIpT5D6hTvQ==
   dependencies:
     "@nevermined-io/nevermined-sdk-js" "1.0.0-rc8"
     circomlibjs "^0.1.1"

@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt'
 import { JWTPayload } from 'jose'
 import { LoginDto } from './dto/login.dto'
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
-import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer'
+import { Babysig } from '@nevermined-io/nevermined-sdk-dtp'
 import {
   ServiceType,
   ValidationParams,
