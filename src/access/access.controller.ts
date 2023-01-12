@@ -3,9 +3,8 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   NotFoundException,
+  InternalServerErrorException,
   Param,
   Post,
   Req,
@@ -14,7 +13,15 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger'
 import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -52,6 +59,11 @@ export class AccessController {
     status: 200,
     description: 'Return the url of asset',
     type: StreamableFile,
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. DID missing',
+    type: BadRequestException,
   })
   @ApiBearerAuth('Authorization')
   async doAccess(
@@ -93,6 +105,11 @@ export class AccessController {
   @ApiResponse({
     status: 200,
     description: 'Return "success" if transfer worked',
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Agreeement not found',
+    type: NotFoundException,
   })
   async doNftTransfer(
     @Body() transferData: TransferDto,
@@ -136,6 +153,11 @@ export class AccessController {
     description: 'Return the asset',
     type: StreamableFile,
   })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. DID missing',
+    type: BadRequestException,
+  })
   @ApiBearerAuth('Authorization')
   async doDownload(
     @Req() req: Request<unknown>,
@@ -158,6 +180,16 @@ export class AccessController {
   @ApiResponse({
     status: 200,
     description: 'Return the url of the file uploaded',
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. File missing or  Backend not supported',
+    type: BadRequestException,
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error uploading file to backend',
+    type: InternalServerErrorException,
   })
   async doUpload(
     @Body() uploadData: UploadDto,
@@ -192,7 +224,7 @@ export class AccessController {
       return { url }
     } catch (error) {
       Logger.error(`Error processing upload: ${error.message}`)
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new InternalServerErrorException(error.message)
     }
   }
 }
