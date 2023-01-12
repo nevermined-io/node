@@ -14,9 +14,7 @@ import {
   Babysig,
 } from '@nevermined-io/nevermined-sdk-js'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import {
-  findServiceConditionByName,
-} from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
+import { findServiceConditionByName } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 
 const BASE_URL = '/api/v1/node/services/'
@@ -65,7 +63,8 @@ export class AuthService {
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
 
-    let plugin = nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
+    const plugin =
+      nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
     const granted = await plugin.accept(params)
     if (!granted) {
