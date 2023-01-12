@@ -41,7 +41,7 @@ export class AuthService {
       if (!holder) {
         return BigNumber.from(1)
       }
-      const num = holder.parameters.find((p) => p.name === '_numberNfts').value
+      const num = holder.parameters.find((p) => p.name === '_numberNfts')?.value
       return BigNumber.from(num)
     }
 
