@@ -13,6 +13,11 @@ import {
   Logger,
 } from '@nevermined-io/nevermined-sdk-js'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
+import {
+  findServiceConditionByName,
+} from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
+import { Logger, Account } from '@nevermined-io/nevermined-sdk-js'
+import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 
 const BASE_URL = '/api/v1/node/services/'
 
@@ -22,14 +27,38 @@ export class AuthService {
 
   async validateOwner(did: string, consumer_address: string): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
+    const getNftAccess = async () => {
+      const ddo = await nevermined.assets.resolve(did)
+      if (!ddo) {
+        return null
+      }
+      const service = ddo.findServiceByType('nft-access')
+      if (!service) {
+        return null
+      }
+      if (service.attributes.main.ercType == 721) {
+        return BigNumber.from(1)
+      }
+      const holder = findServiceConditionByName(service, 'nftHolder')
+      if (!holder) {
+        return BigNumber.from(1)
+      }
+      const num = holder.parameters.find((p) => p.name === '_numberNfts').value
+      return BigNumber.from(num)
+    }
+
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
       consumer_address,
       did,
     )
     if (!granted) {
-      throw new UnauthorizedException(
-        `Address ${consumer_address} has no permission to access ${did}`,
-      )
+      const limit = await getNftAccess()
+      const balance = await nevermined.nfts.balance(did, new Account(consumer_address))
+      if (!limit || !balance.gte(limit)) {
+        throw new UnauthorizedException(
+          `Address ${consumer_address} has no permission to access ${did}`,
+        )
+      }
     }
   }
 
@@ -47,20 +76,20 @@ export class AuthService {
     }
   }
 
-  async validateTransferProof(
-    agreement_id: string,
-    did: string,
-    consumer_address: string,
-    buyer: string,
-    babysig: Babysig,
-  ): Promise<void> {
+  async validateTransferProof(params: ValidationParams): Promise<void> {
     const dtp = this.nvmService.getDtp()
     const buyerPub = new BabyjubPublicKey(
-      zeroX(buyer.substring(0, 64)),
-      zeroX(buyer.substring(64, 128)),
+      zeroX(params.buyer.substring(0, 64)),
+      zeroX(params.buyer.substring(64, 128)),
     )
-    if (!(await dtp.keytransfer.verifyBabyjub(buyerPub, BigInt(consumer_address), babysig))) {
-      throw new UnauthorizedException(`Bad signature for address ${consumer_address}`)
+    if (
+      !(await dtp.keytransfer.verifyBabyjub(
+        buyerPub,
+        BigInt(params.consumer_address),
+        params.babysig,
+      ))
+    ) {
+      throw new UnauthorizedException(`Bad signature for address ${params.consumer_address}`)
     }
   }
 
@@ -96,6 +125,8 @@ export class AuthService {
         await this.validateOwner(payload.did as string, payload.iss)
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateAccess(params, 'nft-access')
+      } else if (payload.aud === BASE_URL + 'nft-sales-proof') {
+        await this.validateTransferProof(params)
       }
 
       delete payload.exp

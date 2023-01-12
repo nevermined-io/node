@@ -25,6 +25,12 @@ import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
 
+export enum AssetResult {
+  DATA = 'data',
+  DECRYPTED = 'decrypted',
+  URL = 'url',
+}
+
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
@@ -91,6 +97,7 @@ export class NeverminedService {
     index: number,
     res: any,
     userAddress: string,
+    result: AssetResult = AssetResult.DATA,
   ): Promise<StreamableFile | string> {
     Logger.debug(`Downloading asset from ${did} index ${index}`)
     try {
@@ -100,9 +107,14 @@ export class NeverminedService {
         Logger.error(`URL for did ${did} not found`)
         throw new NotFoundException(`URL for did ${did} not found`)
       }
-      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
+      if (result === AssetResult.URL) {
         return url
       }
+      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
+        Logger.error(`password should be returned as URL ${url}`)
+        throw new BadRequestException(`URL for did ${did} not found`)
+      }
+      Logger.debug(`Serving URL ${url}`)
 
       // If filename is on the ddo we will use that by default
       let filename: string
@@ -121,6 +133,7 @@ export class NeverminedService {
         const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET')
 
         const cid = url.replace('cid://', '')
+        Logger.debug('Getting', `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`)
 
         const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
@@ -147,7 +160,7 @@ export class NeverminedService {
 
       if (index != 0) {
         const { url, dtp } = await this.getAssetUrl(did, 0)
-        if (dtp) {
+        if (dtp && result === AssetResult.DECRYPTED) {
           const password = Buffer.from(url, 'hex')
           contents = Buffer.from(
             aes_decryption_256(contents.toString('binary'), password),

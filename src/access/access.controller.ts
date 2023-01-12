@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
   Response,
   StreamableFile,
@@ -19,8 +20,8 @@ import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
-import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp'
-import { NeverminedService } from '../shared/nevermined/nvm.service'
+import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
+import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
 import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
@@ -58,11 +59,12 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Get('nft-access/:agreement_id/:index')
@@ -80,8 +82,9 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Post('nft-transfer')
@@ -97,6 +100,14 @@ export class AccessController {
   async doNftTransfer(
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
+  ): Promise<string> {
+    return this.internalTransfer(transferData, req, 'nft-sales')
+  }
+
+  private async internalTransfer(
+    @Body() transferData: TransferDto,
+    @Req() req: Request<unknown>,
+    template: string,
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
@@ -120,10 +131,27 @@ export class AccessController {
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
     }
-    const plugin = nevermined.assets.servicePlugin['nft-sales']
+    const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
     await plugin.process(params, from, undefined)
     return 'success'
+  }
+
+  @Post('nft-sales-proof')
+  @ApiOperation({
+    description: 'Transfer an NFT',
+    summary: 'Public',
+  })
+  @ApiBearerAuth('Authorization')
+  @ApiResponse({
+    status: 200,
+    description: 'Return "success" if transfer worked',
+  })
+  async doNftSales(
+    @Body() transferData: TransferDto,
+    @Req() req: Request<unknown>,
+  ): Promise<string> {
+    return this.internalTransfer(transferData, req, 'nft-sales-proof')
   }
 
   @Get('download/:index')
@@ -141,11 +169,12 @@ export class AccessController {
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
     @Param('index') index: number,
+    @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
     if (!req.user.did) {
       throw new BadRequestException('DID not specified')
     }
-    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address)
+    return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
   @Post('upload/:backend')
@@ -175,6 +204,10 @@ export class AccessController {
     } else {
       throw new BadRequestException('No file or message in request')
     }
+<<<<<<< HEAD
+=======
+    Logger.debug(`Backend ${backend}`)
+>>>>>>> 02fe9138e1dc48bcd24307d09988a6c4067defc5
     if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`)
     try {
