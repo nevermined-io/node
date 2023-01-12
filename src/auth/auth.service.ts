@@ -65,9 +65,7 @@ export class AuthService {
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
 
-    let plugin
-    if (service === 'nft-access') plugin = nevermined.nfts1155.servicePlugin[service]
-    else plugin = nevermined.assets.servicePlugin[service]
+    let plugin = nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
     const granted = await plugin.accept(params)
     if (!granted) {
