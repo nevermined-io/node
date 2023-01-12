@@ -3,8 +3,6 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   NotFoundException,
   InternalServerErrorException,
   Param,
