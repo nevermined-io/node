@@ -204,10 +204,6 @@ export class AccessController {
     } else {
       throw new BadRequestException('No file or message in request')
     }
-<<<<<<< HEAD
-=======
-    Logger.debug(`Backend ${backend}`)
->>>>>>> 02fe9138e1dc48bcd24307d09988a6c4067defc5
     if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`)
     try {
