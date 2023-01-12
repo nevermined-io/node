@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt'
 import { JWTPayload } from 'jose'
 import { LoginDto } from './dto/login.dto'
 import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
-import { Babysig } from '@nevermined-io/nevermined-sdk-dtp'
 import {
   ServiceType,
   ValidationParams,
@@ -11,12 +10,13 @@ import {
   zeroX,
   BabyjubPublicKey,
   Logger,
+  Account,
+  Babysig,
 } from '@nevermined-io/nevermined-sdk-js'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import {
   findServiceConditionByName,
 } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
-import { Logger, Account } from '@nevermined-io/nevermined-sdk-js'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 
 const BASE_URL = '/api/v1/node/services/'
@@ -53,7 +53,7 @@ export class AuthService {
     )
     if (!granted) {
       const limit = await getNftAccess()
-      const balance = await nevermined.nfts.balance(did, new Account(consumer_address))
+      const balance = await nevermined.nfts1155.balance(did, new Account(consumer_address))
       if (!limit || !balance.gte(limit)) {
         throw new UnauthorizedException(
           `Address ${consumer_address} has no permission to access ${did}`,
