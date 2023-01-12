@@ -10,7 +10,7 @@ import {
   zeroX,
   BabyjubPublicKey,
   Logger,
-  Babysig
+  Babysig,
 } from '@nevermined-io/nevermined-sdk-js'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 
