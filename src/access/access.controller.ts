@@ -13,7 +13,15 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse} from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger'
 import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -55,7 +63,7 @@ export class AccessController {
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad Request. DID missing',
-    type: BadRequestException
+    type: BadRequestException,
   })
   @ApiBearerAuth('Authorization')
   async doAccess(
@@ -101,7 +109,7 @@ export class AccessController {
   @ApiNotFoundResponse({
     status: 404,
     description: 'Agreeement not found',
-    type: NotFoundException
+    type: NotFoundException,
   })
   async doNftTransfer(
     @Body() transferData: TransferDto,
@@ -148,7 +156,7 @@ export class AccessController {
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad Request. DID missing',
-    type: BadRequestException
+    type: BadRequestException,
   })
   @ApiBearerAuth('Authorization')
   async doDownload(
@@ -176,12 +184,12 @@ export class AccessController {
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad Request. File missing or  Backend not supported',
-    type: BadRequestException
+    type: BadRequestException,
   })
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Error uploading file to backend',
-    type: InternalServerErrorException
+    type: InternalServerErrorException,
   })
   async doUpload(
     @Body() uploadData: UploadDto,

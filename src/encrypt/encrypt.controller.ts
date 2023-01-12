@@ -24,7 +24,7 @@ export class EncryptController {
   @ApiBadRequestResponse({
     status: 400,
     description: 'Bad Request. Incorrect encryption method',
-    type: BadRequestException
+    type: BadRequestException,
   })
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {

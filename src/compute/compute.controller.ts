@@ -8,7 +8,14 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiInternalServerErrorResponse, ApiNotFoundResponse} from '@nestjs/swagger'
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger'
 import { Public } from '../common/decorators/auth.decorator'
 import { ComputeService } from './compute.service'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
@@ -50,7 +57,7 @@ export class ComputeController {
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Error getting list of workflows from Argo Workflow',
-    type: InternalServerErrorException
+    type: InternalServerErrorException,
   })
   @Public()
   async getWorkflowsList(): Promise<WorkflowListResultDto> {
@@ -101,12 +108,12 @@ export class ComputeController {
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Error processing status from Argo Workflows',
-    type: InternalServerErrorException
+    type: InternalServerErrorException,
   })
   @ApiNotFoundResponse({
     status: 404,
     description: 'workflow not found in Argo Workflow',
-    type: NotFoundException
+    type: NotFoundException,
   })
   @ApiBearerAuth('Authorization')
   async getWorkflowStatus(
@@ -148,7 +155,7 @@ export class ComputeController {
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Error creating a new workflow in  Argo Workflows',
-    type: InternalServerErrorException
+    type: InternalServerErrorException,
   })
   @ApiBearerAuth('Authorization')
   async initCompute(
@@ -188,7 +195,7 @@ export class ComputeController {
   @ApiInternalServerErrorResponse({
     status: 500,
     description: 'Error stopping a workflow in Argo Workflows',
-    type: InternalServerErrorException
+    type: InternalServerErrorException,
   })
   @ApiBearerAuth('Authorization')
   async stopWorkflowExecution(
