@@ -5,7 +5,7 @@ import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
 import { Test, TestingModule } from '@nestjs/testing'
 import { createMock } from '@golevelup/ts-jest'
 import { DDO } from '@nevermined-io/nevermined-sdk-js'
-import { Service } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
+import { MetaData } from '@nevermined-io/nevermined-sdk-js'
 
 describe('ComputeService Testing', () => {
   let computeService: ComputeService
@@ -21,66 +21,61 @@ describe('ComputeService Testing', () => {
     },
     results: [{ id: 'did:nv:1234' }],
   }
+
   // mix in the same mock the metadata for algorithm and workflow
-  const metadataServiceMock: Service<'metadata'> = {
-    type: 'metadata',
-    index: 0,
-    attributes: {
-      main: {
-        name: '',
-        type: 'dataset',
-        dateCreated: '',
-        author: '',
-        license: '',
-        algorithm: {
-          language: 'python',
-          format: 'py',
-          version: '0.1',
-          entrypoint: 'python word_count.py*',
-          requirements: {
-            container: {
-              image: 'python',
-              tag: '3.8-alpine',
-              checksum: 'sha256:53ad3a03b2fb240b6c494339821e6638cd44c989bcf26ec4d51a6a52f7518c1d',
-            },
+  const metadataMock: MetaData = {
+    main: {
+      name: '',
+      type: 'dataset',
+      dateCreated: '',
+      author: '',
+      license: '',
+      algorithm: {
+        language: 'python',
+        format: 'py',
+        version: '0.1',
+        entrypoint: 'python word_count.py*',
+        requirements: {
+          container: {
+            image: 'python',
+            tag: '3.8-alpine',
+            checksum: 'sha256:53ad3a03b2fb240b6c494339821e6638cd44c989bcf26ec4d51a6a52f7518c1d',
           },
         },
-        workflow: {
-          coordinationType: 'argo',
-          stages: [
-            {
-              index: 0,
-              stageType: 'Filtering',
-              requirements: {
-                container: {
-                  image: 'openjdk',
-                  tag: '14-jdl',
-                  checksum:
-                    'sha256:53ad3a03b2fb240b6c494339821e6638cd44c989bcf26ec4d51a6a52f7518c1d',
-                },
-              },
-              input: [
-                {
-                  index: 0,
-                  id: 'did:nv:11223344',
-                },
-              ],
-              transformation: {
-                id: 'did:nv:1122334455',
-              },
-              output: {
-                metadataUrl: 'https://localhost:5000/api/v1/metadata/assets/ddo/',
-                accessProxyUrl: 'https://localhost:8030/api/v1/node/',
-                metadata: {} as any,
+      },
+      workflow: {
+        coordinationType: 'argo',
+        stages: [
+          {
+            index: 0,
+            stageType: 'Filtering',
+            requirements: {
+              container: {
+                image: 'openjdk',
+                tag: '14-jdl',
+                checksum: 'sha256:53ad3a03b2fb240b6c494339821e6638cd44c989bcf26ec4d51a6a52f7518c1d',
               },
             },
-          ],
-        },
+            input: [
+              {
+                index: 0,
+                id: 'did:nv:11223344',
+              },
+            ],
+            transformation: {
+              id: 'did:nv:1122334455',
+            },
+            output: {
+              metadataUrl: 'https://localhost:5000/api/v1/metadata/assets/ddo/',
+              accessProxyUrl: 'https://localhost:8030/api/v1/node/',
+              metadata: {} as any,
+            },
+          },
+        ],
       },
     },
   }
-
-  ddo.addService(metadataServiceMock)
+  ddo.addDefaultMetadataService(metadataMock)
 
   beforeAll(async () => {
     const mockResolve = jest.fn()
