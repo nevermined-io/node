@@ -753,6 +753,11 @@
   resolved "https://registry.yarnpkg.com/@faker-js/faker/-/faker-6.3.1.tgz#1ae963dd40405450a2945408cba553e1afa3e0fb"
   integrity sha512-8YXBE2ZcU/pImVOHX7MWrSR/X5up7t6rPWZlk34RwZEcdr3ua6X+32pSd6XuOQRN+vbuvYNfA6iey8NbrjuMFQ==
 
+"@golevelup/ts-jest@0.3.4":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@golevelup/ts-jest/-/ts-jest-0.3.4.tgz#b1da56344136f9d4ebce03676c099b5214bb7c29"
+  integrity sha512-UXas4+20gNmYfVR7DTJ9iRppy00o0ElqQrRQyn9cF3Gq90iM1Xx1lKvipTEe5NniHDD9FiMZNweOfB+9ebZRZA==
+
 "@hapi/hoek@^9.0.0":
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/@hapi/hoek/-/hoek-9.3.0.tgz#8368869dcb735be2e7f5cb7647de78e167a251fb"
@@ -1189,12 +1194,12 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc8":
-  version "0.3.0-rc8"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc8.tgz#0de08d9b2d84c545ff2c4f7d19bd8b87bfaf1f18"
-  integrity sha512-OLeaH9St4VlcRZbNUdraH13/l9gH7JZqE54/OuHJcqzux2HrFU/HyMvqNP5rLj5fMm2/iOWwLzydBAP+iywFXg==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc9":
+  version "0.3.0-rc9"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc9.tgz#ed483bf712ec0fb67c8d5d092275f5d0a570e3a5"
+  integrity sha512-tyBfwl14duMxPD8XTixVJtUbW/4jcW52M8VM5XuMecaFoHYokxYCd5SpEL4F7NFCm7/Zhx9f5oJhHwKvUqF66w==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc9"
+    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc10"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1202,10 +1207,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc9":
-  version "1.0.0-rc9"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc9.tgz#e7213e778a09c65af425c4d08aa856f3e22fe2ec"
-  integrity sha512-Y1Hm5Yu8ntcGdqWlz/Qxy6GTAtu43Q/PSxKdUo/G19fxr465RJBSs0TgnrkMWuW5GfSPoNQrDJ40B8TB2a5mvg==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc10":
+  version "1.0.0-rc10"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc10.tgz#a23b7b4773e1cd37d3fa4ffb1ad0217a2a8fb2ea"
+  integrity sha512-ddSmChLc+2JAQ6aW1LdqOQeE70rm4JPcAoibG6yvsz66GupveBPNW4V3hdTz9ruwzjq5+EEu1t4/JjKCuSFb0w==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
