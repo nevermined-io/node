@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
-import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
-import { utils } from '@nevermined-io/nevermined-sdk-js'
+import {
+  generateId,
+  generateIntantiableConfigFromConfig,
+  didZeroX,
+  DDO,
+  MetaDataMain,
+  Nevermined,
+} from '@nevermined-io/nevermined-sdk-js'
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -13,15 +17,19 @@ import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
 import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
-import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
+import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp'
 import { ethers } from 'ethers'
-import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
-import { aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
+
+export enum AssetResult {
+  DATA = 'data',
+  DECRYPTED = 'decrypted',
+  URL = 'url',
+}
 
 @Injectable()
 export class NeverminedService {
@@ -89,6 +97,7 @@ export class NeverminedService {
     index: number,
     res: any,
     userAddress: string,
+    result: AssetResult = AssetResult.DATA,
   ): Promise<StreamableFile | string> {
     Logger.debug(`Downloading asset from ${did} index ${index}`)
     try {
@@ -98,9 +107,14 @@ export class NeverminedService {
         Logger.error(`URL for did ${did} not found`)
         throw new NotFoundException(`URL for did ${did} not found`)
       }
-      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
+      if (result === AssetResult.URL) {
         return url
       }
+      if (dtp && !url.startsWith('cid://') && !url.startsWith('http')) {
+        Logger.error(`password should be returned as URL ${url}`)
+        throw new BadRequestException(`URL for did ${did} not found`)
+      }
+      Logger.debug(`Serving URL ${url}`)
 
       // If filename is on the ddo we will use that by default
       let filename: string
@@ -119,6 +133,7 @@ export class NeverminedService {
         const ipfsProjectSecret = this.config.get<string>('IPFS_PROJECT_SECRET')
 
         const cid = url.replace('cid://', '')
+        Logger.debug('Getting', `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`)
 
         const config: HttpModuleOptions = {
           url: `${this.config.get<string>('IPFS_GATEWAY')}/api/v0/cat`,
@@ -145,7 +160,7 @@ export class NeverminedService {
 
       if (index != 0) {
         const { url, dtp } = await this.getAssetUrl(did, 0)
-        if (dtp) {
+        if (dtp && result === AssetResult.DECRYPTED) {
           const password = Buffer.from(url, 'hex')
           contents = Buffer.from(
             aes_decryption_256(contents.toString('binary'), password),
@@ -157,12 +172,12 @@ export class NeverminedService {
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
           const [from] = await this.nevermined.accounts.list()
-          const provId = utils.generateId()
+          const provId = generateId()
           await this.nevermined.provenance.used(
             provId,
             didZeroX(did),
             userAddress,
-            utils.generateId(),
+            generateId(),
             ethers.utils.hexZeroPad('0x0', 32),
             'download',
             from,

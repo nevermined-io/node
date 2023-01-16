@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard'
 import { EncryptController } from './encrypt.controller'
 import request from 'supertest'
 import { ConfigModule } from '../shared/config/config.module'
-import { decrypt } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
+import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
 import { ConfigService } from '../shared/config/config.service'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
