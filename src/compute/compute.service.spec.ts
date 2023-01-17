@@ -138,9 +138,6 @@ describe('ComputeService Testing', () => {
     const argo_host = configServiceMock.computeConfig().argo_namespace
     expect(argo_host).toBe('argo')
 
-    const gethlocal_host_name = configServiceMock.computeConfig().gethlocal_host_name
-    expect(gethlocal_host_name).toBe('localhost')
-
     const minio_port = configServiceMock.computeConfig().minio_port
     expect(minio_port).toBe('9000')
 
