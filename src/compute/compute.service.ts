@@ -119,11 +119,7 @@ export class ComputeService {
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
-    workflow.spec.arguments.parameters = await this.createArguments(
-      ddo,
-      initData.consumer,
-      gethLocal,
-    )
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
     workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
 
     workflow.spec.entrypoint = 'compute-workflow'
@@ -143,7 +139,6 @@ export class ComputeService {
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
-    gethLocal: boolean,
   ): Promise<{ name: string; value: string }[]> {
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
@@ -165,13 +160,6 @@ export class ComputeService {
     Logger.debug(`transformation args: ${args}`)
     Logger.debug(`transformation container: ${image}`)
     Logger.debug(`transformation tag: ${tag}`)
-
-    if (gethLocal)
-      Logger.debug(
-        `Compute Stack running in Nevermined Tools. Using ${
-          this.configService.computeConfig().gethlocal_host_name
-        } as host for NVM services`,
-      )
 
     let providerKey = this.configService.cryptoConfig().provider_key
     let providerPassword = this.configService.cryptoConfig().provider_password
@@ -196,15 +184,11 @@ export class ComputeService {
       },
       {
         name: 'marketplace_api_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:3100`
-          : this.configService.nvm().marketplaceUri,
+        value: this.configService.nvm().marketplaceUri,
       },
       {
         name: 'web3_provider_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:8545`
-          : this.configService.nvm().web3ProviderUri,
+        value: this.configService.nvm().web3ProviderUri,
       },
       {
         name: 'node_address',
@@ -212,9 +196,7 @@ export class ComputeService {
       },
       {
         name: 'node_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:8030`
-          : this.configService.nvm().neverminedNodeUri,
+        value: this.configService.nvm().neverminedNodeUri,
       },
       {
         name: 'workflow_did',
@@ -226,9 +208,7 @@ export class ComputeService {
       },
       {
         name: 'minio_host',
-        value: gethLocal
-          ? `${this.configService.computeConfig().gethlocal_host_name}`
-          : this.configService.computeConfig().minio_host,
+        value: this.configService.computeConfig().minio_host,
       },
       {
         name: 'minio_port',

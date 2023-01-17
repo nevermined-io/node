@@ -100,7 +100,6 @@ describe('ComputeService Testing', () => {
     configServiceMock = createMock<ConfigService>({
       computeConfig: () => ({
         argo_namespace: 'argo',
-        gethlocal_host_name: 'localhost',
         minio_port: '9000',
         minio_access_key: 'aaaakey',
         minio_secret_key: 'bbbsecret',
@@ -138,9 +137,6 @@ describe('ComputeService Testing', () => {
   it('ComputeService should be properly configured', async () => {
     const argo_host = configServiceMock.computeConfig().argo_namespace
     expect(argo_host).toBe('argo')
-
-    const gethlocal_host_name = configServiceMock.computeConfig().gethlocal_host_name
-    expect(gethlocal_host_name).toBe('localhost')
 
     const minio_port = configServiceMock.computeConfig().minio_port
     expect(minio_port).toBe('9000')
