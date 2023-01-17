@@ -100,7 +100,6 @@ describe('ComputeService Testing', () => {
     configServiceMock = createMock<ConfigService>({
       computeConfig: () => ({
         argo_namespace: 'argo',
-        gethlocal_host_name: 'localhost',
         minio_port: '9000',
         minio_access_key: 'aaaakey',
         minio_secret_key: 'bbbsecret',

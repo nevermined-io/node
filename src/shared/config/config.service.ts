@@ -21,7 +21,6 @@ export interface CryptoConfig {
 
 export interface ComputeConfig {
   enable_compute: boolean
-  gethlocal_host_name: string
   argo_host: string
   argo_namespace: string
   argo_auth_token: string
@@ -132,7 +131,6 @@ export class ConfigService {
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
-      gethlocal_host_name: 'host.docker.internal',
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
       argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
