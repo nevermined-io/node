@@ -8,8 +8,6 @@ spec:
   entrypoint:
   workflowMetadata:
     labels:
-      # to be set by the compute api
-      serviceAgreementId:
   arguments:
     parameters:
       - name: volume
