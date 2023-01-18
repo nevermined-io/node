@@ -216,12 +216,11 @@ describe('ComputeService Testing', () => {
       consumer: '0xaaabbbcc',
     }
 
-    const workflow = await computeService.createArgoWorkflow(initData, 'XXXX')
+    const workflow = await computeService.createArgoWorkflow(initData)
     expect(workflow).toBeDefined()
     expect(workflow.kind).toBe('Workflow')
     expect(workflow.spec).toBeDefined()
     expect(workflow.spec.entrypoint).toBe('compute-workflow')
-    expect(workflow.spec.workflowMetadata.labels.serviceAgreement).toBe('XXXX')
     expect(workflow.spec.templates).toBeDefined()
     expect(workflow.spec.templates.length).toBe(4)
   })

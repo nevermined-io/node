@@ -165,7 +165,7 @@ export class ComputeController {
     try {
       Logger.debug(`Executing compute for agreement id ${agreementId}`)
 
-      const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId)
+      const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
       const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow(
         { serverDryRun: false, namespace: this.argoNamespace, workflow: argoWorkflow },
         this.argoNamespace,

@@ -109,7 +109,7 @@ export class ComputeService {
     return yaml.load(templateContent)
   }
 
-  async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
+  async createArgoWorkflow(initData: ExecuteWorkflowDto): Promise<any> {
     const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
     const workflow = this.readWorkflowTemplate(gethLocal)
 
