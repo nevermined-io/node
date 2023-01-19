@@ -39,6 +39,12 @@ export class NeverminedService {
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm()
+    const web3 = new ethers.providers.JsonRpcProvider(config.web3ProviderUri)
+    try {
+      await web3.getNetwork()
+    } catch (e) {
+      throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
+    }
     this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(config),
