@@ -8,8 +8,6 @@ spec:
   entrypoint:
   workflowMetadata:
     labels:
-      # to be set by the compute api
-      serviceAgreementId:
   arguments:
     parameters:
       - name: volume
@@ -78,7 +76,7 @@ spec:
 
     - name: configurator-pod
       container:
-        image: neverminedio/compute-pods-config:latest
+        image: neverminedio/compute-pods-config:develop
         imagePullPolicy: IfNotPresent
         name: configurator-pod
         command:
@@ -151,7 +149,7 @@ spec:
 
     - name: publishing-pod
       container:
-        image: neverminedio/compute-pods-publish:latest
+        image: neverminedio/compute-pods-publish:develop
         imagePullPolicy: IfNotPresent
         name: publishing-pod
         command:

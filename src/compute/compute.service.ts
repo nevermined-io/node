@@ -109,9 +109,8 @@ export class ComputeService {
     return yaml.load(templateContent)
   }
 
-  async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
+  async createArgoWorkflow(initData: ExecuteWorkflowDto): Promise<any> {
     const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
-
     const workflow = this.readWorkflowTemplate(gethLocal)
 
     Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
@@ -120,8 +119,6 @@ export class ComputeService {
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
     workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
-    workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
-
     workflow.spec.entrypoint = 'compute-workflow'
 
     Logger.debug(
