@@ -25,7 +25,7 @@ jobs:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           opengsn: "true"
           estuary: "true"
-          contracts-version: "v3.0.0-rc5"
+          contracts-version: "v3.0.0-rc5" # remove this 
           node: "false"
       - name: Check artifacts
         run: |

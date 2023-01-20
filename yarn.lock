@@ -1231,6 +1231,15 @@
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
 
+"@nevermined-io/passport-nevermined@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/passport-nevermined/-/passport-nevermined-0.1.0.tgz#fbda46c4699ee10e9c58e8aefaf2fbe10db3d753"
+  integrity sha512-oRUgPLIyp3UwVvy/cYpQ1WqaSbK6t4RXjR+lTFJh2oNEQEJrmsahFsK5YLq5y6v7qMM8EKKGXxaWpKc22KDB0A==
+  dependencies:
+    ethers "^5.7.2"
+    jose "^4.11.2"
+    passport-strategy "^1.0.0"
+
 "@nevermined-io/subgraphs@0.5.0-rc1":
   version "0.5.0-rc1"
   resolved "https://registry.yarnpkg.com/@nevermined-io/subgraphs/-/subgraphs-0.5.0-rc1.tgz#ff8b6ef79512ee642eba8895bc98810a0f3a83c3"
@@ -3789,7 +3798,7 @@ ethereumjs-util@^7.1.0:
     ethereum-cryptography "^0.1.3"
     rlp "^2.2.4"
 
-ethers@^5.5.1, ethers@^5.6.3, ethers@^5.6.9:
+ethers@^5.5.1, ethers@^5.6.3, ethers@^5.6.9, ethers@^5.7.2:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.7.2.tgz#3a7deeabbb8c030d4126b24f84e525466145872e"
   integrity sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==
@@ -5344,6 +5353,11 @@ joi@^17.6.0:
     "@sideway/address" "^4.1.3"
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
+
+jose@^4.11.2:
+  version "4.11.2"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.11.2.tgz#d9699307c02e18ff56825843ba90e2fae9f09e23"
+  integrity sha512-njj0VL2TsIxCtgzhO+9RRobBvws4oYyCM8TpvoUQwl/MbIM3NFJRR9+e6x0sS5xXaP1t6OCBkaBME98OV9zU5A==
 
 jose@^4.5.1, jose@^4.6.0:
   version "4.11.1"
