@@ -20,7 +20,7 @@ jobs:
           yarn run lint
       - name: Check code formatting
         run: yarn format:check
-      - uses: nevermined-io/nvm-tools-actions@v0.4.0
+      - uses: nevermined-io/nvm-tools-actions@v0.5.0
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           opengsn: "true"
