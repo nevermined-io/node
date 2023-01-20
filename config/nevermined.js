@@ -5,8 +5,8 @@ const fs = require('fs')
 const nograph = process.env['NO_GRAPH'] === 'true'
 
 const configBase = {
-  web3ProviderUri: process.env['WEB3_PROVIDER_URL'] || 'http://localhost:8545',
-  marketplaceUri: process.env['MARKETPLACE_URI'] || 'http://nevermined-metadata:3100',
+  web3ProviderUri: process.env['WEB3_PROVIDER_URL'] || 'http://contracts.nevermined.localnet',
+  marketplaceUri: process.env['MARKETPLACE_URI'] || 'http://marketplace.nevermined.localnet',
   faucetUri: process.env['FAUCET_URI'] || 'http://localhost:3001',
   neverminedNodeUri: process.env['NODE_URI'] || 'http://localhost:8030',
   neverminedNodeAddress:

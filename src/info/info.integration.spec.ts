@@ -25,6 +25,6 @@ describe('Info', () => {
 
     expect(response.statusCode).toBe(200)
     // eslint-disable-next-line
-    expect(response.body['keeper-url']).toBe('http://localhost:8545')
+    expect(response.body['keeper-url']).toBe('http://contracts.nevermined.localnet')
   })
 })
