@@ -57,7 +57,7 @@
     "nest-router": "^1.0.9",
     "node-rsa": "^1.1.1",
     "passport": "^0.5.2",
-    "passport-jwt": "^4.0.0",
+    "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "reflect-metadata": "0.1.13",
     "rxjs": "^7.5.7",
