@@ -204,26 +204,6 @@ export class ComputeService {
         value: consumerAddress,
       },
       {
-        name: 'minio_host',
-        value: this.configService.computeConfig().minio_host,
-      },
-      {
-        name: 'minio_port',
-        value: this.configService.computeConfig().minio_port,
-      },
-      {
-        name: 'minio_access_key',
-        value: this.configService.computeConfig().minio_access_key,
-      },
-      {
-        name: 'minio_secret_key',
-        value: this.configService.computeConfig().minio_secret_key,
-      },
-      {
-        name: 'minio_bucket_prefix',
-        value: 'pod-publishing-',
-      },
-      {
         name: 'transformation_container_image',
         value: `${image}:${tag}`,
       },
