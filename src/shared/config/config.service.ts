@@ -24,10 +24,6 @@ export interface ComputeConfig {
   argo_host: string
   argo_namespace: string
   argo_auth_token: string
-  minio_host: string
-  minio_port: string
-  minio_access_key: string
-  minio_secret_key: string
   compute_provider_keyfile: string
   compute_provider_key: string
   compute_provider_password: string
@@ -72,10 +68,6 @@ const DOTENV_SCHEMA = Joi.object({
   ARGO_HOST: Joi.string().default('http:localhost:2746/'),
   ARGO_NAMESPACE: Joi.string().default('argo'),
   ARGO_AUTH_TOKEN: Joi.string(),
-  MINIO_HOST: Joi.string().default('127.0.0.1'),
-  MINIO_PORT: Joi.string().default('9000'),
-  MINIO_ACCESS_KEY: Joi.string().default('AKIAIOSFODNN7EXAMPLE'),
-  MINIO_SECRET_KEY: Joi.string().default('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'),
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
 })
@@ -109,10 +101,6 @@ type DotenvSchemaKeys =
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE'
   | 'ARGO_AUTH_TOKEN'
-  | 'MINIO_HOST'
-  | 'MINIO_PORT'
-  | 'MINIO_ACCESS_KEY'
-  | 'MINIO_SECRET_KEY'
   | 'COMPUTE_PROVIDER_KEYFILE'
   | 'COMPUTE_PROVIDER_PASSWORD'
 
@@ -134,10 +122,6 @@ export class ConfigService {
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
       argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
-      minio_host: this.get('MINIO_HOST'),
-      minio_port: this.get('MINIO_PORT'),
-      minio_access_key: this.get('MINIO_ACCESS_KEY'),
-      minio_secret_key: this.get('MINIO_SECRET_KEY'),
       compute_provider_keyfile: this.get('COMPUTE_PROVIDER_KEYFILE'),
       compute_provider_key:
         this.get('COMPUTE_PROVIDER_KEYFILE') &&
