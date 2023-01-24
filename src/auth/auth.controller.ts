@@ -1,9 +1,10 @@
-import { Controller, Post, UseGuards, Req } from '@nestjs/common'
+import { Controller, Post, Body } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Public } from '../common/decorators/auth.decorator'
 import { AuthService } from './auth.service'
+import { ClientAssertionDto } from './dto/clientAssertion.dto'
 import { LoginDto } from './dto/login.dto'
-import { NeverminedGuard } from './nvm.guard'
+// import { Request } from '../common/helpers/request.interface';
 
 @ApiTags('Auth')
 @Controller()
@@ -24,9 +25,8 @@ export class AuthController {
     status: 401,
     description: 'Unauthorized access',
   })
-  @UseGuards(NeverminedGuard)
   @Public()
-  token(@Req() req): Promise<LoginDto> {
-    return this.authService.validateClaim(req.user)
+  token(@Body() clientAssertion: ClientAssertionDto): Promise<LoginDto> {
+    return this.authService.validateClaim(clientAssertion.grant_type, clientAssertion.assertion)
   }
 }

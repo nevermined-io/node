@@ -7,7 +7,6 @@ import { JwtStrategy } from '../common/strategies/jwt.strategy'
 import { ConfigModule } from '../shared/config/config.module'
 import { ConfigService } from '../shared/config/config.service'
 import { NeverminedModule } from '../shared/nevermined/nvm.module'
-import { NeverminedStrategy } from './nvm.strategy'
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { NeverminedStrategy } from './nvm.strategy'
       },
     }),
   ],
-  providers: [AuthService, JwtStrategy, ConfigService, NeverminedStrategy],
+  providers: [AuthService, JwtStrategy, ConfigService],
   controllers: [AuthController],
 })
 export class AuthModule {}

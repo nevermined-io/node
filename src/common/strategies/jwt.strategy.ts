@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
-import { JWTPayload } from '@nevermined-io/passport-nevermined'
+import { JWTPayload } from 'jose'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { ConfigService } from '../../shared/config/config.service'
 
