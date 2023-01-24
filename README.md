@@ -4,9 +4,9 @@
 
 > Nevermined node that helps to provide services around digital assets
 
-[![Tests](https://github.com/nevermined-io/node-ts/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/node-ts/actions/workflows/test.yml)
-[![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/node-ts.svg)](https://hub.docker.com/repository/docker/neverminedio/node-ts)
-[![GitHub contributors](https://img.shields.io/github/contributors/nevermined-io/node-ts.svg)](https://github.com/nevermined-io/node-ts/graphs/contributors)
+[![Tests](https://github.com/nevermined-io/node/actions/workflows/test.yml/badge.svg)](https://github.com/nevermined-io/node/actions/workflows/test.yml)
+[![Docker Build Status](https://img.shields.io/docker/cloud/build/neverminedio/node.svg)](https://hub.docker.com/repository/docker/neverminedio/node)
+[![GitHub contributors](https://img.shields.io/github/contributors/nevermined-io/node.svg)](https://github.com/nevermined-io/node/graphs/contributors)
 
 ## First-time setup
 
