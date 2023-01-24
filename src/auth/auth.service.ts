@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { JWTPayload } from 'jose'
 import { LoginDto } from './dto/login.dto'
+import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
 import {
   ServiceType,
   ValidationParams,
@@ -14,7 +16,6 @@ import {
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { findServiceConditionByName } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
-import { JWTPayload } from '@nevermined-io/passport-nevermined'
 
 const BASE_URL = '/api/v1/node/services/'
 
@@ -89,8 +90,24 @@ export class AuthService {
     }
   }
 
-  async validateClaim(payload: JWTPayload): Promise<LoginDto> {
+  /**
+   * RFC-7523 Client Authentication https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
+   * RFC-8812 ECDSA Signature with secp256k1 Curve (ES256K)
+   * https://www.rfc-editor.org/rfc/rfc8812#name-ecdsa-signature-with-secp25
+   * This implementation is different from the standard in:
+   * - the size of the signature. ethereum adds an extra byte to the signature to help
+   * with recovering the public key that create the signature
+   * - the hash function used. ES256K uses sha-256 while ethereum uses keccak
+   **/
+  async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
+    if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
+      throw new UnauthorizedException('Invalid "assertion_type"')
+    }
+
+    let payload: JWTPayload
     try {
+      payload = jwtEthVerify(clientAssertion)
+
       const params: ValidationParams = {
         consumer_address: payload.iss,
         did: didZeroX(payload.did as string),
@@ -109,6 +126,7 @@ export class AuthService {
         await this.validateTransferProof(params)
       }
 
+      delete payload.exp
       return {
         access_token: this.jwtService.sign(payload),
       }
