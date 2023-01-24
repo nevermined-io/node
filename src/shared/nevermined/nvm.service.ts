@@ -210,9 +210,45 @@ export class NeverminedService {
     }
   }
 
+  private async checkBucketExists(bucketName: string, s3: AWS.S3): Promise<boolean> {
+    const options = {
+      Bucket: bucketName,
+    }
+    Logger.debug(`Checking if bucket ${bucketName} exists on S3`)
+    try {
+      await s3.headBucket(options).promise()
+      Logger.debug(`Bucket ${bucketName} exists on S3`)
+      return true
+    } catch (error) {
+      if (error.statusCode === 404) {
+        Logger.debug(`Bucket ${bucketName} does NOT exists on S3`)
+        return false
+      }
+      Logger.error(`Error checking if bucket ${bucketName} exists on S3: ${error}`)
+      throw error
+    }
+  }
+
+  private async createBucket(bucketName: string, s3: AWS.S3): Promise<boolean> {
+    const options = {
+      Bucket: bucketName,
+    }
+
+    Logger.debug(`Creating ${bucketName} on S3`)
+    try {
+      await s3.createBucket(options).promise()
+      Logger.debug(`Bucket  ${bucketName} created correctly on S3`)
+      return true
+    } catch (error) {
+      Logger.error(`Error creating Bucket ${bucketName} on S3`)
+      throw error
+    }
+  }
+
   async uploadS3(file: Buffer, filename: string): Promise<string> {
     Logger.debug(`Uploading to S3 ${filename}`)
     filename = filename || 'data'
+    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME')
     try {
       const s3 = new AWS.S3({
         accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
@@ -221,15 +257,19 @@ export class NeverminedService {
         s3ForcePathStyle: true,
         signatureVersion: 'v4',
       })
+      const bucketExists = await this.checkBucketExists(bucketName, s3)
+      if (!bucketExists) {
+        await this.createBucket(bucketName, s3)
+      }
       await s3
         .upload({
-          Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
+          Bucket: bucketName,
           Key: filename,
           Body: file,
         })
         .promise()
       const url = s3.getSignedUrl('getObject', {
-        Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
+        Bucket: bucketName,
         Key: filename,
         Expires: 3600 * 24,
       })

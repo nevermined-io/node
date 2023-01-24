@@ -17,8 +17,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "composite": true,
-    "allowJs": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "./src/compute/argo-workflows-templates/*.yaml"],
+  "include": ["next-env.d.ts", "./src/**/*.ts", "./src/compute/argo-workflows-templates/*.yaml"],
   "exclude": ["node_modules"]
 }
