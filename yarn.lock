@@ -1207,10 +1207,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc12":
-  version "1.0.0-rc12"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc12.tgz#eaaa8a1a748ad81a97bad314aaf84cc487a3cb9a"
-  integrity sha512-eDZqd3rjVFVAQcJ/iRgixeG9lQFElIwEwR6DHUx6qL/tmSUECOLYUq19CPDy8JDov7UJGjPjp9b+eL1ZsMEyoQ==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc12", "@nevermined-io/nevermined-sdk-js@1.0.0-rc14":
+  version "1.0.0-rc14"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc14.tgz#c18208ffc3b3eecd7d4b79a23f347c29a04dc60d"
+  integrity sha512-ieH58UZ7GOilBWaQhPq4V8uLMaD8yGdIhQHdvVdEBSpfTL1DE2Xrzzk/X9bLxTM/rAhS3up5gcVgHeH/DQ5hLQ==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
@@ -5359,7 +5359,7 @@ jose@^4.11.2:
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.11.2.tgz#d9699307c02e18ff56825843ba90e2fae9f09e23"
   integrity sha512-njj0VL2TsIxCtgzhO+9RRobBvws4oYyCM8TpvoUQwl/MbIM3NFJRR9+e6x0sS5xXaP1t6OCBkaBME98OV9zU5A==
 
-jose@^4.5.1, jose@^4.6.0:
+jose@^4.5.1:
   version "4.11.1"
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.11.1.tgz#8f7443549befe5bddcf4bae664a9cbc1a62da4fa"
   integrity sha512-YRv4Tk/Wlug8qicwqFNFVEZSdbROCHRAC6qu/i0dyNKr5JQdoa2pIGoS04lLO/jXQX7Z9omoNewYIVIxqZBd9Q==
