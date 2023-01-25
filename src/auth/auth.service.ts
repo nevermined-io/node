@@ -109,8 +109,9 @@ export class AuthService {
         await this.validateTransferProof(params)
       }
 
+      const { iat: _iat, exp: _exp, ...accessTokenPayload } = payload
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token: this.jwtService.sign(accessTokenPayload),
       }
     } catch (error) {
       Logger.error(error)
