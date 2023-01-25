@@ -49,6 +49,13 @@ describe('ComputeService Testing', () => {
           {
             index: 0,
             stageType: 'Filtering',
+            requirements: {
+              container: {
+                image: 'openjdk',
+                tag: '14-jdl',
+                checksum: 'sha256:53ad3a03b2fb240b6c494339821e6638cd44c989bcf26ec4d51a6a52f7518c1d',
+              },
+            },
             input: [
               {
                 index: 0,
@@ -93,9 +100,6 @@ describe('ComputeService Testing', () => {
     configServiceMock = createMock<ConfigService>({
       computeConfig: () => ({
         argo_namespace: 'argo',
-        minio_port: '9000',
-        minio_access_key: 'aaaakey',
-        minio_secret_key: 'bbbsecret',
       }),
       cryptoConfig: () => ({
         provider_key: './keyfile.json',
@@ -130,15 +134,6 @@ describe('ComputeService Testing', () => {
   it('ComputeService should be properly configured', async () => {
     const argo_host = configServiceMock.computeConfig().argo_namespace
     expect(argo_host).toBe('argo')
-
-    const minio_port = configServiceMock.computeConfig().minio_port
-    expect(minio_port).toBe('9000')
-
-    const minio_access_key = configServiceMock.computeConfig().minio_access_key
-    expect(minio_access_key).toBe('aaaakey')
-
-    const minio_secret_key = configServiceMock.computeConfig().minio_secret_key
-    expect(minio_secret_key).toBe('bbbsecret')
 
     const provider_key = configServiceMock.cryptoConfig().provider_key
     expect(provider_key).toBe('./keyfile.json')
