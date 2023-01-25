@@ -1,4 +1,4 @@
-name: Unit and integration Tests
+name: Unit Tests
 
 on: [push]
 
@@ -22,4 +22,5 @@ jobs:
         run: yarn format:check
       - name: Run tests
         run: |
+          yarn run setup:dev
           yarn run test:cov -- --forceExit
