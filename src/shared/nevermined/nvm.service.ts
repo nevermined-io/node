@@ -210,7 +210,7 @@ export class NeverminedService {
     }
   }
 
-  private async checkBucketExists(bucketName: string, s3: AWS.S3): Promise<boolean> {
+  public async checkBucketExists(bucketName: string, s3: AWS.S3): Promise<boolean> {
     const options = {
       Bucket: bucketName,
     }
@@ -229,7 +229,7 @@ export class NeverminedService {
     }
   }
 
-  private async createBucket(bucketName: string, s3: AWS.S3): Promise<boolean> {
+  public async createBucket(bucketName: string, s3: AWS.S3): Promise<boolean> {
     const options = {
       Bucket: bucketName,
     }
@@ -276,7 +276,7 @@ export class NeverminedService {
       return url
     } catch (e) {
       Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
-      throw new InternalServerErrorException(e.response)
+      throw new InternalServerErrorException(e)
     }
   }
 

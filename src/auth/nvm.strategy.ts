@@ -4,7 +4,7 @@ import { Strategy, JWTPayload } from '@nevermined-io/passport-nevermined'
 
 @Injectable()
 export class NeverminedStrategy extends PassportStrategy(Strategy) {
-  async validate(payload: JWTPayload) {
+  async validate(payload: JWTPayload): Promise<JWTPayload> {
     return payload
   }
 }
