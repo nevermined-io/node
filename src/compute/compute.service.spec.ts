@@ -120,7 +120,7 @@ describe('ComputeService Testing', () => {
     computeService = computeModule.get<ComputeService>(ComputeService)
   })
 
-  it.skip('ComputeService should be defined', () => {
+  it('ComputeService should be defined', () => {
     expect(computeService).toBeDefined()
   })
 
