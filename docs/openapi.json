@@ -36,6 +36,14 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/EncryptResult" } }
             }
+          },
+          "400": {
+            "description": "Bad Request. Incorrect encryption method",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BadRequestException" }
+              }
+            }
           }
         },
         "tags": ["Encrypt"]
@@ -47,7 +55,8 @@
         "summary": "Public",
         "description": "Access asset",
         "parameters": [
-          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } }
+          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "result", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -55,24 +64,14 @@
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/StreamableFile" } }
             }
-          }
-        },
-        "tags": ["Access"],
-        "security": [{ "Authorization": [] }]
-      }
-    },
-    "/api/v1/node/services/access-proof/{agreement_id}/{index}": {
-      "get": {
-        "operationId": "AccessController_doAccessProof",
-        "summary": "Public",
-        "description": "Access asset w/ DTP proof",
-        "parameters": [
-          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } }
-        ],
-        "responses": {
-          "200": {
-            "description": "Return the url of asset",
-            "content": { "application/json": { "schema": { "type": "string" } } }
+          },
+          "400": {
+            "description": "Bad Request. DID missing",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BadRequestException" }
+              }
+            }
           }
         },
         "tags": ["Access"],
@@ -85,7 +84,8 @@
         "summary": "Public",
         "description": "Access asset",
         "parameters": [
-          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } }
+          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "result", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
@@ -103,7 +103,31 @@
       "post": {
         "operationId": "AccessController_doNftTransfer",
         "summary": "Public",
-        "description": "Access asset",
+        "description": "Transfer an NFT",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/TransferDto" } }
+          }
+        },
+        "responses": {
+          "200": { "description": "Return \"success\" if transfer worked" },
+          "404": {
+            "description": "Agreeement not found",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/NotFoundException" } }
+            }
+          }
+        },
+        "tags": ["Access"]
+      }
+    },
+    "/api/v1/node/services/nft-sales-proof": {
+      "post": {
+        "operationId": "AccessController_doNftSales",
+        "summary": "Public",
+        "description": "Transfer an NFT",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -112,7 +136,8 @@
           }
         },
         "responses": { "200": { "description": "Return \"success\" if transfer worked" } },
-        "tags": ["Access"]
+        "tags": ["Access"],
+        "security": [{ "Authorization": [] }]
       }
     },
     "/api/v1/node/services/download/{index}": {
@@ -121,13 +146,22 @@
         "summary": "Public",
         "description": "Download asset",
         "parameters": [
-          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } }
+          { "name": "index", "required": true, "in": "path", "schema": { "type": "number" } },
+          { "name": "result", "required": true, "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
           "200": {
             "description": "Return the asset",
             "content": {
               "application/json": { "schema": { "$ref": "#/components/schemas/StreamableFile" } }
+            }
+          },
+          "400": {
+            "description": "Bad Request. DID missing",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BadRequestException" }
+              }
             }
           }
         },
@@ -139,7 +173,7 @@
       "post": {
         "operationId": "AccessController_doUpload",
         "summary": "Public",
-        "description": "Access asset",
+        "description": "Uploads a file or some content to a remote storage",
         "parameters": [
           { "name": "backend", "required": true, "in": "path", "schema": { "type": "string" } }
         ],
@@ -149,7 +183,25 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/UploadDto" } }
           }
         },
-        "responses": { "200": { "description": "Return the url of asset" } },
+        "responses": {
+          "200": { "description": "Return the url of the file uploaded" },
+          "400": {
+            "description": "Bad Request. File missing or  Backend not supported",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BadRequestException" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error uploading file to backend",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InternalServerErrorException" }
+              }
+            }
+          }
+        },
         "tags": ["Access"]
       }
     },
@@ -176,9 +228,160 @@
         },
         "tags": ["Auth"]
       }
+    },
+    "/api/v1/node/services/compute/list": {
+      "get": {
+        "operationId": "ComputeController_getWorkflowsList",
+        "summary": "Returns a list of all executed workflows",
+        "description": "List of workflows",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Returns an object that contains the list of workflows IDs",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkflowListResultDto" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error getting list of workflows from Argo Workflow",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InternalServerErrorException" }
+              }
+            }
+          }
+        },
+        "tags": ["Compute"]
+      }
+    },
+    "/api/v1/node/services/compute/status/{workflowID}": {
+      "get": {
+        "operationId": "ComputeController_getWorkflowStatus",
+        "summary": "Returns the complete status about a workflow",
+        "description": "Status",
+        "parameters": [
+          { "name": "workflowID", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a status object",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StatusWorkflowResultDto" }
+              }
+            }
+          },
+          "404": {
+            "description": "workflow not found in Argo Workflow",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/NotFoundException" } }
+            }
+          },
+          "500": {
+            "description": "Error processing status from Argo Workflows",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InternalServerErrorException" }
+              }
+            }
+          }
+        },
+        "tags": ["Compute"],
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/api/v1/node/services/compute/execute/{agreement_id}": {
+      "post": {
+        "operationId": "ComputeController_initCompute",
+        "summary": "Starts the execution of a compute workflow",
+        "description": "Execute compute",
+        "parameters": [
+          { "name": "agreement_id", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": { "schema": { "$ref": "#/components/schemas/ExecuteWorkflowDto" } }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the Workflow ID",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExecuteWorkflowResultDto" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error creating a new workflow in  Argo Workflows",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InternalServerErrorException" }
+              }
+            }
+          }
+        },
+        "tags": ["Compute"],
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/api/v1/node/services/compute/stop/{workflowID}": {
+      "delete": {
+        "operationId": "ComputeController_stopWorkflowExecution",
+        "summary": "Stop the execution of a workflow",
+        "description": "Stop",
+        "parameters": [
+          { "name": "workflowID", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a success message",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/StopWorkflowResultDto" }
+              }
+            }
+          },
+          "500": {
+            "description": "Error stopping a workflow in Argo Workflows",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InternalServerErrorException" }
+              }
+            }
+          }
+        },
+        "tags": ["Compute"],
+        "security": [{ "Authorization": [] }]
+      }
+    },
+    "/api/v1/node/services/compute/logs/{workflowID}": {
+      "get": {
+        "operationId": "ComputeController_getWorkflowExecutionLogs",
+        "summary": "Returns the logs of the execution of a workflow",
+        "description": "Logs",
+        "parameters": [
+          { "name": "workflowID", "required": true, "in": "path", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an object that contains the execution logs",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/LogsWorkflowResultDto" }
+              }
+            }
+          }
+        },
+        "tags": ["Compute"],
+        "security": [{ "Authorization": [] }]
+      }
     }
   },
-  "info": { "title": "Nevermined node", "description": "", "version": "0.1.5", "contact": {} },
+  "info": { "title": "Nevermined Node", "description": "", "version": "1.0.0-rc6", "contact": {} },
   "tags": [],
   "servers": [],
   "components": {
@@ -214,7 +417,20 @@
         },
         "required": ["method", "message"]
       },
-      "EncryptResult": { "type": "object", "properties": {} },
+      "EncryptResult": {
+        "type": "object",
+        "properties": {
+          "public-key": { "type": "string", "description": "Public key used by the node" },
+          "hash": { "type": "string", "description": "Encrypted data" },
+          "method": {
+            "type": "string",
+            "description": "Encryption method (PSK-ECDSA or PSK-RSA)",
+            "example": "PSK-ECDSA"
+          }
+        },
+        "required": ["public-key", "hash", "method"]
+      },
+      "BadRequestException": { "type": "object", "properties": {} },
       "StreamableFile": { "type": "object", "properties": {} },
       "TransferDto": {
         "type": "object",
@@ -235,7 +451,7 @@
             "example": "0x..."
           },
           "nftAmount": {
-            "type": "number",
+            "type": "string",
             "description": "Number of NFTs to transfer",
             "example": "1"
           },
@@ -243,6 +459,8 @@
         },
         "required": ["agreementId", "nftHolder", "nftReceiver", "nftAmount", "nftType"]
       },
+      "NotFoundException": { "type": "object", "properties": {} },
+      "": { "type": "object", "properties": {} },
       "UploadDto": {
         "type": "object",
         "properties": {
@@ -250,9 +468,15 @@
             "type": "string",
             "description": "Encrypt uploaded data",
             "example": "false"
+          },
+          "message": {
+            "example": "Hello!",
+            "description": "Message to upload",
+            "allOf": [{ "$ref": "#/components/schemas/" }]
           }
         }
       },
+      "InternalServerErrorException": { "type": "object", "properties": {} },
       "ClientAssertionDto": {
         "type": "object",
         "properties": {
@@ -279,6 +503,75 @@
           }
         },
         "required": ["access_token"]
+      },
+      "WorkflowListResultDto": {
+        "type": "object",
+        "properties": {
+          "workflows": {
+            "description": "Array with workflowsId",
+            "example": "[\"workflowId\": \"nevermined-compute-q9rld\", \"workflowId\": \"nevermined-compute-jf9gf\"]",
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": ["workflows"]
+      },
+      "StatusWorkflowResultDto": {
+        "type": "object",
+        "properties": {
+          "workflowStatus": {
+            "type": "object",
+            "description": "Status of the workflow",
+            "example": "{\"status\":\"Succeeded\",\"startedAt\":\"2022-11-30T08:34:12Z\",\"finishedAt\":\"2022-11-30T08:34:38Z\",\"pods\":[]}"
+          }
+        },
+        "required": ["workflowStatus"]
+      },
+      "ExecuteWorkflowDto": {
+        "type": "object",
+        "properties": {
+          "workflowDid": {
+            "type": "string",
+            "description": "The Did for the Compute Workflow DDO",
+            "example": "did:nv:e12092c13c408ade77f16bfbfb279c04fdcfb75eb5f9a4464a1d77db4c613652"
+          },
+          "consumer": {
+            "type": "string",
+            "description": "The address of the consumer of the compute result",
+            "example": "0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
+          }
+        },
+        "required": ["workflowDid", "consumer"]
+      },
+      "ExecuteWorkflowResultDto": {
+        "type": "object",
+        "properties": {
+          "workflowId": {
+            "type": "string",
+            "description": "The workflowId executed",
+            "example": "nevermined-compute-q9rld"
+          }
+        },
+        "required": ["workflowId"]
+      },
+      "StopWorkflowResultDto": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "number", "description": "status of the request", "example": "200" },
+          "text": {
+            "type": "string",
+            "description": "text explaining result",
+            "example": "workflow nevermined-compute-9lw24 successfuly deleted`"
+          }
+        },
+        "required": ["status", "text"]
+      },
+      "LogsWorkflowResultDto": {
+        "type": "object",
+        "properties": {
+          "logs": { "type": "object", "description": "logs of the workflow", "example": "200" }
+        },
+        "required": ["logs"]
       }
     }
   }
