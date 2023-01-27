@@ -1194,12 +1194,12 @@
   dependencies:
     axios "^0.21.1"
 
-"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc13":
-  version "0.3.0-rc13"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc13.tgz#12d67e49137fab6bc6bc80c78cf920bbef53831b"
-  integrity sha512-3DrbPeRVi/yEzs4JaWaiLhBmeMmZhtQBXX/qkp2s41LAi8Few1nqZmDxnj1Uc9tF92CxnoeTs4Q18hY2Yvk7Aw==
+"@nevermined-io/nevermined-sdk-dtp@0.3.0-rc14":
+  version "0.3.0-rc14"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-dtp/-/nevermined-sdk-dtp-0.3.0-rc14.tgz#dd977de5942da638c2310134b253e4767ab52a76"
+  integrity sha512-5GOxkBhpQ3LNc9hI5rRMd2BmfownbJuraNvQHgQPw2PWR4iBvZNXU/lJA9qmpeDyRFdLvSclW/Tc72bvqUgQjA==
   dependencies:
-    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc16"
+    "@nevermined-io/nevermined-sdk-js" "1.0.0-rc17"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1207,34 +1207,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc15":
-  version "1.0.0-rc15"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc15.tgz#b7e1f718417dd84f6c325791249646a1539fa0d4"
-  integrity sha512-eaUrQ2bN1wL42y/JVJ+koF0SGnt5luGp/dJ88MbAg7eFXVh6T9izjs2hXS7cy3aiOJGGCWNQ2xEE+tF4TK6R6w==
-  dependencies:
-    "@nevermined-io/subgraphs" "0.5.0-rc1"
-    assert "^2.0.0"
-    codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
-    crypto-browserify "^3.12.0"
-    deprecated-decorator "^0.1.6"
-    ethers "^5.6.9"
-    https-browserify "^1.0.0"
-    jose "^4.5.1"
-    js-file-download "^0.4.12"
-    node-fetch "^2.6.1"
-    os-browserify "^0.3.0"
-    path-browserify "^1.0.1"
-    save-file "^2.3.1"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    url "^0.11.0"
-    uuid "^3.4.0"
-    whatwg-url "^7.1.0"
-
-"@nevermined-io/nevermined-sdk-js@1.0.0-rc16":
-  version "1.0.0-rc16"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc16.tgz#8d9197ae1be3e62207eb89063798cc3f7d5e6b82"
-  integrity sha512-9puqk67SSjmsWqJVTxqtbAsii4BqDyAGsveAn7D2oD+10yGYGpotWOlxAmNl/+oQ8SnOHZyhmGZFUu+aOaq8SQ==
+"@nevermined-io/nevermined-sdk-js@1.0.0-rc17":
+  version "1.0.0-rc17"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/nevermined-sdk-js/-/nevermined-sdk-js-1.0.0-rc17.tgz#95350f0cf247fd4a59a9294c28f92d9d0b4219a0"
+  integrity sha512-AP1VHxXnbaScYFRUUYS1eYyMpJbIIRTWKZdkq6LHXBgEGoZdleYCwuPBG8iaAyM2GN133drKPVYEbJFIuZcAmQ==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0-rc1"
     assert "^2.0.0"
