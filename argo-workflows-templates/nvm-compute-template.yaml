@@ -37,6 +37,8 @@ spec:
         #   value:
         # - name: artifacts_folder
         #   value:
+        # - name: circuits_folder
+        #   value:
         # - name: input_dir
         #   value:
         # - name: output_dir
@@ -95,6 +97,8 @@ spec:
             value: '{{workflow.parameters.marketplace_api_url}}'
           - name: ARTIFACTS_FOLDER
             value: '{{workflow.parameters.artifacts_folder}}'
+          - name: CIRCUITS_FOLDER
+            value: '{{workflow.parameters.circuits_folder}}'
           - name: BASE_PATH
             value: '{{workflow.parameters.volume}}'
           - name: INPUT_DIR
@@ -172,6 +176,8 @@ spec:
             value: '{{workflow.parameters.marketplace_api_url}}'
           - name: ARTIFACTS_FOLDER
             value: '{{workflow.parameters.artifacts_folder}}'
+          - name: CIRCUITS_FOLDER
+            value: '{{workflow.parameters.circuits_folder}}'
           - name: BASE_PATH
             value: '{{workflow.parameters.volume}}'
           - name: OUTPUT_DIR

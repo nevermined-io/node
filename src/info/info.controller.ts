@@ -50,6 +50,7 @@ export class InfoController {
     const baby = this.config.getProviderBabyjub()
     const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
     const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
+    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER')
 
     const providerURL = new URL(this.nvmService.web3ProviderUri())
 
@@ -60,6 +61,7 @@ export class InfoController {
       'keeper-url': `${providerURL.protocol}//${providerURL.host}`,
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
+      'circuits-folder': circuitDir,
       contracts: [],
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion('DIDRegistry', artifactDir),

@@ -12,6 +12,7 @@ const configBase = {
   neverminedNodeAddress:
     process.env['NODE_ADDRESS'] || '0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0',
   artifactsFolder: process.env['ARTIFACTS_FOLDER'] || './artifacts',
+  circuitsFolder: process.env['CIRCUITS_FOLDER'] || './circuits',
   marketplaceAuthToken: process.env['MARKETPLACE_AUTH_TOKEN'] || 'bogus',
   graphHttpUri: nograph
     ? undefined
