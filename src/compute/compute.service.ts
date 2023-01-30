@@ -216,6 +216,10 @@ export class ComputeService {
         value: '/artifacts',
       },
       {
+        name: 'circuits_folder',
+        value: '/circuits',
+      },
+      {
         name: 'input_dir',
         value: 'inputs',
       },

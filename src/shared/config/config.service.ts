@@ -64,6 +64,7 @@ const DOTENV_SCHEMA = Joi.object({
   AWS_S3_BUCKET_NAME: Joi.string(),
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
+  CIRCUITS_FOLDER: Joi.string().default('./circuits'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default('http:localhost:2746/'),
   ARGO_NAMESPACE: Joi.string().default('argo'),
@@ -97,6 +98,7 @@ type DotenvSchemaKeys =
   | 'AWS_S3_BUCKET_NAME'
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
+  | 'CIRCUITS_FOLDER'
   | 'ENABLE_COMPUTE'
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE'
