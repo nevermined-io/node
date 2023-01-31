@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "1.0.0-rc7",
+  "version": "1.0.0-rc8",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
@@ -31,8 +31,8 @@
     "@nestjs/swagger": "^5.2.0",
     "@nestjs/typeorm": "^8.0.3",
     "@nevermined-io/argo-workflows-api": "^0.1.3",
-    "@nevermined-io/nevermined-sdk-dtp": "0.3.0-rc15",
-    "@nevermined-io/nevermined-sdk-js": "1.0.0-rc18",
+    "@nevermined-io/nevermined-sdk-dtp": "0.3.0-rc16",
+    "@nevermined-io/nevermined-sdk-js": "1.0.0-rc20",
     "@nevermined-io/passport-nevermined": "^0.1.1",
     "@sideway/address": "^4.1.3",
     "@sideway/formula": "^3.0.0",
