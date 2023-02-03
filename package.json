@@ -113,11 +113,10 @@
     "uuid": "^8.3.2"
   },
   "lint-staged": {
-    "src/**/*.{js,json}": [
+    "**/*.{js,json,md,sol,ts,yml}": [
       "yarn run prettier"
     ],
-    "src/**/*.ts": [
-      "yarn run prettier",
+    "**/*.ts": [
       "yarn run lint:fix"
     ]
   },
