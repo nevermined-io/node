@@ -23,7 +23,7 @@ describe('Info', () => {
         ConfigModule,
         PassportModule,
         JwtModule.register({
-          secret: 'secret',
+          secret: "secret",
           signOptions: { expiresIn: '60m' },
         }),
       ],
