@@ -28,26 +28,26 @@ The Node allows also the encryption and decryption of content using RSA and ECDS
 # Compute Endpoints
 
 The [Nevermined Node](https://github.com/nevermined-io/node) is also in charge of
- orchestrating the execution of compute jobs in the premises of
- the Data/Compute Providers.
+orchestrating the execution of compute jobs in the premises of
+the Data/Compute Providers.
 
- In Nevermined the Data/Compute Providers can publish services saying they offer
-  compute capabilities to the network on top of their data under some conditions
-   for a given price. The Nevermined Node is in charge of, after run all the
-   verifications needed, to manage all the infrastructure to move
-   the algorithm where the data is and track the execution of these ephemeral
-   environments.
+In Nevermined the Data/Compute Providers can publish services saying they offer
+compute capabilities to the network on top of their data under some conditions
+for a given price. The Nevermined Node is in charge of, after run all the
+verifications needed, to manage all the infrastructure to move
+the algorithm where the data is and track the execution of these ephemeral
+environments.
 
 The Nevermined Node exposes a set of endpoints in its REST API, that can plugs
 different compute backends. At this point in time, integrates
 2 different backends:
 
-* **Kubernetes backend** - It allows the orchestration of Kubernetes clusters
-for setting up compute workflows in cloud or on-premise environments.  
-* **Federated Learning backend** - It manages the execution of FL jobs in
-different federated environments. It starts the coordinator and an aggregator
-tasks doing the management of the participants as part of a federated job and
-the secure aggregation of the trained models.
+- **Kubernetes backend** - It allows the orchestration of Kubernetes clusters
+  for setting up compute workflows in cloud or on-premise environments.
+- **Federated Learning backend** - It manages the execution of FL jobs in
+  different federated environments. It starts the coordinator and an aggregator
+  tasks doing the management of the participants as part of a federated job and
+  the secure aggregation of the trained models.
 
 # REST API
 
