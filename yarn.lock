@@ -1364,12 +1364,12 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@0.3.0-rc17":
-  version "0.3.0-rc17"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.3.0-rc17.tgz#1c76ebb3c202627939959fb3cc29456422bba27a"
-  integrity sha512-FdJQg3/83SctWHVN4wzb9Iem2F9nrkIVgMaDlyHvXIprYnq1AiPcjDvIz54nMctZO1VCymmA4xnvmuu5/+cCCw==
+"@nevermined-io/sdk-dtp@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.3.0.tgz#2cc003bf6ea35b40e1385895a72030fd00ac6402"
+  integrity sha512-4X6JZCIOTEaEEPlJ9wtQQZ1lZ50nVOQuzH8z/8bdduAIMy05KlMwLJsiu8LlMcPly96d7zkmQR4AQ+P0bUwGEA==
   dependencies:
-    "@nevermined-io/sdk" "1.0.0-rc22"
+    "@nevermined-io/sdk" "1.0.0"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1377,10 +1377,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@1.0.0-rc22":
-  version "1.0.0-rc22"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.0.0-rc22.tgz#40b01b1be48250a3c03a524505cfcdf0efe5eb44"
-  integrity sha512-XPVrJZI15qhqH/uWIyD2u0UaYBKocLIfzlldLUM4g9NKBH0HQ22c/2uFHodyvFIiZnd7X4MQyenBJkIAcKcqgQ==
+"@nevermined-io/sdk@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.0.0.tgz#fa1ceb831e842f0387f504a0561137b3a0a61eb5"
+  integrity sha512-vaqx1WXRafjXpW4OcyBExR+Fl9QNE7B+5JLyCzTjuFKY35MmaTbwRgfw8r1JiSOiQgXiBVqrXMKi4+QsKL5IYg==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.0"
     assert "^2.0.0"
