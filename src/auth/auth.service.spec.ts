@@ -1,11 +1,9 @@
 import { AuthService } from './auth.service'
 import { JwtService } from '@nestjs/jwt'
-import { BigNumber } from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { Test } from '@nestjs/testing'
-import { ServiceType, ValidationParams } from '@nevermined-io/nevermined-sdk-js'
+import { Babysig, BigNumber, ServiceType, ValidationParams } from '@nevermined-io/sdk'
 import { UnauthorizedException } from '@nestjs/common'
-import { Babysig } from '@nevermined-io/nevermined-sdk-js/dist/node/models/types'
 
 describe('AuthService', () => {
   let authService: AuthService

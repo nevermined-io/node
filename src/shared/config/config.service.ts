@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
-import { NeverminedOptions } from '@nevermined-io/nevermined-sdk-js'
+import { NeverminedOptions } from '@nevermined-io/sdk'
 import { readFileSync } from 'fs'
 import * as Joi from 'joi'
 import { get as loGet } from 'lodash'

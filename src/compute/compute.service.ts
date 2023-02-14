@@ -4,7 +4,7 @@ import yaml from 'js-yaml'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
-import { DDO } from '@nevermined-io/nevermined-sdk-js'
+import { DDO } from '@nevermined-io/sdk'
 import { ConfigService } from '../shared/config/config.service'
 import { Logger } from '../shared/logger/logger.service'
 require('js-yaml')
