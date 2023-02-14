@@ -6,7 +6,7 @@ import {
   DDO,
   MetaDataMain,
   Nevermined,
-} from '@nevermined-io/nevermined-sdk-js'
+} from '@nevermined-io/sdk'
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -17,7 +17,7 @@ import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
 import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
-import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp'
+import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/sdk-dtp'
 import { ethers } from 'ethers'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'

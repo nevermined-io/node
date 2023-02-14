@@ -4,8 +4,8 @@ import { ConfigService } from '../shared/config/config.service'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
 import { Test, TestingModule } from '@nestjs/testing'
 import { createMock } from '@golevelup/ts-jest'
-import { DDO } from '@nevermined-io/nevermined-sdk-js'
-import { MetaData } from '@nevermined-io/nevermined-sdk-js'
+import { DDO } from '@nevermined-io/sdk'
+import { MetaData } from '@nevermined-io/sdk'
 
 describe('ComputeService Testing', () => {
   let computeService: ComputeService

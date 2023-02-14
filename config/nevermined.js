@@ -1,4 +1,4 @@
-const LogLevel = require('@nevermined-io/nevermined-sdk-js/dist/node/utils').LogLevel
+const LogLevel = require('@nevermined-io/sdk').LogLevel
 const ethers = require('ethers').ethers
 const fs = require('fs')
 

@@ -10,10 +10,10 @@ import {
   Logger,
   Account,
   Babysig,
-} from '@nevermined-io/nevermined-sdk-js'
+  BigNumber,
+  findServiceConditionByName,
+} from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import { findServiceConditionByName } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
-import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 import { JWTPayload } from '@nevermined-io/passport-nevermined'
 
 const BASE_URL = '/api/v1/node/services/'
