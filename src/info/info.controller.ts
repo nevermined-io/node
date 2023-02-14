@@ -5,7 +5,7 @@ import path from 'path'
 import { Public } from '../common/decorators/auth.decorator'
 import { Request } from '../common/helpers/request.interface'
 import { GetInfoDto } from './dto/get-info.dto'
-import ContractHandler from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/ContractHandler'
+import { ContractHandler } from '@nevermined-io/sdk'
 import { ethers } from 'ethers'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
@@ -50,14 +50,18 @@ export class InfoController {
     const baby = this.config.getProviderBabyjub()
     const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
     const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
+    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER')
+
+    const providerURL = new URL(this.nvmService.web3ProviderUri())
 
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
-      'keeper-url': this.nvmService.web3ProviderUri(),
+      'keeper-url': `${providerURL.protocol}//${providerURL.host}`,
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
+      'circuits-folder': circuitDir,
       contracts: [],
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion('DIDRegistry', artifactDir),
