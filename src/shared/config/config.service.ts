@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
-import { Config } from '@nevermined-io/nevermined-sdk-js'
+import { NeverminedOptions } from '@nevermined-io/sdk'
 import { readFileSync } from 'fs'
 import * as Joi from 'joi'
 import { get as loGet } from 'lodash'
@@ -21,14 +21,9 @@ export interface CryptoConfig {
 
 export interface ComputeConfig {
   enable_compute: boolean
-  gethlocal_host_name: string
   argo_host: string
   argo_namespace: string
   argo_auth_token: string
-  minio_host: string
-  minio_port: string
-  minio_access_key: string
-  minio_secret_key: string
   compute_provider_keyfile: string
   compute_provider_key: string
   compute_provider_password: string
@@ -69,14 +64,11 @@ const DOTENV_SCHEMA = Joi.object({
   AWS_S3_BUCKET_NAME: Joi.string(),
   ENABLE_PROVENANCE: Joi.boolean().default(true),
   ARTIFACTS_FOLDER: Joi.string().default('./artifacts'),
+  CIRCUITS_FOLDER: Joi.string().default('./circuits'),
   ENABLE_COMPUTE: Joi.boolean().default(false),
   ARGO_HOST: Joi.string().default('http:localhost:2746/'),
   ARGO_NAMESPACE: Joi.string().default('argo'),
   ARGO_AUTH_TOKEN: Joi.string(),
-  MINIO_HOST: Joi.string().default('127.0.0.1'),
-  MINIO_PORT: Joi.string().default('9000'),
-  MINIO_ACCESS_KEY: Joi.string().default('AKIAIOSFODNN7EXAMPLE'),
-  MINIO_SECRET_KEY: Joi.string().default('wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'),
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
 })
@@ -106,14 +98,11 @@ type DotenvSchemaKeys =
   | 'AWS_S3_BUCKET_NAME'
   | 'ENABLE_PROVENANCE'
   | 'ARTIFACTS_FOLDER'
+  | 'CIRCUITS_FOLDER'
   | 'ENABLE_COMPUTE'
   | 'ARGO_HOST'
   | 'ARGO_NAMESPACE'
   | 'ARGO_AUTH_TOKEN'
-  | 'MINIO_HOST'
-  | 'MINIO_PORT'
-  | 'MINIO_ACCESS_KEY'
-  | 'MINIO_SECRET_KEY'
   | 'COMPUTE_PROVIDER_KEYFILE'
   | 'COMPUTE_PROVIDER_PASSWORD'
 
@@ -132,14 +121,9 @@ export class ConfigService {
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
-      gethlocal_host_name: 'host.docker.internal',
       argo_host: this.get('ARGO_HOST'),
       argo_namespace: this.get('ARGO_NAMESPACE'),
       argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
-      minio_host: this.get('MINIO_HOST'),
-      minio_port: this.get('MINIO_PORT'),
-      minio_access_key: this.get('MINIO_ACCESS_KEY'),
-      minio_secret_key: this.get('MINIO_SECRET_KEY'),
       compute_provider_keyfile: this.get('COMPUTE_PROVIDER_KEYFILE'),
       compute_provider_key:
         this.get('COMPUTE_PROVIDER_KEYFILE') &&
@@ -152,7 +136,7 @@ export class ConfigService {
     return loGet(this.envConfig, path) as unknown as T | undefined
   }
 
-  nvm(): Config {
+  nvm(): NeverminedOptions {
     return this.envConfig.nvm
   }
 
