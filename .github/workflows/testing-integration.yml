@@ -1,0 +1,51 @@
+name: Integration Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - name: Install dependencies
+        run: |
+          yarn
+      - name: Compile and lint
+        run: |
+          yarn run build
+          yarn run lint
+      - name: Check code formatting
+        run: yarn format:check
+      - uses: nevermined-io/nvm-tools-actions@v0.6.1
+        with:
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          opengsn: 'false'
+          estuary: 'true'
+          node: 'false'
+      - name: Check artifacts
+        run: |
+          nvm-tools copy-artifacts ./artifacts
+          ls -l artifacts
+          nvm-tools copy-circuits ./circuits
+          ls -l circuits
+      - name: Run tests
+        run: |
+          export PROVIDER_KEYFILE=accounts/provider.json
+          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
+          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
+          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
+          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
+          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
+          export NO_GRAPH=true
+          export SEED_WORDS=${{ secrets.seedWords }}
+          export PROVIDER_PASSWORD=secret
+          yarn run setup:dev
+          # HDWalletProvider keeps jest from exiting
+          yarn run integration:cov -- --forceExit

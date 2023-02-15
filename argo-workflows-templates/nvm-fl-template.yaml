@@ -39,21 +39,13 @@ spec:
         #   value:
         # - name: artifacts_folder
         #   value:
+        # - name: circuits_folder
+        #   value:
         # - name: input_dir
         #   value:
         # - name: output_dir
         #   value:
         # - name: transformations_dir
-        #   value:
-        # - name: minio_host
-        #   value:
-        # - name: minio_port
-        #   value:
-        # - name: minio_access_key
-        #   value:
-        # - name: minio_secret_key
-        #   value:
-        # - name: minio_bucket_prefix
         #   value:
   dnsPolicy: ClusterFirstWithHostNet
   hostNetwork: true
@@ -126,6 +118,8 @@ spec:
             value: '{{workflow.parameters.marketplace_api_url}}'
           - name: ARTIFACTS_FOLDER
             value: '{{workflow.parameters.artifacts_folder}}'
+          - name: CIRCUITS_FOLDER
+            value: '{{workflow.parameters.circuits_folder}}'
           - name: BASE_PATH
             value: '{{workflow.parameters.volume}}'
           - name: INPUT_DIR
@@ -203,20 +197,12 @@ spec:
             value: '{{workflow.parameters.marketplace_api_url}}'
           - name: ARTIFACTS_FOLDER
             value: '{{workflow.parameters.artifacts_folder}}'
+          - name: CIRCUITS_FOLDER
+            value: '{{workflow.parameters.circuits_folder}}'
           - name: BASE_PATH
             value: '{{workflow.parameters.volume}}'
           - name: OUTPUT_DIR
             value: '{{workflow.parameters.output_dir}}'
-          - name: MINIO_HOST
-            value: '{{workflow.parameters.minio_host}}'
-          - name: MINIO_PORT
-            value: '{{workflow.parameters.minio_port}}'
-          - name: MINIO_ACCESS_KEY
-            value: '{{workflow.parameters.minio_access_key}}'
-          - name: MINIO_SECRET_KEY
-            value: '{{workflow.parameters.minio_secret_key}}'
-          - name: MINIO_BUCKET_PREFIX
-            value: '{{workflow.parameters.minio_bucket_prefix}}'
           - name: VERBOSE
             value: '{{workflow.parameters.verbose}}'
         volumeMounts:

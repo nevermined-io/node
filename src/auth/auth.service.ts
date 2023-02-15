@@ -1,22 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { JWTPayload } from 'jose'
 import { LoginDto } from './dto/login.dto'
-import { CLIENT_ASSERTION_TYPE, jwtEthVerify } from '../common/guards/shared/jwt.utils'
-import { BabyjubPublicKey } from '@nevermined-io/nevermined-sdk-js/dist/node/models/KeyTransfer'
-import { Babysig } from '@nevermined-io/nevermined-sdk-dtp/dist/KeyTransfer'
 import {
   ServiceType,
   ValidationParams,
-} from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
-import { NeverminedService } from '../shared/nevermined/nvm.service'
-import {
   didZeroX,
   zeroX,
+  BabyjubPublicKey,
+  Logger,
+  Account,
+  Babysig,
+  BigNumber,
   findServiceConditionByName,
-} from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
-import { Logger, Account } from '@nevermined-io/nevermined-sdk-js'
-import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
+} from '@nevermined-io/sdk'
+import { NeverminedService } from '../shared/nevermined/nvm.service'
+import { JWTPayload } from '@nevermined-io/passport-nevermined'
 
 const BASE_URL = '/api/v1/node/services/'
 
@@ -42,7 +40,7 @@ export class AuthService {
       if (!holder) {
         return BigNumber.from(1)
       }
-      const num = holder.parameters.find((p) => p.name === '_numberNfts').value
+      const num = holder.parameters.find((p) => p.name === '_numberNfts')?.value
       return BigNumber.from(num)
     }
 
@@ -52,7 +50,7 @@ export class AuthService {
     )
     if (!granted) {
       const limit = await getNftAccess()
-      const balance = await nevermined.nfts.balance(did, new Account(consumer_address))
+      const balance = await nevermined.nfts1155.balance(did, new Account(consumer_address))
       if (!limit || !balance.gte(limit)) {
         throw new UnauthorizedException(
           `Address ${consumer_address} has no permission to access ${did}`,
@@ -63,7 +61,10 @@ export class AuthService {
 
   async validateAccess(params: ValidationParams, service: ServiceType): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
-    const plugin = nevermined.assets.servicePlugin[service]
+
+    const plugin =
+      nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
+
     const granted = await plugin.accept(params)
     if (!granted) {
       const [from] = await nevermined.accounts.list()
@@ -88,24 +89,8 @@ export class AuthService {
     }
   }
 
-  /**
-   * RFC-7523 Client Authentication https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
-   * RFC-8812 ECDSA Signature with secp256k1 Curve (ES256K)
-   * https://www.rfc-editor.org/rfc/rfc8812#name-ecdsa-signature-with-secp25
-   * This implementation is different from the standard in:
-   * - the size of the signature. ethereum adds an extra byte to the signature to help
-   * with recovering the public key that create the signature
-   * - the hash function used. ES256K uses sha-256 while ethereum uses keccak
-   **/
-  async validateClaim(clientAssertionType: string, clientAssertion: string): Promise<LoginDto> {
-    if (clientAssertionType !== CLIENT_ASSERTION_TYPE) {
-      throw new UnauthorizedException('Invalid "assertion_type"')
-    }
-
-    let payload: JWTPayload
+  async validateClaim(payload: JWTPayload): Promise<LoginDto> {
     try {
-      payload = jwtEthVerify(clientAssertion)
-
       const params: ValidationParams = {
         consumer_address: payload.iss,
         did: didZeroX(payload.did as string),
@@ -124,9 +109,9 @@ export class AuthService {
         await this.validateTransferProof(params)
       }
 
-      delete payload.exp
+      const { iat: _iat, exp: _exp, ...accessTokenPayload } = payload
       return {
-        access_token: this.jwtService.sign(payload),
+        access_token: this.jwtService.sign(accessTokenPayload),
       }
     } catch (error) {
       Logger.error(error)

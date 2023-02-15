@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common'
-import { Dtp } from '@nevermined-io/nevermined-sdk-dtp/dist/Dtp'
-import { generateIntantiableConfigFromConfig } from '@nevermined-io/nevermined-sdk-js/dist/node/Instantiable.abstract'
-import { DDO, MetaDataMain, Nevermined } from '@nevermined-io/nevermined-sdk-js'
-import { utils } from '@nevermined-io/nevermined-sdk-js'
+import {
+  generateId,
+  generateIntantiableConfigFromConfig,
+  didZeroX,
+  DDO,
+  MetaDataMain,
+  Nevermined,
+} from '@nevermined-io/sdk'
 import {
   BadRequestException,
   InternalServerErrorException,
@@ -13,15 +17,13 @@ import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
 import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
-import { decrypt } from '@nevermined-io/nevermined-sdk-dtp'
+import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/sdk-dtp'
 import { ethers } from 'ethers'
-import { didZeroX } from '@nevermined-io/nevermined-sdk-js/dist/node/utils'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
-import { aes_decryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
 
 export enum AssetResult {
   DATA = 'data',
@@ -176,12 +178,12 @@ export class NeverminedService {
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
           const [from] = await this.nevermined.accounts.list()
-          const provId = utils.generateId()
+          const provId = generateId()
           await this.nevermined.provenance.used(
             provId,
             didZeroX(did),
             userAddress,
-            utils.generateId(),
+            generateId(),
             ethers.utils.hexZeroPad('0x0', 32),
             'download',
             from,
@@ -208,9 +210,45 @@ export class NeverminedService {
     }
   }
 
+  public async checkBucketExists(bucketName: string, s3: AWS.S3): Promise<boolean> {
+    const options = {
+      Bucket: bucketName,
+    }
+    Logger.debug(`Checking if bucket ${bucketName} exists on S3`)
+    try {
+      await s3.headBucket(options).promise()
+      Logger.debug(`Bucket ${bucketName} exists on S3`)
+      return true
+    } catch (error) {
+      if (error.statusCode === 404) {
+        Logger.debug(`Bucket ${bucketName} does NOT exists on S3`)
+        return false
+      }
+      Logger.error(`Error checking if bucket ${bucketName} exists on S3: ${error}`)
+      throw error
+    }
+  }
+
+  public async createBucket(bucketName: string, s3: AWS.S3): Promise<boolean> {
+    const options = {
+      Bucket: bucketName,
+    }
+
+    Logger.debug(`Creating ${bucketName} on S3`)
+    try {
+      await s3.createBucket(options).promise()
+      Logger.debug(`Bucket  ${bucketName} created correctly on S3`)
+      return true
+    } catch (error) {
+      Logger.error(`Error creating Bucket ${bucketName} on S3`)
+      throw error
+    }
+  }
+
   async uploadS3(file: Buffer, filename: string): Promise<string> {
     Logger.debug(`Uploading to S3 ${filename}`)
     filename = filename || 'data'
+    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME')
     try {
       const s3 = new AWS.S3({
         accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
@@ -219,22 +257,26 @@ export class NeverminedService {
         s3ForcePathStyle: true,
         signatureVersion: 'v4',
       })
+      const bucketExists = await this.checkBucketExists(bucketName, s3)
+      if (!bucketExists) {
+        await this.createBucket(bucketName, s3)
+      }
       await s3
         .upload({
-          Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
+          Bucket: bucketName,
           Key: filename,
           Body: file,
         })
         .promise()
       const url = s3.getSignedUrl('getObject', {
-        Bucket: this.config.get('AWS_S3_BUCKET_NAME'),
+        Bucket: bucketName,
         Key: filename,
         Expires: 3600 * 24,
       })
       return url
     } catch (e) {
       Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
-      throw new InternalServerErrorException(e.response)
+      throw new InternalServerErrorException(e)
     }
   }
 

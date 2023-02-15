@@ -1,11 +1,11 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiOperation, ApiResponse, ApiTags, ApiBadRequestResponse } from '@nestjs/swagger'
 import { Public } from '../common/decorators/auth.decorator'
-import { Logger } from '@nevermined-io/nevermined-sdk-js'
+import { Logger } from '@nevermined-io/sdk'
 import { EncryptDto } from './dto/encrypt'
 import { EncryptResult } from './dto/result'
 import { ConfigService } from '../shared/config/config.service'
-import { encrypt } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
+import { encrypt } from '@nevermined-io/sdk-dtp'
 
 @ApiTags('Encrypt')
 @Controller()
@@ -20,6 +20,11 @@ export class EncryptController {
     status: 200,
     description: 'Return encrypted stuff',
     type: EncryptResult,
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. Incorrect encryption method',
+    type: BadRequestException,
   })
   @Public()
   async doEncrypt(@Body() encryptData: EncryptDto): Promise<EncryptResult> {
