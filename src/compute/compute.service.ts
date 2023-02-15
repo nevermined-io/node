@@ -4,7 +4,7 @@ import yaml from 'js-yaml'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
-import { DDO } from '@nevermined-io/nevermined-sdk-js'
+import { DDO } from '@nevermined-io/sdk'
 import { ConfigService } from '../shared/config/config.service'
 import { Logger } from '../shared/logger/logger.service'
 require('js-yaml')
@@ -87,7 +87,7 @@ export class ComputeService {
           },
         }
 
-        const queryResult = await this.nvmService.getNevermined().assets.query({ query: query })
+        const queryResult = await this.nvmService.getNevermined().search.query({ query: query })
 
         if (queryResult.totalResults.value > 0) {
           const did = queryResult.results[0].id
@@ -109,9 +109,8 @@ export class ComputeService {
     return yaml.load(templateContent)
   }
 
-  async createArgoWorkflow(initData: ExecuteWorkflowDto, agreementId: string): Promise<any> {
+  async createArgoWorkflow(initData: ExecuteWorkflowDto): Promise<any> {
     const gethLocal = (await this.getNetworkName()) === 'geth-localnet'
-
     const workflow = this.readWorkflowTemplate(gethLocal)
 
     Logger.debug(`Resolving workflow DDO ${initData.workflowDid}`)
@@ -119,13 +118,7 @@ export class ComputeService {
     Logger.debug(`workflow DDO ${initData.workflowDid} resolved`)
 
     workflow.metadata.namespace = this.configService.computeConfig().argo_namespace
-    workflow.spec.arguments.parameters = await this.createArguments(
-      ddo,
-      initData.consumer,
-      gethLocal,
-    )
-    workflow.spec.workflowMetadata.labels.serviceAgreement = agreementId
-
+    workflow.spec.arguments.parameters = await this.createArguments(ddo, initData.consumer)
     workflow.spec.entrypoint = 'compute-workflow'
 
     Logger.debug(
@@ -143,7 +136,6 @@ export class ComputeService {
   private async createArguments(
     workflowDdo: DDO,
     consumerAddress: string,
-    gethLocal: boolean,
   ): Promise<{ name: string; value: string }[]> {
     const metadata = workflowDdo.findServiceByType('metadata')
     const workflow = metadata.attributes.main.workflow
@@ -165,13 +157,6 @@ export class ComputeService {
     Logger.debug(`transformation args: ${args}`)
     Logger.debug(`transformation container: ${image}`)
     Logger.debug(`transformation tag: ${tag}`)
-
-    if (gethLocal)
-      Logger.debug(
-        `Compute Stack running in Nevermined Tools. Using ${
-          this.configService.computeConfig().gethlocal_host_name
-        } as host for NVM services`,
-      )
 
     let providerKey = this.configService.cryptoConfig().provider_key
     let providerPassword = this.configService.cryptoConfig().provider_password
@@ -196,15 +181,11 @@ export class ComputeService {
       },
       {
         name: 'marketplace_api_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:3100`
-          : this.configService.nvm().marketplaceUri,
+        value: this.configService.nvm().marketplaceUri,
       },
       {
         name: 'web3_provider_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:8545`
-          : this.configService.nvm().web3ProviderUri,
+        value: this.configService.nvm().web3ProviderUri,
       },
       {
         name: 'node_address',
@@ -212,9 +193,7 @@ export class ComputeService {
       },
       {
         name: 'node_url',
-        value: gethLocal
-          ? `http://${this.configService.computeConfig().gethlocal_host_name}:8030`
-          : this.configService.nvm().neverminedNodeUri,
+        value: this.configService.nvm().neverminedNodeUri,
       },
       {
         name: 'workflow_did',
@@ -223,28 +202,6 @@ export class ComputeService {
       {
         name: 'consumer_address',
         value: consumerAddress,
-      },
-      {
-        name: 'minio_host',
-        value: gethLocal
-          ? `${this.configService.computeConfig().gethlocal_host_name}`
-          : this.configService.computeConfig().minio_host,
-      },
-      {
-        name: 'minio_port',
-        value: this.configService.computeConfig().minio_port,
-      },
-      {
-        name: 'minio_access_key',
-        value: this.configService.computeConfig().minio_access_key,
-      },
-      {
-        name: 'minio_secret_key',
-        value: this.configService.computeConfig().minio_secret_key,
-      },
-      {
-        name: 'minio_bucket_prefix',
-        value: 'pod-publishing-',
       },
       {
         name: 'transformation_container_image',
@@ -257,6 +214,10 @@ export class ComputeService {
       {
         name: 'artifacts_folder',
         value: '/artifacts',
+      },
+      {
+        name: 'circuits_folder',
+        value: '/circuits',
       },
       {
         name: 'input_dir',

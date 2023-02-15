@@ -8,7 +8,14 @@ import {
   NotFoundException,
   InternalServerErrorException,
 } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth } from '@nestjs/swagger'
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger'
 import { Public } from '../common/decorators/auth.decorator'
 import { ComputeService } from './compute.service'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
@@ -46,6 +53,11 @@ export class ComputeController {
     status: 200,
     description: 'Returns an object that contains the list of workflows IDs',
     type: WorkflowListResultDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error getting list of workflows from Argo Workflow',
+    type: InternalServerErrorException,
   })
   @Public()
   async getWorkflowsList(): Promise<WorkflowListResultDto> {
@@ -93,6 +105,16 @@ export class ComputeController {
     description: 'Returns a status object',
     type: StatusWorkflowResultDto,
   })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error processing status from Argo Workflows',
+    type: InternalServerErrorException,
+  })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'workflow not found in Argo Workflow',
+    type: NotFoundException,
+  })
   @ApiBearerAuth('Authorization')
   async getWorkflowStatus(
     @Param('workflowID') workflowID: string,
@@ -130,6 +152,11 @@ export class ComputeController {
     description: 'Returns the Workflow ID',
     type: ExecuteWorkflowResultDto,
   })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error creating a new workflow in  Argo Workflows',
+    type: InternalServerErrorException,
+  })
   @ApiBearerAuth('Authorization')
   async initCompute(
     @Body() initData: ExecuteWorkflowDto,
@@ -138,7 +165,7 @@ export class ComputeController {
     try {
       Logger.debug(`Executing compute for agreement id ${agreementId}`)
 
-      const argoWorkflow = await this.computeService.createArgoWorkflow(initData, agreementId)
+      const argoWorkflow = await this.computeService.createArgoWorkflow(initData)
       const response = await this.argoWorkflowApi.workflowServiceCreateWorkflow(
         { serverDryRun: false, namespace: this.argoNamespace, workflow: argoWorkflow },
         this.argoNamespace,
@@ -164,6 +191,11 @@ export class ComputeController {
     status: 200,
     description: 'Returns a success message',
     type: StopWorkflowResultDto,
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error stopping a workflow in Argo Workflows',
+    type: InternalServerErrorException,
   })
   @ApiBearerAuth('Authorization')
   async stopWorkflowExecution(
@@ -214,8 +246,8 @@ export class ComputeController {
       workflowID,
       undefined,
       'main',
+      false,
       undefined,
-      true,
       undefined,
       undefined,
       undefined,
