@@ -1,15 +1,15 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Test } from '@nestjs/testing'
-import { JwtAuthGuard } from '../common/guards/auth/jwt-auth.guard'
-import { AccessController } from './access.controller'
-import { NeverminedModule } from '../shared/nevermined/nvm.module'
+import { JwtAuthGuard } from '../src/common/guards/auth/jwt-auth.guard'
+import { AccessController } from '../src/access/access.controller'
+import { NeverminedModule } from '../src/shared/nevermined/nvm.module'
 import request from 'supertest'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
-import { AuthService } from '../auth/auth.service.mock'
-import { JwtStrategy } from '../common/strategies/jwt.strategy'
-import { ConfigModule } from '../shared/config/config.module'
+import { AuthService } from '../src/auth/auth.service.mock'
+import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
+import { ConfigModule } from '../src/shared/config/config.module'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 

@@ -14,5 +14,5 @@ module.exports = {
   security: {
     enableHttpsRedirect: process.env.ENABLE_HTTPS_REDIRECT,
   },
-  ... require('./from-env').config
-};
+  ...require('./from-env').config,
+}
