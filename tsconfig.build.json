@@ -1,8 +1,8 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-      "noUnusedLocals": true
-    },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules", "**/*.spec.ts", "**/*.factory.ts", "**/*.seed.ts", "**/*.mock.ts"]
-  }
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUnusedLocals": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.factory.ts", "**/*.seed.ts", "**/*.mock.ts"]
+}

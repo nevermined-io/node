@@ -1,8 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { decodeJwt, JWTPayload } from 'jose'
-import { CLIENT_ASSERTION_TYPE, EthSignJWT } from '../common/guards/shared/jwt.utils'
+import { CLIENT_ASSERTION_TYPE } from '../common/guards/shared/jwt.utils'
 import { ethers } from 'ethers'
+import { EthSignJWT } from '@nevermined-io/sdk'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 

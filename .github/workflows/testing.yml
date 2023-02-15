@@ -1,0 +1,26 @@
+name: Unit Tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - name: Install dependencies
+        run: |
+          yarn
+      - name: Compile and lint
+        run: |
+          yarn run build
+          yarn run lint
+      - name: Check code formatting
+        run: yarn format:check
+      - name: Run tests
+        run: |
+          yarn run setup:dev
+          yarn run test:cov -- --forceExit
