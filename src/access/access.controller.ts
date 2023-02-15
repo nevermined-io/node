@@ -3,9 +3,8 @@ import {
   Body,
   Controller,
   Get,
-  HttpException,
-  HttpStatus,
   NotFoundException,
+  InternalServerErrorException,
   Param,
   Post,
   Query,
@@ -15,21 +14,26 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger'
 import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
-import { aes_encryption_256 } from '@nevermined-io/nevermined-sdk-dtp/dist/utils'
-import { ValidationParams } from '@nevermined-io/nevermined-sdk-js/dist/node/ddo/Service'
-import BigNumber from '@nevermined-io/nevermined-sdk-js/dist/node/utils/BigNumber'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
 import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
-import { AgreementData } from '@nevermined-io/nevermined-sdk-js/dist/node/keeper/contracts/managers'
-import { utils } from '@nevermined-io/nevermined-sdk-js'
+import { generateId, ValidationParams, BigNumber, AgreementData } from '@nevermined-io/sdk'
+import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
 
 export enum UploadBackends {
   IPFS = 'ipfs',
@@ -51,6 +55,11 @@ export class AccessController {
     status: 200,
     description: 'Return the url of asset',
     type: StreamableFile,
+  })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. DID missing',
+    type: BadRequestException,
   })
   @ApiBearerAuth('Authorization')
   async doAccess(
@@ -95,6 +104,11 @@ export class AccessController {
     status: 200,
     description: 'Return "success" if transfer worked',
   })
+  @ApiNotFoundResponse({
+    status: 404,
+    description: 'Agreeement not found',
+    type: NotFoundException,
+  })
   async doNftTransfer(
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
@@ -129,6 +143,7 @@ export class AccessController {
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
     }
+    console.log(template, nevermined.assets.servicePlugin[template])
     const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
     await plugin.process(params, from, undefined)
@@ -162,6 +177,11 @@ export class AccessController {
     description: 'Return the asset',
     type: StreamableFile,
   })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. DID missing',
+    type: BadRequestException,
+  })
   @ApiBearerAuth('Authorization')
   async doDownload(
     @Req() req: Request<unknown>,
@@ -186,6 +206,16 @@ export class AccessController {
     status: 200,
     description: 'Return the url of the file uploaded',
   })
+  @ApiBadRequestResponse({
+    status: 400,
+    description: 'Bad Request. File missing or  Backend not supported',
+    type: BadRequestException,
+  })
+  @ApiInternalServerErrorResponse({
+    status: 500,
+    description: 'Error uploading file to backend',
+    type: InternalServerErrorException,
+  })
   async doUpload(
     @Body() uploadData: UploadDto,
     @Param('backend') backend: UploadBackends,
@@ -198,11 +228,10 @@ export class AccessController {
       fileName = file.originalname
     } else if (uploadData.message) {
       data = Buffer.from(uploadData.message)
-      fileName = `fileUpload_${utils.generateId()}.data${uploadData.encrypt ? '.encrypted' : ''}`
+      fileName = `fileUpload_${generateId()}.data${uploadData.encrypt ? '.encrypted' : ''}`
     } else {
       throw new BadRequestException('No file or message in request')
     }
-    Logger.debug(`Backend ${backend}`)
     if (!Object.values(UploadBackends).includes(backend))
       throw new BadRequestException(`Backend ${backend} not supported`)
     try {
@@ -220,7 +249,7 @@ export class AccessController {
       return { url }
     } catch (error) {
       Logger.error(`Error processing upload: ${error.message}`)
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new InternalServerErrorException(error.message)
     }
   }
 }
