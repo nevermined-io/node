@@ -21,6 +21,7 @@ export class GetInfoDto {
   'keeper-url': string
   'provenance-enabled': boolean
   'artifacts-folder': string
+  'circuits-folder': string
   contracts: any
   'external-contracts': any
   'keeper-version': string
