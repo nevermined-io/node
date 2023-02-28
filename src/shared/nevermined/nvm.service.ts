@@ -87,15 +87,26 @@ export class NeverminedService {
     const name = file_attributes.name
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
-      const filelist = JSON.parse(
-        await decrypt(this.config.cryptoConfig(), service.attributes.encryptedFiles, 'PSK-RSA'),
-      )
+      const filelist = this.decrypt(service.attributes.encryptedFiles, 'PSK-RSA')
+
       // download url or what?
       const url: string = filelist[index].url
       return { url, content_type, dtp: this.isDTP(service.attributes.main), name }
     }
     Logger.error(`Auth METHOD wasn't RSAES-OAEP`)
     throw new BadRequestException()
+  }
+
+  /**
+   * Decrypts a an encrypted JSON object
+   *
+   * @param encryptedJson - The encrypted json object as a string
+   * @param encryptionMethod - The encryption method used. Currently only PSK-RSA is supported
+   *
+   * @returns The decrypted JSON object
+   */
+  async decrypt(encryptedJson: string, encryptionMethod: string): Promise<any> {
+    return JSON.parse(await decrypt(this.config.cryptoConfig(), encryptedJson, encryptionMethod))
   }
 
   async downloadAsset(
