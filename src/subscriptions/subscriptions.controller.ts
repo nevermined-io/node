@@ -1,9 +1,11 @@
 import { Controller, ForbiddenException, Get, Param, Req } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { LoginDto } from '../auth/dto/login.dto'
+import { SubscriptionTokenDto } from './dto/token.dto'
 import { SubscriptionsService } from './subscriptions.service'
 
-@Controller('subscriptions')
+@ApiTags('Subscriptions')
+@Controller()
 export class SubscriptionsController {
   constructor(private subscriptionService: SubscriptionsService) {}
 
@@ -21,16 +23,16 @@ export class SubscriptionsController {
     description: 'Unauthorized access',
   })
   @ApiBearerAuth('Authorization')
-  async getAccessToken(@Req() req, @Param('did') did: string): Promise<LoginDto> {
+  async getAccessToken(@Req() req, @Param('did') did: string): Promise<SubscriptionTokenDto> {
     // get subscription data
     const { contractAddress, numberNfts, endpoints, headers } =
       await this.subscriptionService.validateDid(did)
 
     // validate that the subscription is valid
-    const isValid = this.subscriptionService.isSubscriptionValid(
+    const isValid = await this.subscriptionService.isSubscriptionValid(
       contractAddress,
       numberNfts,
-      req.user.iss,
+      req.user.address,
     )
 
     if (!isValid) {
@@ -45,6 +47,9 @@ export class SubscriptionsController {
       headers,
     )
 
-    return { access_token: accessToken }
+    return {
+      accessToken: accessToken,
+      neverminedProxyUri: this.subscriptionService.neverminedProxyUri,
+    }
   }
 }

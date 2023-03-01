@@ -11,7 +11,7 @@ const exposeCompute: boolean = process.env.ENABLE_COMPUTE === 'true'
 export const routes: Routes = [
   { path: '/api/v1/node/services/encrypt', module: EncryptModule },
   { path: '/api/v1/node/services/oauth', module: AuthModule },
-  { path: '/api/v1/node/services/subscription', module: SubscriptionsModule },
+  { path: '/api/v1/node/services/subscriptions', module: SubscriptionsModule },
   { path: '/api/v1/node/services', module: AccessModule },
   { path: '/', module: InfoModule },
 ]

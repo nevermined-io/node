@@ -29,6 +29,11 @@ export interface ComputeConfig {
   compute_provider_password: string
 }
 
+export interface SubscriptionsConfig {
+  jwtSecret: Uint8Array
+  neverminedProxyUri: string
+}
+
 const configProfile = require('../../../config')
 
 const DOTENV_SCHEMA = Joi.object({
@@ -37,6 +42,9 @@ const DOTENV_SCHEMA = Joi.object({
     .default('development'),
   JWT_SECRET_KEY: Joi.string().required().error(new Error('JWT_SECRET_KEY is required!')),
   JWT_EXPIRY_KEY: Joi.string().default('60m'),
+  JWT_SUBSCRIPTION_SECRET_KEY: Joi.string()
+    .required()
+    .error(new Error('JWT_SUBSCRIPTION_SECRET_KEY is required!')),
   server: Joi.object({
     port: Joi.number().default(3000),
   }),
@@ -71,6 +79,7 @@ const DOTENV_SCHEMA = Joi.object({
   ARGO_AUTH_TOKEN: Joi.string(),
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
+  NEVERMINED_PROXY_URI: Joi.string(),
 })
 
 type DotenvSchemaKeys =
@@ -105,11 +114,14 @@ type DotenvSchemaKeys =
   | 'ARGO_AUTH_TOKEN'
   | 'COMPUTE_PROVIDER_KEYFILE'
   | 'COMPUTE_PROVIDER_PASSWORD'
+  | 'JWT_SUBSCRIPTION_SECRET_KEY'
+  | 'NEVERMINED_PROXY_URI'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig
   private readonly crypto: CryptoConfig
   private readonly compute: ComputeConfig
+  private readonly subscriptions: SubscriptionsConfig
 
   constructor() {
     this.envConfig = this.validateInput(configProfile)
@@ -130,6 +142,15 @@ export class ConfigService {
         readFileSync(this.get('COMPUTE_PROVIDER_KEYFILE')).toString(),
       compute_provider_password: this.get('COMPUTE_PROVIDER_PASSWORD'),
     }
+
+    this.subscriptions = {
+      jwtSecret: Uint8Array.from(
+        this.get<string>('JWT_SUBSCRIPTION_SECRET_KEY')
+          .split('')
+          .map((x) => parseInt(x)),
+      ),
+      neverminedProxyUri: this.get<string>('NEVERMINED_PROXY_URI'),
+    }
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
@@ -146,6 +167,10 @@ export class ConfigService {
 
   computeConfig(): ComputeConfig {
     return this.compute
+  }
+
+  subscriptionsConfig(): SubscriptionsConfig {
+    return this.subscriptions
   }
 
   getProviderBabyjub() {

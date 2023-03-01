@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { DDOServiceNotFoundError, findServiceConditionByName, Service } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import jose from 'jose'
+import * as jose from 'jose'
+import { ConfigService } from '../shared/config/config.service'
 
 export interface SubscriptionData {
   numberNfts: number
@@ -12,7 +13,13 @@ export interface SubscriptionData {
 
 @Injectable()
 export class SubscriptionsService {
-  constructor(private nvmService: NeverminedService) {}
+  private readonly jwtSecret: Uint8Array
+  public readonly neverminedProxyUri: string
+
+  constructor(private nvmService: NeverminedService, private config: ConfigService) {
+    this.jwtSecret = this.config.subscriptionsConfig().jwtSecret
+    this.neverminedProxyUri = this.config.subscriptionsConfig().neverminedProxyUri
+  }
 
   /**
    * Validates if a DID has an associated subscription
@@ -86,6 +93,7 @@ export class SubscriptionsService {
   ): Promise<boolean> {
     const nft = await this.nvmService.nevermined.contracts.loadNft721(contractAddress)
     const balance = await nft.balanceOf(userAddress)
+
     return balance.toNumber() >= numberNfts
   }
 
@@ -95,8 +103,6 @@ export class SubscriptionsService {
     endpoints: any,
     headers?: any,
   ): Promise<string> {
-    const JWT_SECRET_PHRASE = process.env.JWT_SECRET_PHRASE || '12345678901234567890123456789012'
-    const JWT_SECRET = Uint8Array.from(JWT_SECRET_PHRASE.split('').map((x) => parseInt(x)))
     return await new jose.EncryptJWT({
       did: did,
       userId: userAddress,
@@ -106,6 +112,6 @@ export class SubscriptionsService {
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()
       .setExpirationTime('1w')
-      .encrypt(JWT_SECRET)
+      .encrypt(this.jwtSecret)
   }
 }
