@@ -1,6 +1,5 @@
 import { Controller, ForbiddenException, Get, Param, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { LoginDto } from '../auth/dto/login.dto'
 import { SubscriptionTokenDto } from './dto/token.dto'
 import { SubscriptionsService } from './subscriptions.service'
 
@@ -16,7 +15,7 @@ export class SubscriptionsController {
   @ApiResponse({
     status: 200,
     description: 'Returns the access token',
-    type: LoginDto,
+    type: SubscriptionTokenDto,
   })
   @ApiResponse({
     status: 401,
