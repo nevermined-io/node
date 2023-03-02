@@ -39,11 +39,18 @@ export class SubscriptionsController {
       throw new ForbiddenException(`user ${req.user.iss} has not access to subscription ${did}`)
     }
 
+    // get expiry time
+    const expiryTime = await this.subscriptionService.getExpirationTime(
+      contractAddress,
+      req.user.address,
+    )
+
     // get access token
     const accessToken = await this.subscriptionService.generateToken(
       did,
       req.user.iss,
       endpoints,
+      expiryTime,
       headers,
     )
 
