@@ -11,6 +11,7 @@ import { AccessModule } from './access/access.module'
 import { NeverminedModule } from './shared/nevermined/nvm.module'
 import { ComputeModule } from './compute/compute.module'
 import { HttpLoggerMiddleware } from './common/middlewares/http-logger/http-logger.middleware'
+import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { HttpLoggerMiddleware } from './common/middlewares/http-logger/http-logg
     AuthModule,
     NeverminedModule,
     ComputeModule,
+    SubscriptionsModule,
   ],
 })
 export class ApplicationModule {
