@@ -6,6 +6,7 @@ import {
   DDO,
   MetaDataMain,
   Nevermined,
+  MetaDataExternalResource,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -87,7 +88,10 @@ export class NeverminedService {
     const name = file_attributes.name
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
-      const filelist = this.decrypt(service.attributes.encryptedFiles, 'PSK-RSA')
+      const filelist: MetaDataExternalResource = await this.decrypt(
+        service.attributes.encryptedFiles,
+        'PSK-RSA',
+      )
 
       // download url or what?
       const url: string = filelist[index].url
