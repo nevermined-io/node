@@ -2,6 +2,7 @@ import { Controller, ForbiddenException, Get, Param, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { SubscriptionTokenDto } from './dto/token.dto'
 import { SubscriptionsService } from './subscriptions.service'
+import { Logger } from '../shared/logger/logger.service'
 
 @ApiTags('Subscriptions')
 @Controller()
@@ -44,6 +45,7 @@ export class SubscriptionsController {
       req.user.address,
     )
 
+    Logger.debug(`Generating access token with expiration time: ${expiryTime}`)
     // get access token
     const accessToken = await this.subscriptionService.generateToken(
       did,

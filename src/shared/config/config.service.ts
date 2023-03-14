@@ -32,7 +32,7 @@ export interface ComputeConfig {
 export interface SubscriptionsConfig {
   jwtSecret: Uint8Array
   neverminedProxyUri: string
-  defaultExpiryTime: number
+  defaultExpiryTime: string
   averageBlockTime: number
 }
 
@@ -48,7 +48,7 @@ const DOTENV_SCHEMA = Joi.object({
     .required()
     .error(new Error('JWT_SUBSCRIPTION_SECRET_KEY is required!')),
   // defaults to 2 years in seconds
-  SUBSCRIPTION_DEFAULT_EXPIRY_TIME: Joi.number().default(60 * 60 * 24 * 365 * 2),
+  SUBSCRIPTION_DEFAULT_EXPIRY_TIME: Joi.string().default('100 years'),
   // Used to calculate expiry time of subscriptions in milliseconds
   NETWORK_AVERAGE_BLOCK_TIME: Joi.number().default(2100),
   server: Joi.object({
@@ -158,7 +158,7 @@ export class ConfigService {
           .map((x) => parseInt(x)),
       ),
       neverminedProxyUri: this.get<string>('NEVERMINED_PROXY_URI'),
-      defaultExpiryTime: this.get<number>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
+      defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
       averageBlockTime: this.get<number>('NETWORK_AVERAGE_BLOCK_TIME'),
     }
   }
