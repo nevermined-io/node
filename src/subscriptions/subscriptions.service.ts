@@ -22,7 +22,7 @@ export interface SubscriptionData {
 export class SubscriptionsService {
   private readonly jwtSecret: Uint8Array
   public readonly neverminedProxyUri: string
-  private readonly defaultExpiryTime: number
+  private readonly defaultExpiryTime: string
   private readonly averageBlockTime: number
 
   constructor(private nvmService: NeverminedService, private config: ConfigService) {
@@ -123,7 +123,7 @@ export class SubscriptionsService {
     did: string,
     userAddress: string,
     endpoints: any,
-    expiryTime: number,
+    expiryTime: number | string,
     headers?: any,
   ): Promise<string> {
     return await new jose.EncryptJWT({
@@ -139,15 +139,17 @@ export class SubscriptionsService {
   }
 
   /**
-   * Get the expiration time in seconds for a subscription
+   * Get the expiration time for a subscription.
+   * The expiration time is generated in string format using common abbreviations:
+   * `seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y`
    *
    * @param contractAddress - The NFT-721 contract address of the subscription
    * @param userAddress - The address of the user requesting a JWT token
    *
    * @throws {@link BadRequestException}
-   * @returns {@link Promise<number>} The expiration time in seconds
+   * @returns {@link Promise<string>} The expiration time
    */
-  public async getExpirationTime(contractAddress: string, userAddress: string): Promise<number> {
+  public async getExpirationTime(contractAddress: string, userAddress: string): Promise<string> {
     // get subscription DDO
     const subscriptionDdo = await this.getSubscriptionDdo(contractAddress)
     // get duration
@@ -180,7 +182,7 @@ export class SubscriptionsService {
     const currentDate = new Date()
     const expiryTime = Math.floor(currentDate.getTime() / 1000) + secondsLeft
 
-    return expiryTime
+    return `${expiryTime} secs`
   }
 
   /**
