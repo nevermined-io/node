@@ -178,10 +178,7 @@ export class SubscriptionsService {
     }
 
     // calculate the number of seconds left in the subscription
-    const secondsLeft = Math.floor((subscriptionBlocksLeft * this.averageBlockTime) / 1000)
-    const currentDate = new Date()
-    const expiryTime = Math.floor(currentDate.getTime() / 1000) + secondsLeft
-
+    const expiryTime = Math.floor((subscriptionBlocksLeft * this.averageBlockTime) / 1000)
     return `${expiryTime} secs`
   }
 
