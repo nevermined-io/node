@@ -33,7 +33,7 @@ jobs:
           ls -l circuits
       - name: Run tests
         env:
-          SEED_WORDS: ${{ secrets.seedWords }}
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
         run: |
           export PROVIDER_KEYFILE=accounts/provider.json
           export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
