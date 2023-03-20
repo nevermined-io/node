@@ -32,6 +32,8 @@ jobs:
           nvm-tools copy-circuits ./circuits
           ls -l circuits
       - name: Run tests
+        env:
+          SEED_WORDS: ${{ secrets.seedWords }}
         run: |
           export PROVIDER_KEYFILE=accounts/provider.json
           export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
@@ -43,7 +45,6 @@ jobs:
           export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
           export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
           export NO_GRAPH=true
-          export SEED_WORDS=${{ secrets.seedWords }}
           export PROVIDER_PASSWORD=secret
           yarn run setup:dev
           # HDWalletProvider keeps jest from exiting
