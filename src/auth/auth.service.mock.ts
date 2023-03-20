@@ -22,16 +22,16 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
     }
   }
-  async createToken(obj: any) {
-    const wallet = ethers.Wallet.createRandom()
+  async createToken(obj: any, signer?: ethers.Signer) {
+    signer = signer || ethers.Wallet.createRandom()
     const clientAssertion = await new EthSignJWT({
       ...obj,
-      iss: wallet.address,
+      iss: await signer.getAddress(),
     })
       .setProtectedHeader({ alg: 'ES256K' })
       .setIssuedAt()
       .setExpirationTime('60m')
-      .ethSign(wallet)
+      .ethSign(signer)
 
     return this.validateClaim(CLIENT_ASSERTION_TYPE, clientAssertion).access_token
   }
