@@ -15,4 +15,6 @@ if (process.env.SEED_WORDS) {
   configBase.accounts = makeAccounts(process.env.SEED_WORDS)
 }
 
+console.log('------------------ config SEED_WORDS', process.env.SEED_WORDS)
+
 export const config: NeverminedOptions = configBase

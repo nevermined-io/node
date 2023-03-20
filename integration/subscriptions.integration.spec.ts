@@ -172,6 +172,7 @@ describe('SubscriptionsController', () => {
 
     beforeAll(async () => {
       const [publisher, subscriber, notSubscriber] = await nevermined.accounts.list()
+      console.log('---------------------- test SEED_WORDS', process.env.SEED_WORDS)
 
       // deploy contract
       const subscriptionNFT = await SubscriptionNFTApi.deployInstance(
