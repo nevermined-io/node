@@ -37,6 +37,9 @@ const keys = [
   'NEVERMINED_PROXY_URI',
   'SUBSCRIPTION_DEFAULT_EXPIRY_TIME',
   'NETWORK_AVERAGE_BLOCK_TIME',
+
+  // for testing
+  'SEED_WORDS',
 ]
 
 const config = {}
