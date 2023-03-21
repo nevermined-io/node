@@ -108,7 +108,6 @@ describe('Info', () => {
       message: 'hi there',
     })
     expect(response.statusCode).toBe(201)
-    console.log(JSON.stringify(response.body))
     expect(response.body.url).toContain('cid://')
   })
 })

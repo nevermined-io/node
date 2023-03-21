@@ -1,15 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
 import {
   DDO,
+  DDOError,
   DDOServiceNotFoundError,
+  DID,
   didZeroX,
   EventOptions,
   findServiceConditionByName,
+  NFT721Api,
   Service,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
+import { Logger } from '../shared/logger/logger.service'
 
 export interface SubscriptionData {
   numberNfts: number
@@ -22,7 +26,7 @@ export interface SubscriptionData {
 export class SubscriptionsService {
   private readonly jwtSecret: Uint8Array
   public readonly neverminedProxyUri: string
-  private readonly defaultExpiryTime: string
+  public readonly defaultExpiryTime: string
   private readonly averageBlockTime: number
 
   constructor(private nvmService: NeverminedService, private config: ConfigService) {
@@ -41,10 +45,47 @@ export class SubscriptionsService {
    * @returns {@link SubscriptionData}
    */
   public async validateDid(did: string): Promise<SubscriptionData> {
+    let ddo: DDO
+
+    // validate DID
+    try {
+      DID.parse(did)
+    } catch (e) {
+      Logger.debug(`[GET /subscriptions] error parsing DID ${did}: ${e}`)
+      throw new BadRequestException(`${did} is not a valid DID.`)
+    }
+
     // get the DDO
-    const ddo = await this.nvmService.nevermined.assets.resolve(did)
-    if (!ddo) {
+    try {
+      ddo = await this.nvmService.nevermined.assets.resolve(did)
+    } catch (e) {
       throw new BadRequestException(`${did} not found.`)
+    }
+    if (!ddo) {
+      Logger.debug(`[GET /subscriptions] error resolving DID ${did}: resolve(did) returned null`)
+      throw new BadRequestException(`${did} not found.`)
+    }
+
+    // ddo should be of type service
+    let metadataService: Service<'metadata'>
+    try {
+      metadataService = ddo.findServiceByType('metadata')
+    } catch (e) {
+      if (e instanceof DDOError) {
+        Logger.debug(`[GET /subscriptions] DID ${did}: metadata service does not exist on the DDO`)
+        throw new BadRequestException(`${did} does not contain an 'metadata' service`)
+      } else {
+        Logger.error(`[GET /subscriptions] ${did}: error getting the metadata service from the DDO`)
+        throw e
+      }
+    }
+    if (metadataService.attributes.main.type !== 'service') {
+      Logger.debug(
+        `[GET /subscriptions] DID ${did} DDO has type ${metadataService.attributes.main.type}: should be service`,
+      )
+      throw new BadRequestException(
+        `${did} DDO has type ${metadataService.attributes.main.type}: should be service`,
+      )
     }
 
     // get the nft-access service
@@ -52,9 +93,15 @@ export class SubscriptionsService {
     try {
       nftAccessService = ddo.findServiceByType('nft-access')
     } catch (e) {
-      if (e instanceof DDOServiceNotFoundError) {
+      if (e instanceof DDOError) {
+        Logger.debug(
+          `[GET /subscriptions] DID ${did}: nft-access service does not exist on the DDO`,
+        )
         throw new BadRequestException(`${did} does not contain an 'nft-access' service`)
       } else {
+        Logger.error(
+          `[GET /subscriptions] ${did}: error getting the nft-access service from the DDO`,
+        )
         throw e
       }
     }
@@ -69,9 +116,6 @@ export class SubscriptionsService {
 
     // get the web-service endpoints
     const metadata = ddo.findServiceByType('metadata')
-    if (!metadata.attributes.main.webService) {
-      throw new BadRequestException(`${did} does not contain any web services`)
-    }
     const endpoints = metadata.attributes.main.webService.endpoints.flatMap((e) => Object.values(e))
 
     // decrypt the headers
@@ -102,7 +146,15 @@ export class SubscriptionsService {
     numberNfts: number,
     userAddress: string,
   ): Promise<boolean> {
-    const nft = await this.nvmService.nevermined.contracts.loadNft721(contractAddress)
+    // load the contract
+    let nft: NFT721Api
+    try {
+      nft = await this.nvmService.nevermined.contracts.loadNft721(contractAddress)
+    } catch (e) {
+      Logger.debug(`failed to loadNft721 for contract '${contractAddress}': ${e}`)
+      throw new BadRequestException(`Failed to load contract with address '${contractAddress}'`)
+    }
+
     const balance = await nft.balanceOf(userAddress)
 
     return balance.toNumber() >= numberNfts
@@ -146,7 +198,7 @@ export class SubscriptionsService {
    * @param contractAddress - The NFT-721 contract address of the subscription
    * @param userAddress - The address of the user requesting a JWT token
    *
-   * @throws {@link BadRequestException}
+   * @throws {@link ForbiddenException}
    * @returns {@link Promise<string>} The expiration time
    */
   public async getExpirationTime(contractAddress: string, userAddress: string): Promise<string> {
@@ -172,7 +224,7 @@ export class SubscriptionsService {
     // blocks left in the subscription
     const subscriptionBlocksLeft = subscriptionTransferBlockNumber + duration - currentBlockNumber
     if (subscriptionBlocksLeft <= 0) {
-      throw new BadRequestException(
+      throw new ForbiddenException(
         `Subscription with contract address ${contractAddress} for user ${userAddress} is expired.`,
       )
     }
@@ -213,7 +265,7 @@ export class SubscriptionsService {
    * @throws {@link BadRequestException}
    * @returns {@link Promise<number>} The duration in number of blocks
    */
-  private async getDuration(subscriptionDDO: DDO): Promise<number> {
+  public async getDuration(subscriptionDDO: DDO): Promise<number> {
     // get the nft-sales service
     let nftSalesService: Service<'nft-sales'>
     try {

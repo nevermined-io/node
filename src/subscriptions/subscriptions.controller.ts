@@ -22,6 +22,14 @@ export class SubscriptionsController {
     status: 401,
     description: 'Unauthorized access',
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Subscription not valid or expired',
+  })
   @ApiBearerAuth('Authorization')
   async getAccessToken(@Req() req, @Param('did') did: string): Promise<SubscriptionTokenDto> {
     // get subscription data
@@ -36,7 +44,12 @@ export class SubscriptionsController {
     )
 
     if (!isValid) {
-      throw new ForbiddenException(`user ${req.user.iss} has not access to subscription ${did}`)
+      Logger.debug(
+        `[GET /subscriptions] ${did}: user ${req.user.address} does not have access to subscription`,
+      )
+      throw new ForbiddenException(
+        `user ${req.user.address} does not have access to subscription ${did}`,
+      )
     }
 
     // get expiry time
