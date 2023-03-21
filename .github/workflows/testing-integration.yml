@@ -48,5 +48,4 @@ jobs:
           export PROVIDER_PASSWORD=secret
           yarn run setup:dev
           # HDWalletProvider keeps jest from exiting
-          echo "------ SEED_WORDS $SEED_WORDS"
           yarn run integration:cov -- --forceExit
