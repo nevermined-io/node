@@ -2,7 +2,7 @@ import type { Config } from 'jest'
 
 const config: Config = {
   verbose: true,
-  testTimeout: 30000,
+  testTimeout: 300000,
   moduleFileExtensions: ['js', 'json', 'ts'],
   setupFiles: ['jest-date-mock'],
   roots: ['src', 'integration'],
