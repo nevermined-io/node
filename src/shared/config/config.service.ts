@@ -70,6 +70,7 @@ const DOTENV_SCHEMA = Joi.object({
   ESTUARY_TOKEN: Joi.string(),
   ESTUARY_ENDPOINT: Joi.string(),
   IPFS_GATEWAY: Joi.string(),
+  IPFS_HOST: Joi.string(),
   IPFS_PROJECT_ID: Joi.string(),
   IPFS_PROJECT_SECRET: Joi.string(),
   AWS_S3_ACCESS_KEY_ID: Joi.string(),
@@ -105,6 +106,7 @@ type DotenvSchemaKeys =
   | 'ESTUARY_TOKEN'
   | 'ESTUARY_ENDPOINT'
   | 'IPFS_GATEWAY'
+  | 'IPFS_HOST'
   | 'IPFS_PROJECT_ID'
   | 'IPFS_PROJECT_SECRET'
   | 'AWS_S3_ACCESS_KEY_ID'

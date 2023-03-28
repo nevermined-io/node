@@ -346,7 +346,7 @@ export class NeverminedService {
         }),
       })
       const addResult = await ipfs.add(content)
-      return `cid://${addResult[0].hash}`
+      return `${this.config.get('IPFS_HOST')}/${addResult[0].hash}`
     } catch (e) {
       Logger.error(`Uploading ${filename}: IPFS error ${e}`)
       throw new InternalServerErrorException(e)
