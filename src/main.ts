@@ -1,3 +1,6 @@
+// telemetry should be the first import
+import otelSDK from './shared/logger/tracing'
+
 import { ValidationPipe } from '@nestjs/common'
 import { NestFactory, Reflector } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
@@ -11,6 +14,11 @@ import { ConfigService } from './shared/config/config.service'
 import { Logger } from './shared/logger/logger.service'
 
 const bootstrap = async () => {
+  // initialize telemetry
+  if (otelSDK) {
+    otelSDK.start()
+  }
+
   const logger = new Logger(bootstrap.name)
 
   const app = await NestFactory.create<NestExpressApplication>(ApplicationModule, {
