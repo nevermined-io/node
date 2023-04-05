@@ -89,6 +89,8 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **NEVERMINED_PROXY_URI**             | The proxy address where the subscription tokens can be used.                                                                                                                 | `https://proxy.nevermined.network`                                        |
 | **SUBSCRIPTION_DEFAULT_EXPIRY_TIME** | The default subscription token expiry time in seconds to be used for unlimited subscriptions. Defaults to 2 years (63072000 seconds)                                         | `63072000`                                                                |
 | **NETWORK_AVERAGE_BLOCK_TIME**       | The average block time in milliseconds for the connected network. Used to calculate the expiry time of the subscriptions token. Defaults 2100 milliseconds                   | `2100`                                                                    |
+| **TELEMETRY_URI**                    | Where to send open telemetry data to.                                                                                                                                        | `https://monitoring.nevermiend.io`                                        |
+| **TELEMETRY_SERVICE_NAME**           | The service name that will be associated with the telemetry data                                                                                                             | `node-myapp`                                                              |
 
 ## Install and run:
 

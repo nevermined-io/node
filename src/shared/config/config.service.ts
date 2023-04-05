@@ -36,6 +36,11 @@ export interface SubscriptionsConfig {
   averageBlockTime: number
 }
 
+export interface TelemetryConfig {
+  telemetryUri: string
+  telemetryServiceName: string
+}
+
 const configProfile = require('../../../config')
 
 const DOTENV_SCHEMA = Joi.object({
@@ -51,6 +56,11 @@ const DOTENV_SCHEMA = Joi.object({
   SUBSCRIPTION_DEFAULT_EXPIRY_TIME: Joi.string().default('100 years'),
   // Used to calculate expiry time of subscriptions in milliseconds
   NETWORK_AVERAGE_BLOCK_TIME: Joi.number().default(2100),
+
+  // Monitoring
+  TELEMETRY_URI: Joi.string(),
+  TELEMETRY_SERVICE_NAME: Joi.string().default('node'),
+
   server: Joi.object({
     port: Joi.number().default(3000),
   }),
@@ -124,12 +134,15 @@ type DotenvSchemaKeys =
   | 'NEVERMINED_PROXY_URI'
   | 'SUBSCRIPTION_DEFAULT_EXPIRY_TIME'
   | 'NETWORK_AVERAGE_BLOCK_TIME'
+  | 'TELEMETRY_URI'
+  | 'TELEMETRY_SERVICE_NAME'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig
   private readonly crypto: CryptoConfig
   private readonly compute: ComputeConfig
   private readonly subscriptions: SubscriptionsConfig
+  private readonly telemetry: TelemetryConfig
 
   constructor() {
     this.envConfig = this.validateInput(configProfile)
@@ -161,6 +174,11 @@ export class ConfigService {
       defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
       averageBlockTime: this.get<number>('NETWORK_AVERAGE_BLOCK_TIME'),
     }
+
+    this.telemetry = {
+      telemetryUri: this.get<string>('TELEMETRY_URI'),
+      telemetryServiceName: this.get<string>('TELEMETRY_SERVICE_NAME'),
+    }
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
@@ -181,6 +199,10 @@ export class ConfigService {
 
   subscriptionsConfig(): SubscriptionsConfig {
     return this.subscriptions
+  }
+
+  telemetryConfig(): TelemetryConfig {
+    return this.telemetry
   }
 
   getProviderBabyjub() {
