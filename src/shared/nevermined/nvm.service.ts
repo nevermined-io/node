@@ -170,6 +170,28 @@ export class NeverminedService {
         }
 
         response = await firstValueFrom(this.httpService.request(config))
+
+        // S3 compatible storage
+      } else if (url.startsWith('s3://')) {
+        const s3Url = new URL(url)
+        const bucketName = s3Url.host
+        const filePath = s3Url.pathname.substring(1)
+
+        const s3 = new AWS.S3({
+          accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
+          secretAccessKey: this.config.get('AWS_S3_SECRET_ACCESS_KEY'),
+          endpoint: this.config.get('AWS_S3_ENDPOINT'),
+          region: 'auto',
+        })
+
+        const bucketOptions = {
+          Bucket: bucketName,
+          Key: filePath,
+        }
+        const fileObject = await s3.getObject(bucketOptions).promise()
+        response = {
+          data: fileObject.Body,
+        }
       } else {
         const config: HttpModuleOptions = {
           responseType: 'arraybuffer',
@@ -216,9 +238,11 @@ export class NeverminedService {
       return new StreamableFile(contents)
     } catch (e) {
       if (e instanceof NotFoundException) {
+        console.log('not found')
         Logger.error(e)
         throw e
       } else {
+        console.log('error')
         Logger.error(e)
         throw new InternalServerErrorException(e.toString())
       }
