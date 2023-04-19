@@ -157,7 +157,6 @@ export class AccessController {
       buyer: (req.user || {}).buyer,
       expiration: expiration,
     }
-    console.log('validating')
 
     const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
