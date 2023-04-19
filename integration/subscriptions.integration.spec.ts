@@ -30,11 +30,13 @@ import { getMetadata } from './utils'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import NFT721SubscriptionUpgradeableABI from './resources/NFT721SubscriptionUpgradeable.json'
+import { NeverminedService } from '../src/shared/nevermined/nvm.service'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
   let authService: AuthService
   let subscriptionsService: SubscriptionsService
+  let neverminedService: NeverminedService
   let bearerToken: string
   let nevermined: Nevermined
 
@@ -57,6 +59,7 @@ describe('SubscriptionsController', () => {
     app = moduleRef.createNestApplication()
     authService = moduleRef.get<AuthService>(AuthService)
     subscriptionsService = moduleRef.get<SubscriptionsService>(SubscriptionsService)
+    neverminedService = moduleRef.get<NeverminedService>(NeverminedService)
     app.useGlobalGuards(new JwtAuthGuard(new Reflector()))
     await app.init()
 
@@ -246,7 +249,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should not allow expired subscription', async () => {
-      jest.spyOn(subscriptionsService, 'getDuration').mockImplementation(async () => 1)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -257,7 +260,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow unlimited subscriptions', async () => {
-      jest.spyOn(subscriptionsService, 'getDuration').mockImplementation(async () => 0)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 0)
       const spyGetExpirationTime = jest.spyOn(subscriptionsService, 'getExpirationTime')
 
       const response = await request(app.getHttpServer())
@@ -271,7 +274,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow limited duration subscriptions', async () => {
-      jest.spyOn(subscriptionsService, 'getDuration').mockImplementation(async () => 1000)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1000)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
