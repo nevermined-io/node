@@ -2,10 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import {
   DDO,
   DDOError,
-  DDOServiceNotFoundError,
   DID,
-  didZeroX,
-  EventOptions,
   findServiceConditionByName,
   NFT721Api,
   Service,
@@ -205,7 +202,7 @@ export class SubscriptionsService {
     // get subscription DDO
     const subscriptionDdo = await this.getSubscriptionDdo(contractAddress)
     // get duration
-    const duration = await this.getDuration(subscriptionDdo)
+    const duration = await this.nvmService.getDuration(subscriptionDdo)
 
     // if duration is unlimited
     if (duration === 0) {
@@ -213,10 +210,8 @@ export class SubscriptionsService {
     }
 
     // get nft transfer block number
-    const subscriptionTransferBlockNumber = await this.getSubscriptionTransferBlockNumber(
-      subscriptionDdo.id,
-      userAddress,
-    )
+    const subscriptionTransferBlockNumber =
+      await this.nvmService.getSubscriptionTransferBlockNumber(subscriptionDdo.id, userAddress)
 
     // get current block number
     const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
@@ -255,86 +250,5 @@ export class SubscriptionsService {
     }
 
     return ddo
-  }
-
-  /**
-   * Get the duration of the subscription in number of blocks
-   *
-   * @param subscriptionDDO - The DDO of the subscription
-   *
-   * @throws {@link BadRequestException}
-   * @returns {@link Promise<number>} The duration in number of blocks
-   */
-  public async getDuration(subscriptionDDO: DDO): Promise<number> {
-    // get the nft-sales service
-    let nftSalesService: Service<'nft-sales'>
-    try {
-      nftSalesService = subscriptionDDO.findServiceByType('nft-sales')
-    } catch (e) {
-      if (e instanceof DDOServiceNotFoundError) {
-        throw new BadRequestException(
-          `${subscriptionDDO.id} does not contain an 'nft-sales' service`,
-        )
-      } else {
-        throw e
-      }
-    }
-
-    // get the nft-holder condition
-    const transferNftCondition = findServiceConditionByName(nftSalesService, 'transferNFT')
-    const duration = Number(
-      transferNftCondition.parameters.find((p) => p.name === '_duration').value,
-    )
-
-    return duration
-  }
-
-  /**
-   * Get the block number when a user bought the subscription
-   *
-   * @param subscriptionDid - The DID of the asset with associated subscription
-   * @param userAddress - The address of the user that bough the subscription
-   *
-   * @returns {@link Promise<number>} The block number the user bought the subscription
-   */
-  private async getSubscriptionTransferBlockNumber(
-    subscriptionDid: string,
-    userAddress: string,
-  ): Promise<number> {
-    const eventOptions: EventOptions = {
-      methodName: 'getFulfilleds',
-      eventName: 'Fulfilled',
-      filterSubgraph: {
-        where: {
-          _did: didZeroX(subscriptionDid),
-          _receiver: userAddress,
-        },
-      },
-      filterJsonRpc: {
-        _did: didZeroX(subscriptionDid),
-        _receiver: userAddress,
-      },
-      result: {
-        id: true,
-        _agreementId: true,
-        _did: true,
-        _receiver: true,
-      },
-    }
-
-    const [event] =
-      await this.nvmService.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
-        eventOptions,
-      )
-
-    if (event.blockNumber) {
-      return event.blockNumber
-    } else if (event.id) {
-      const [transactionHash] = event.id.split('-')
-      const transactionReceipt = await this.nvmService.nevermined.utils.web3.getTransaction(
-        transactionHash,
-      )
-      return transactionReceipt.blockNumber
-    }
   }
 }

@@ -7,6 +7,11 @@ import {
   MetaDataMain,
   Nevermined,
   MetaDataExternalResource,
+  InstantiableConfig,
+  EventOptions,
+  Service,
+  DDOServiceNotFoundError,
+  findServiceConditionByName,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -51,7 +56,7 @@ export class NeverminedService {
       ...generateIntantiableConfigFromConfig(config),
       nevermined: this.nevermined,
     }
-    this.dtp = await Dtp.getInstance(instanceConfig, this.config.cryptoConfig())
+    this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
   }
   getNevermined() {
     return this.nevermined
@@ -59,7 +64,7 @@ export class NeverminedService {
   getDtp() {
     return this.dtp
   }
-  instanceConfig() {
+  instanceConfig(): InstantiableConfig {
     const instanceConfig = {
       ...generateIntantiableConfigFromConfig(this.config.nvm()),
       nevermined: this.nevermined,
@@ -400,5 +405,84 @@ export class NeverminedService {
 
   private isDTP(main: MetaDataMain): boolean {
     return main.files && main.files.some((f) => f.encryption === 'dtp')
+  }
+
+  /**
+   * Get the duration of the subscription in number of blocks
+   *
+   * @param subscriptionDDO - The DDO of the subscription
+   *
+   * @throws {@link BadRequestException}
+   * @returns {@link Promise<number>} The duration in number of blocks
+   */
+  public async getDuration(subscriptionDDO: DDO): Promise<number> {
+    // get the nft-sales service
+    let nftSalesService: Service<'nft-sales'>
+    try {
+      nftSalesService = subscriptionDDO.findServiceByType('nft-sales')
+    } catch (e) {
+      if (e instanceof DDOServiceNotFoundError) {
+        throw new BadRequestException(
+          `${subscriptionDDO.id} does not contain an 'nft-sales' service`,
+        )
+      } else {
+        throw e
+      }
+    }
+
+    // get the nft-holder condition
+    const transferNftCondition = findServiceConditionByName(nftSalesService, 'transferNFT')
+    const duration = Number(
+      transferNftCondition.parameters.find((p) => p.name === '_duration').value,
+    )
+
+    return duration
+  }
+
+  /**
+   * Get the block number when a user bought the subscription
+   *
+   * @param subscriptionDid - The DID of the asset with associated subscription
+   * @param userAddress - The address of the user that bough the subscription
+   *
+   * @returns {@link Promise<number>} The block number the user bought the subscription
+   */
+  public async getSubscriptionTransferBlockNumber(
+    subscriptionDid: string,
+    userAddress: string,
+  ): Promise<number> {
+    const eventOptions: EventOptions = {
+      methodName: 'getFulfilleds',
+      eventName: 'Fulfilled',
+      filterSubgraph: {
+        where: {
+          _did: didZeroX(subscriptionDid),
+          _receiver: userAddress,
+        },
+      },
+      filterJsonRpc: {
+        _did: didZeroX(subscriptionDid),
+        _receiver: userAddress,
+      },
+      result: {
+        id: true,
+        _agreementId: true,
+        _did: true,
+        _receiver: true,
+      },
+    }
+
+    const [event] =
+      await this.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
+        eventOptions,
+      )
+
+    if (event.blockNumber) {
+      return event.blockNumber
+    } else if (event.id) {
+      const [transactionHash] = event.id.split('-')
+      const transactionReceipt = await this.nevermined.utils.web3.getTransaction(transactionHash)
+      return transactionReceipt.blockNumber
+    }
   }
 }
