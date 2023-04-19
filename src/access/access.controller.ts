@@ -136,12 +136,26 @@ export class AccessController {
       Logger.error(`Agreement ${transferData.agreementId} not found`)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
+
+    const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(agreement.did)
+    const duration = await this.nvmService.getDuration(subscriptionDDO)
+
+    let expiration = 0
+    if (duration > 0) {
+      const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
+      expiration = currentBlockNumber + duration
+    } else {
+      // TODO: Remove this once the subscription contract is fixed to accept _expirationBlock = 0
+      expiration = 1_000_000_000_000
+    }
+
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: agreement.did,
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
+      expiration: expiration,
     }
 
     const plugin = nevermined.assets.servicePlugin[template]
