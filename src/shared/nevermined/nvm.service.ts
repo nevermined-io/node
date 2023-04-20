@@ -432,11 +432,14 @@ export class NeverminedService {
 
     // get the nft-holder condition
     const transferNftCondition = findServiceConditionByName(nftSalesService, 'transferNFT')
-    const duration = Number(
-      transferNftCondition.parameters.find((p) => p.name === '_duration').value,
-    )
+    const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
 
-    return duration
+    // non-subscription nfts have no expiration
+    if (duration) {
+      return Number(duration.value)
+    } else {
+      return 0
+    }
   }
 
   /**

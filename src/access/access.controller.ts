@@ -13,6 +13,7 @@ import {
   StreamableFile,
   UploadedFile,
   UseInterceptors,
+  ForbiddenException,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -22,6 +23,7 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger'
 import { Request } from '../common/helpers/request.interface'
 import { Public } from '../common/decorators/auth.decorator'
@@ -109,6 +111,11 @@ export class AccessController {
     description: 'Agreeement not found',
     type: NotFoundException,
   })
+  @ApiForbiddenResponse({
+    status: 403,
+    description: 'Node was not able to transfer the NFT',
+    type: ForbiddenException,
+  })
   async doNftTransfer(
     @Body() transferData: TransferDto,
     @Req() req: Request<unknown>,
@@ -160,7 +167,15 @@ export class AccessController {
 
     const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
-    await plugin.process(params, from, undefined)
+
+    try {
+      await plugin.process(params, from, undefined)
+    } catch (e) {
+      Logger.error(`Failed to transfer NFT ${e}`)
+      throw new ForbiddenException(
+        `Could not transfer nft ${agreement.did} to ${transferData.nftReceiver}`,
+      )
+    }
 
     return 'success'
   }
