@@ -435,11 +435,7 @@ export class NeverminedService {
     const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
 
     // non-subscription nfts have no expiration
-    if (duration) {
-      return Number(duration.value)
-    } else {
-      return 0
-    }
+    return Number(duration?.value) || 0
   }
 
   /**
