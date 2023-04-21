@@ -203,6 +203,8 @@ describe('SubscriptionsController', () => {
         providers: [config.neverminedNodeAddress],
         duration: 1000,
         nftContractAddress: subscriptionNFT.address,
+        nftTransfer: false,
+        preMint: false,
       })
       ddoSubscription = await nevermined.nfts721.create(nftAttributesSubscription, publisher)
 
