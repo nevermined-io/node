@@ -151,9 +151,6 @@ export class AccessController {
     if (duration > 0) {
       const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
       expiration = currentBlockNumber + duration
-    } else {
-      // TODO: Remove this once the subscription contract is fixed to accept _expirationBlock = 0
-      expiration = 1_000_000_000_000
     }
 
     const params: ValidationParams = {
