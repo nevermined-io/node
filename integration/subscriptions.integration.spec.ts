@@ -287,7 +287,10 @@ describe('SubscriptionsController', () => {
 
     it('should throw 403 if any event is found', async () => {
       jest
-        .spyOn(nevermined.keeper.conditions.transferNft721Condition.events, 'getPastEvents')
+        .spyOn(
+          neverminedService.nevermined.keeper.conditions.transferNft721Condition.events,
+          'getPastEvents',
+        )
         .mockResolvedValue(undefined)
 
       const response = await request(app.getHttpServer())
