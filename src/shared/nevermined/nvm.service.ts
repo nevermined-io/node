@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -476,10 +476,16 @@ export class NeverminedService {
         eventOptions,
       )
 
-    if (event?.blockNumber) {
+    if (!event) {
+      throw new ForbiddenException(
+        `No purchase found for subscription ${subscriptionDid} from user ${userAddress}`,
+      )
+    }
+
+    if (event.blockNumber) {
       return event.blockNumber
-    } else if (event?.id) {
-      const [transactionHash] = event.id.split('-') as string[]
+    } else if (event.id) {
+      const [transactionHash] = event.id.split('-')
       const transactionReceipt = await this.nevermined.utils.web3.getTransaction(transactionHash)
       return transactionReceipt.blockNumber
     }
