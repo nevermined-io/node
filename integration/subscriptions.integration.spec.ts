@@ -291,7 +291,7 @@ describe('SubscriptionsController', () => {
           neverminedService.nevermined.keeper.conditions.transferNft721Condition.events,
           'getPastEvents',
         )
-        .mockResolvedValue(undefined)
+        .mockResolvedValue([])
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
