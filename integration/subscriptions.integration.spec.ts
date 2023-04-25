@@ -284,5 +284,17 @@ describe('SubscriptionsController', () => {
 
       expect(response.statusCode).toEqual(200)
     })
+
+    it('should throw 403 if any event is found', async () => {
+      jest
+        .spyOn(nevermined.keeper.conditions.transferNft721Condition.events, 'getPastEvents')
+        .mockResolvedValue(undefined)
+
+      const response = await request(app.getHttpServer())
+        .get(`/${ddoWebService.id}`)
+        .set('Authorization', `Bearer ${subscriberToken}`)
+
+      expect(response.statusCode).toEqual(403)
+    })
   })
 })
