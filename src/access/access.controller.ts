@@ -159,7 +159,7 @@ export class AccessController {
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
-      expiration: expiration,
+      expiration,
     }
 
     const plugin = nevermined.assets.servicePlugin[template]

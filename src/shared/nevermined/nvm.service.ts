@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -475,6 +475,12 @@ export class NeverminedService {
       await this.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
         eventOptions,
       )
+
+    if (!event) {
+      throw new ForbiddenException(
+        `No purchase found for subscription ${subscriptionDid} from user ${userAddress}`,
+      )
+    }
 
     if (event.blockNumber) {
       return event.blockNumber
