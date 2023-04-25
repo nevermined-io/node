@@ -476,7 +476,9 @@ export class NeverminedService {
         eventOptions,
       )
 
-    if (event.id) {
+    if (event?.blockNumber) {
+      return event.blockNumber
+    } else if (event?.id) {
       const [transactionHash] = event.id.split('-') as string[]
       const transactionReceipt = await this.nevermined.utils.web3.getTransaction(transactionHash)
       return transactionReceipt.blockNumber
