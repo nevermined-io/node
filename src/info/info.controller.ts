@@ -54,6 +54,12 @@ export class InfoController {
 
     const providerURL = new URL(this.nvmService.web3ProviderUri())
 
+    const contractInstances = nevermined.keeper.getAllInstances()
+    const keys = Object.keys(contractInstances).filter(
+      (key) => contractInstances[key]?.contract?.address !== undefined,
+    )
+    const contracts = keys.map((key) => ({ [key]: contractInstances[key].contract.address }))
+
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
@@ -62,7 +68,7 @@ export class InfoController {
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
       'circuits-folder': circuitDir,
-      contracts: [],
+      contracts: contracts,
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion('DIDRegistry', artifactDir),
       'provider-address': provider.getId(),
