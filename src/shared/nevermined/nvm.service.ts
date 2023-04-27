@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -12,6 +12,7 @@ import {
   Service,
   DDOServiceNotFoundError,
   findServiceConditionByName,
+  ServiceType,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -411,19 +412,23 @@ export class NeverminedService {
    * Get the duration of the subscription in number of blocks
    *
    * @param subscriptionDDO - The DDO of the subscription
+   * @param serviceType - The service to fetch the duration from. Usually 'nft-sales' and 'nft-sales-proof'
    *
    * @throws {@link BadRequestException}
    * @returns {@link Promise<number>} The duration in number of blocks
    */
-  public async getDuration(subscriptionDDO: DDO): Promise<number> {
+  public async getDuration(
+    subscriptionDDO: DDO,
+    serviceType: ServiceType = 'nft-sales',
+  ): Promise<number> {
     // get the nft-sales service
-    let nftSalesService: Service<'nft-sales'>
+    let nftSalesService: Service
     try {
-      nftSalesService = subscriptionDDO.findServiceByType('nft-sales')
+      nftSalesService = subscriptionDDO.findServiceByType(serviceType)
     } catch (e) {
       if (e instanceof DDOServiceNotFoundError) {
         throw new BadRequestException(
-          `${subscriptionDDO.id} does not contain an 'nft-sales' service`,
+          `${subscriptionDDO.id} does not contain an '${serviceType}' service`,
         )
       } else {
         throw e
@@ -475,6 +480,12 @@ export class NeverminedService {
       await this.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
         eventOptions,
       )
+
+    if (!event) {
+      throw new ForbiddenException(
+        `No purchase found for subscription ${subscriptionDid} from user ${userAddress}`,
+      )
+    }
 
     if (event.blockNumber) {
       return event.blockNumber

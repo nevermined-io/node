@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "1.2.0",
+  "version": "1.2.4",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
@@ -22,7 +22,8 @@
     "integration": "jest ./integration --setupFiles dotenv/config",
     "integration:cov": "jest ./integration --setupFiles dotenv/config --coverage",
     "prettier": "prettier --config ./.prettierrc.js --write \"**/*.{js,json,md,sol,ts,yml}\"",
-    "prettier:check": "prettier --check --config ./.prettierrc.json \"**/*.{js,json,md,sol,ts,yml}\""
+    "prettier:check": "prettier --check --config ./.prettierrc.json \"**/*.{js,json,md,sol,ts,yml}\"",
+    "artifacts:mumbai": "sh ./scripts/download-artifacts.sh $CONTRACT_VERSION mumbai"
   },
   "dependencies": {
     "@nestjs/axios": "^1.0.0",

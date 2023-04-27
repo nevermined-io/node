@@ -34,7 +34,13 @@ import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
-import { generateId, ValidationParams, BigNumber, AgreementData } from '@nevermined-io/sdk'
+import {
+  generateId,
+  ValidationParams,
+  BigNumber,
+  AgreementData,
+  ServiceType,
+} from '@nevermined-io/sdk'
 import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
 
 export enum UploadBackends {
@@ -145,15 +151,12 @@ export class AccessController {
     }
 
     const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(agreement.did)
-    const duration = await this.nvmService.getDuration(subscriptionDDO)
+    const duration = await this.nvmService.getDuration(subscriptionDDO, template as ServiceType)
 
     let expiration = 0
     if (duration > 0) {
       const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
       expiration = currentBlockNumber + duration
-    } else {
-      // TODO: Remove this once the subscription contract is fixed to accept _expirationBlock = 0
-      expiration = 1_000_000_000_000
     }
 
     const params: ValidationParams = {
@@ -162,7 +165,7 @@ export class AccessController {
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
-      expiration: expiration,
+      expiration,
     }
 
     const plugin = nevermined.assets.servicePlugin[template]
