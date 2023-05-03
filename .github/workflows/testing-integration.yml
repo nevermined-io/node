@@ -24,7 +24,7 @@ jobs:
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
-          contracts-version: 'v3.1.0'
+          contracts-version: 'v3.2.1'
       - name: Check artifacts
         run: |
           nvm-tools copy-artifacts ./artifacts
