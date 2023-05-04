@@ -239,6 +239,7 @@ export class NeverminedService {
 
       res.set({
         'Content-Type': content_type,
+        'Access-Control-Expose-Headers': 'Content-Disposition',
         'Content-Disposition': `attachment;filename=${filename}`,
       })
       return new StreamableFile(contents)
