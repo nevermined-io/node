@@ -1362,12 +1362,12 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@^0.4.5":
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.4.5.tgz#0cce3d034cf9859c925e12df28aeb662ae75aeef"
-  integrity sha512-9rWjTUdwzERpLsl4XjHqOu1Hz6xbBKccVYE6pRwb4y7h2pZZTAlzckG0Fhc4+2GySqCAbaufkIF4xU83HD38Gg==
+"@nevermined-io/sdk-dtp@^0.4.7":
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.4.7.tgz#8e0ce85e13c1c5d173c799b19af170373ea34a03"
+  integrity sha512-yxULAVUCk148uw2T3N0RBN0IE8rLw9R0srKdD53XtbPhfVWNz7pNqS5uyg/hQm5Pta4Cg1bR5th/+MU+9pXE8g==
   dependencies:
-    "@nevermined-io/sdk" "1.3.4"
+    "@nevermined-io/sdk" "1.3.6"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1375,12 +1375,12 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.3.4.tgz#618d4b585c09e46aea8006a09ff506c497c4caf2"
-  integrity sha512-9YK57S/MVXygqdolUKXbSSK6OI7tC5IgRHvWhWkx55yS4mnWh0nsk660W6cDsxImFvzjaPaaM7wWOW+xd2FuFQ==
+"@nevermined-io/sdk@1.3.6", "@nevermined-io/sdk@^1.3.6":
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.3.6.tgz#88c71ee95f627d4740b322ae6a4d1ef914b0d038"
+  integrity sha512-qpy2pX4WANrAw6NAFr3YL5V619kyt0uRBC5viaqg5vKiKXBxeGxwRm0Ns7v/y7v2xB7XVcAF8ips245nEDI2yA==
   dependencies:
-    "@nevermined-io/subgraphs" "0.5.0"
+    "@nevermined-io/subgraphs" "0.5.1"
     assert "^2.0.0"
     codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
     crypto-browserify "^3.12.0"
@@ -1399,10 +1399,10 @@
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
 
-"@nevermined-io/subgraphs@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.npmjs.org/@nevermined-io/subgraphs/-/subgraphs-0.5.0.tgz"
-  integrity sha512-i4s5iBF5QvVmePBmuL6SXsrMPaPsiNASViHBQlo19sqqNh0JMHhzsgBi11n4L0A83U7OSWD9eO6AL9Ka7SlYoA==
+"@nevermined-io/subgraphs@0.5.1":
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/subgraphs/-/subgraphs-0.5.1.tgz#04af20d9010f6d21ad2bb03cf1d630896ccd721e"
+  integrity sha512-uWrEZNiOaAMpeYa7jKq7smBujfBgQq/QfUUFCzBYHm384b/RPzmIL8+h7mrtln5+e3xzxw9PWZBpA2hnpKEVnw==
   dependencies:
     codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
     glob "^7.2.0"
@@ -1755,10 +1755,10 @@
   resolved "https://registry.npmjs.org/@types/parse-json/-/parse-json-4.0.0.tgz"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/passport-jwt@^3.0.6":
-  version "3.0.7"
-  resolved "https://registry.npmjs.org/@types/passport-jwt/-/passport-jwt-3.0.7.tgz"
-  integrity sha512-qRQ4qlww1Yhs3IaioDKrsDNmKy6gLDLgFsGwpCnc2YqWovO2Oxu9yCQdWHMJafQ7UIuOba4C4/TNXcGkQfEjlQ==
+"@types/passport-jwt@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/@types/passport-jwt/-/passport-jwt-3.0.8.tgz#c8a95bf7d8f330f2560f1b3d07605e23ac01469a"
+  integrity sha512-VKJZDJUAHFhPHHYvxdqFcc5vlDht8Q2pL1/ePvKAgqRThDaCc84lSYOTQmnx3+JIkDlN+2KfhFhXIzlcVT+Pcw==
   dependencies:
     "@types/express" "*"
     "@types/jsonwebtoken" "*"
