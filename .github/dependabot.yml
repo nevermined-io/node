@@ -5,3 +5,5 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    github_token:
+      secure: ${{ secrets.GITHUB_TOKEN }}
