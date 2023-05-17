@@ -50,6 +50,7 @@ export class NeverminedService {
     try {
       await web3.getNetwork()
     } catch (e) {
+      Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
     }
     this.nevermined = await Nevermined.getInstance(config)
@@ -86,6 +87,7 @@ export class NeverminedService {
       asset = await this.nevermined.assets.resolve(did)
     } catch (e) {
       Logger.error(`Cannot resolve DID ${did}`)
+      Logger.error(e)
       throw new BadRequestException(`No such DID ${did}`)
     }
     const service = asset.findServiceByType('metadata')

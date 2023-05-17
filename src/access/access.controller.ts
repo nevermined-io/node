@@ -143,6 +143,7 @@ export class AccessController {
       )
     } catch (e) {
       Logger.error(`Error resolving agreement ${transferData.agreementId}`)
+      Logger.error(e)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
     if (!agreement) {
