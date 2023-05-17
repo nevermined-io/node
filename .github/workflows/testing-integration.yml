@@ -34,18 +34,17 @@ jobs:
       - name: Run tests
         env:
           SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          PROVIDER_KEYFILE: accounts/provider.json
+          RSA_PRIVKEY_FILE: accounts/rsa_priv_key.pem
+          RSA_PUBKEY_FILE: accounts/rsa_pub_key.pem
+          PROVIDER_BABYJUB_SECRET: ${{ secrets.PROVIDER_BABYJUB_SECRET }}
+          BUYER_BABYJUB_SECRET: ${{ secrets.BUYER_BABYJUB_SECRET }}
+          PROVIDER_BABYJUB_PUBLIC1: ${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+          PROVIDER_BABYJUB_PUBLIC2: ${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+          BUYER_BABYJUB_PUBLIC1: ${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+          BUYER_BABYJUB_PUBLIC2: ${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
+          PROVIDER_PASSWORD: secret
         run: |
-          export PROVIDER_KEYFILE=accounts/provider.json
-          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
-          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
-          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
-          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
-          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
-          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
-          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
-          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
-          export NO_GRAPH=true
-          export PROVIDER_PASSWORD=secret
           yarn run setup:dev
           # HDWalletProvider keeps jest from exiting
           yarn run integration:cov -- --forceExit
