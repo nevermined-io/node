@@ -56,6 +56,7 @@ export class SubscriptionsService {
     try {
       ddo = await this.nvmService.nevermined.assets.resolve(did)
     } catch (e) {
+      Logger.error(e)
       throw new BadRequestException(`${did} not found.`)
     }
     if (!ddo) {
