@@ -41,6 +41,7 @@ import {
   AgreementData,
   ServiceType,
   DID,
+  ZeroAddress,
 } from '@nevermined-io/sdk'
 import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
 
@@ -137,7 +138,21 @@ export class AccessController {
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
-    console.log(`Transferring NFT with agreement ${transferData.agreementId}`)
+
+    // Check the agreement exists on-chain
+    try {
+      const { accessConsumer } =
+        await nevermined.keeper.templates.nftSalesTemplate.getAgreementData(
+          transferData.agreementId,
+        )
+      if (accessConsumer.toLowerCase() === ZeroAddress) {
+        throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
+      }
+    } catch (e) {
+      Logger.error(`Agreement ${transferData.agreementId} not found`)
+      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+    }
+
     let did: DID
     try {
       // If we get DID from the request, we use it
