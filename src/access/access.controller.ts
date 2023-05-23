@@ -137,7 +137,7 @@ export class AccessController {
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
-
+    console.log(`Transferring NFT with agreement ${transferData.agreementId}`)
     let did: DID
     try {
       // If we get DID from the request, we use it
