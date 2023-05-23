@@ -167,7 +167,7 @@ describe('SubscriptionsController', () => {
     })
   })
 
-  describe.only('GET /subscriptions should validate the subscription', () => {
+  describe('GET /subscriptions should validate the subscription', () => {
     let ddoWebService: DDO
     let ddoSubscription: DDO
     let notSubscriberToken: string
