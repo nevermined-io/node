@@ -10,6 +10,13 @@ export class TransferDto {
   agreementId: string
 
   @ApiProperty({
+    description: 'The asset DID',
+    example: 'did:nv:aaa',
+  })
+  @IsString()
+  did: string
+
+  @ApiProperty({
     description: 'NFT holder address',
     example: '0x...',
   })
