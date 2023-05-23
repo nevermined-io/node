@@ -46,10 +46,21 @@ export class NeverminedService {
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm()
+    Logger.debug(
+      `Starting NeverminedService with config:\n${JSON.stringify(
+        config,
+        (k, v) => {
+          return typeof v === 'undefined' ? null : v
+        },
+        2,
+      )}`,
+    )
+
     const web3 = new ethers.providers.JsonRpcProvider(config.web3ProviderUri)
     try {
       await web3.getNetwork()
     } catch (e) {
+      Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
     }
     this.nevermined = await Nevermined.getInstance(config)
@@ -86,6 +97,7 @@ export class NeverminedService {
       asset = await this.nevermined.assets.resolve(did)
     } catch (e) {
       Logger.error(`Cannot resolve DID ${did}`)
+      Logger.error(e)
       throw new BadRequestException(`No such DID ${did}`)
     }
     const service = asset.findServiceByType('metadata')
