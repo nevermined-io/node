@@ -24,6 +24,7 @@ jobs:
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
+          node: 'false'
           contracts-version: 'v3.2.1'
       - name: Check artifacts
         run: |
@@ -31,20 +32,14 @@ jobs:
           ls -l artifacts
           nvm-tools copy-circuits ./circuits
           ls -l circuits
-      - name: Run tests
-        env:
-          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
-          PROVIDER_KEYFILE: accounts/provider.json
-          RSA_PRIVKEY_FILE: accounts/rsa_priv_key.pem
-          RSA_PUBKEY_FILE: accounts/rsa_pub_key.pem
-          PROVIDER_BABYJUB_SECRET: ${{ secrets.PROVIDER_BABYJUB_SECRET }}
-          BUYER_BABYJUB_SECRET: ${{ secrets.BUYER_BABYJUB_SECRET }}
-          PROVIDER_BABYJUB_PUBLIC1: ${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
-          PROVIDER_BABYJUB_PUBLIC2: ${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
-          BUYER_BABYJUB_PUBLIC1: ${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
-          BUYER_BABYJUB_PUBLIC2: ${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
-          PROVIDER_PASSWORD: secret
+      - name: Run node
         run: |
           yarn run setup:dev
+          yarn start &
+
+          # wait for node to start
+          wget --retry-connrefused --tries=20 http://localhost:8030
+      - name: Run tests
+        run: |
           # HDWalletProvider keeps jest from exiting
           yarn run integration:cov -- --forceExit
