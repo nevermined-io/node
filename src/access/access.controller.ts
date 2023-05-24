@@ -41,6 +41,7 @@ import {
   AgreementData,
   ServiceType,
   DID,
+  zeroX,
   ZeroAddress,
 } from '@nevermined-io/sdk'
 import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
@@ -141,15 +142,16 @@ export class AccessController {
 
     // Check the agreement exists on-chain
     try {
-      const { accessConsumer } =
-        await nevermined.keeper.templates.nftSalesTemplate.getAgreementData(
-          transferData.agreementId,
-        )
-      if (accessConsumer.toLowerCase() === ZeroAddress) {
+      const templateId: string = await nevermined.keeper.agreementStoreManager.call(
+        'getAgreementTemplate',
+        [zeroX(transferData.agreementId)],
+      )
+      if (templateId.toLowerCase() === ZeroAddress) {
         throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
       }
     } catch (e) {
       Logger.error(`Agreement ${transferData.agreementId} not found`)
+      Logger.error(e)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
 
