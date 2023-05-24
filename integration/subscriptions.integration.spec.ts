@@ -238,7 +238,12 @@ describe('SubscriptionsController', () => {
 
       // buy subscription
       const agreementId = await nevermined.nfts721.order(ddoSubscription.id, subscriber)
-      await nevermined.nfts721.claim(agreementId, publisher.getId(), subscriber.getId())
+      await nevermined.nfts721.claim(
+        agreementId,
+        publisher.getId(),
+        subscriber.getId(),
+        ddoSubscription.id,
+      )
     })
 
     it('should not allow subscriptions the user does not own', async () => {
