@@ -1383,10 +1383,34 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@1.4.0", "@nevermined-io/sdk@^1.4.0":
+"@nevermined-io/sdk@1.4.0":
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.0.tgz#ae68fb457a616668c8087e776e01df4f7fe32b1b"
   integrity sha512-FzsoZ86GutIrRNwV1NW+S0jJl7z5bvC++Mw8BJOzi9KeDp06HcEgotHwm1hCVhNYtoeIIEqEXphvsUv4GTShYg==
+  dependencies:
+    "@nevermined-io/subgraphs" "0.5.1"
+    assert "^2.0.0"
+    codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
+    crypto-browserify "^3.12.0"
+    deprecated-decorator "^0.1.6"
+    ethers "^5.6.9"
+    https-browserify "^1.0.0"
+    jose "^4.5.1"
+    js-file-download "^0.4.12"
+    node-fetch "^2.6.1"
+    os-browserify "^0.3.0"
+    path-browserify "^1.0.1"
+    save-file "^2.3.1"
+    stream-browserify "^3.0.0"
+    stream-http "^3.2.0"
+    url "^0.11.0"
+    uuid "^3.4.0"
+    whatwg-url "^7.1.0"
+
+"@nevermined-io/sdk@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.1.tgz#5a0e0f9ef9868bb79d6f2d6d38c531fd5be88ae5"
+  integrity sha512-mjQNSrQ5i03zzrb5asyQGboXaQ7GpcOOEO/nxxBrKaJt/RvzecJXcpLINHdv5c/I37OZSJ3NO0rTh7KpQc2Eaw==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.1"
     assert "^2.0.0"
@@ -5802,20 +5826,10 @@ joi@^17.6.0:
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
 
-jose@^4.11.2:
-  version "4.11.2"
-  resolved "https://registry.npmjs.org/jose/-/jose-4.11.2.tgz"
-  integrity sha512-njj0VL2TsIxCtgzhO+9RRobBvws4oYyCM8TpvoUQwl/MbIM3NFJRR9+e6x0sS5xXaP1t6OCBkaBME98OV9zU5A==
-
-jose@^4.13.0:
+jose@^4.11.2, jose@^4.13.0, jose@^4.5.1:
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/jose/-/jose-4.13.0.tgz#bee9096c666301641d360577572a3834c3842dfc"
   integrity sha512-v6BN7fuPVfG9XIxcPT2jzyAg5EmA/mtNeJEXJ7d31Wz7fFOqOZeN8mPtNJYQmnuAIxJII7EcURcbZ7qXs9a4kA==
-
-jose@^4.5.1:
-  version "4.11.1"
-  resolved "https://registry.npmjs.org/jose/-/jose-4.11.1.tgz"
-  integrity sha512-YRv4Tk/Wlug8qicwqFNFVEZSdbROCHRAC6qu/i0dyNKr5JQdoa2pIGoS04lLO/jXQX7Z9omoNewYIVIxqZBd9Q==
 
 js-file-download@^0.4.12:
   version "0.4.12"
