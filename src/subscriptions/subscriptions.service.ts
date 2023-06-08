@@ -17,6 +17,7 @@ export interface SubscriptionData {
   contractAddress: string
   endpoints: string[]
   headers: { [key: string]: string }[]
+  owner: string
 }
 
 @Injectable()
@@ -122,11 +123,15 @@ export class SubscriptionsService {
       'PSK-RSA',
     )
 
+    // get the owner of the DID
+    const [{ owner }] = ddo.publicKey
+
     return {
       numberNfts,
       contractAddress,
       endpoints,
       headers,
+      owner,
     }
   }
 
@@ -174,6 +179,7 @@ export class SubscriptionsService {
     userAddress: string,
     endpoints: any,
     expiryTime: number | string,
+    owner: string,
     headers?: any,
   ): Promise<string> {
     return await new jose.EncryptJWT({
@@ -181,6 +187,7 @@ export class SubscriptionsService {
       userId: userAddress,
       endpoints,
       headers,
+      owner,
     })
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()
