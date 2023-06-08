@@ -33,7 +33,7 @@ export class SubscriptionsController {
   @ApiBearerAuth('Authorization')
   async getAccessToken(@Req() req, @Param('did') did: string): Promise<SubscriptionTokenDto> {
     // get subscription data
-    const { contractAddress, numberNfts, endpoints, headers } =
+    const { contractAddress, numberNfts, endpoints, headers, owner } =
       await this.subscriptionService.validateDid(did)
 
     // validate that the subscription is valid
@@ -62,9 +62,10 @@ export class SubscriptionsController {
     // get access token
     const accessToken = await this.subscriptionService.generateToken(
       did,
-      req.user.iss,
+      req.user.address,
       endpoints,
       expiryTime,
+      owner,
       headers,
     )
 

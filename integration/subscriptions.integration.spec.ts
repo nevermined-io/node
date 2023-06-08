@@ -20,6 +20,7 @@ import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
 import { AuthService } from '../src/auth/auth.service.mock'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
+import * as jose from 'jose'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -31,12 +32,14 @@ import { getMetadata } from './utils'
 // @ts-ignore
 import NFT721SubscriptionUpgradeableABI from './resources/NFT721SubscriptionUpgradeable.json'
 import { NeverminedService } from '../src/shared/nevermined/nvm.service'
+import { ConfigService } from '../src/shared/config/config.service'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
   let authService: AuthService
   let subscriptionsService: SubscriptionsService
   let neverminedService: NeverminedService
+  let configService: ConfigService
   let bearerToken: string
   let nevermined: Nevermined
 
@@ -60,6 +63,7 @@ describe('SubscriptionsController', () => {
     authService = moduleRef.get<AuthService>(AuthService)
     subscriptionsService = moduleRef.get<SubscriptionsService>(SubscriptionsService)
     neverminedService = moduleRef.get<NeverminedService>(NeverminedService)
+    configService = moduleRef.get<ConfigService>(ConfigService)
     app.useGlobalGuards(new JwtAuthGuard(new Reflector()))
     await app.init()
 
@@ -172,9 +176,13 @@ describe('SubscriptionsController', () => {
     let ddoSubscription: DDO
     let notSubscriberToken: string
     let subscriberToken: string
+    let subscriberAddress: string
+    let ownerAddress: string
 
     beforeAll(async () => {
       const [publisher, subscriber, notSubscriber] = await nevermined.accounts.list()
+      subscriberAddress = subscriber.getId()
+      ownerAddress = publisher.getId()
 
       // deploy contract
       const subscriptionNFT = await SubscriptionNFTApi.deployInstance(
@@ -278,6 +286,14 @@ describe('SubscriptionsController', () => {
         Promise.resolve(subscriptionsService.defaultExpiryTime),
       )
       expect(response.statusCode).toEqual(200)
+
+      const { accessToken } = response.body
+      const { jwtSecret } = configService.subscriptionsConfig()
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+
+      expect(payload.did).toEqual(ddoWebService.id)
+      expect(payload.owner).toEqual(ownerAddress)
+      expect(payload.userId).toEqual(subscriberAddress)
     })
 
     it('should allow limited duration subscriptions', async () => {
