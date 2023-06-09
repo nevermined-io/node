@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -22,7 +22,6 @@ import {
 } from '@nestjs/common'
 import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
-import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
 import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/sdk-dtp'
 import { ethers } from 'ethers'

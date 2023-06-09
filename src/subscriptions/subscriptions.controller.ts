@@ -1,8 +1,7 @@
-import { Controller, ForbiddenException, Get, Param, Req } from '@nestjs/common'
+import { Controller, ForbiddenException, Get, Logger, Param, Req } from '@nestjs/common'
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { SubscriptionTokenDto } from './dto/token.dto'
 import { SubscriptionsService } from './subscriptions.service'
-import { Logger } from '../shared/logger/logger.service'
 
 @ApiTags('Subscriptions')
 @Controller()

@@ -14,6 +14,7 @@ import {
   UploadedFile,
   UseInterceptors,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -30,7 +31,6 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
-import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
