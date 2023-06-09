@@ -2,7 +2,6 @@ import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
 import { RouterModule } from 'nest-router'
 import { routes } from './routes'
 import { ConfigModule } from './shared/config/config.module'
-import { LoggerModule } from './shared/logger/logger.module'
 import { InfoModule } from './info/info.module'
 import { HttpsRedirectMiddleware } from './common/middlewares/https-redirection/https-redirection.middleware'
 import { AuthModule } from './auth/auth.module'
@@ -16,7 +15,6 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 @Module({
   imports: [
     RouterModule.forRoutes(routes),
-    LoggerModule,
     ConfigModule,
     InfoModule,
     EncryptModule,

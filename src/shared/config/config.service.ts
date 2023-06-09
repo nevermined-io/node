@@ -1,11 +1,11 @@
 /* eslint @typescript-eslint/no-var-requires: 0 */
 /* eslint @typescript-eslint/no-unsafe-assignment: 0 */
 /* eslint @typescript-eslint/no-unsafe-argument: 0 */
+import { Logger } from '@nestjs/common'
 import { NeverminedOptions } from '@nevermined-io/sdk'
 import { readFileSync } from 'fs'
 import * as Joi from 'joi'
 import { get as loGet } from 'lodash'
-import { Logger } from '../logger/logger.service'
 
 export interface EnvConfig {
   [key: string]: string

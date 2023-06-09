@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   DDO,
   DDOError,
@@ -10,7 +10,6 @@ import {
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
-import { Logger } from '../shared/logger/logger.service'
 
 export interface SubscriptionData {
   numberNfts: number

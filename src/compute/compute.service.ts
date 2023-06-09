@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import yaml from 'js-yaml'
 import { readFileSync } from 'fs'
@@ -6,7 +6,6 @@ import path from 'path'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
 import { DDO } from '@nevermined-io/sdk'
 import { ConfigService } from '../shared/config/config.service'
-import { Logger } from '../shared/logger/logger.service'
 require('js-yaml')
 
 export type WorkflowStatus = {
