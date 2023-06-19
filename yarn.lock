@@ -1407,10 +1407,10 @@
     uuid "^3.4.0"
     whatwg-url "^7.1.0"
 
-"@nevermined-io/sdk@^1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.3.tgz#064b6cb2510fb989af0e15ea62ee16a313024d06"
-  integrity sha512-Tf1lmRzsOGY1NSTQexqhtnc0r+U/hwlQRQK0ySpYwAWW16WrmVazkdsCyGyKBZlwM35axBrSc5iFvn6Sl6VM/A==
+"@nevermined-io/sdk@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.4.tgz#a30e1eec8b83ed440f83cf8465b8653580d36c2b"
+  integrity sha512-BSPz9PRT9GGRpURW51aLzCutTomH71BsOWr+MYdVQv++lJeyNht/qcbklCC4JLb0ImA3bKkQraiwDeHdg2pOsA==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.1"
     assert "^2.0.0"
