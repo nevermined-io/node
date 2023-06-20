@@ -1370,12 +1370,12 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@0.4.17":
-  version "0.4.17"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.4.17.tgz#24923d9b8913be6e84bc5294321e804531438f84"
-  integrity sha512-IBmtwRazTn+0JgIBA8uEnmvsf46CYq2rhZiCK3pT2c3hOqVp9FRZUklRbmtyPTMZZypifDjJDzsR2CH2GUiTQg==
+"@nevermined-io/sdk-dtp@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.5.0.tgz#7520a69733246155cd03080f5bcabb3918caf4b6"
+  integrity sha512-3DXFHyeNSqbTSuVo7DZ3tz5ndvrOph70RHtNzLJa+9Rh4byzAb3DdSvrPCqmeFRzMBV1Yws+//xgh6T5SEBasQ==
   dependencies:
-    "@nevermined-io/sdk" "1.4.0"
+    "@nevermined-io/sdk" "1.5.0"
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
     ffjavascript "^0.2.55"
@@ -1383,34 +1383,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.0.tgz#ae68fb457a616668c8087e776e01df4f7fe32b1b"
-  integrity sha512-FzsoZ86GutIrRNwV1NW+S0jJl7z5bvC++Mw8BJOzi9KeDp06HcEgotHwm1hCVhNYtoeIIEqEXphvsUv4GTShYg==
-  dependencies:
-    "@nevermined-io/subgraphs" "0.5.1"
-    assert "^2.0.0"
-    codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
-    crypto-browserify "^3.12.0"
-    deprecated-decorator "^0.1.6"
-    ethers "^5.6.9"
-    https-browserify "^1.0.0"
-    jose "^4.5.1"
-    js-file-download "^0.4.12"
-    node-fetch "^2.6.1"
-    os-browserify "^0.3.0"
-    path-browserify "^1.0.1"
-    save-file "^2.3.1"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    url "^0.11.0"
-    uuid "^3.4.0"
-    whatwg-url "^7.1.0"
-
-"@nevermined-io/sdk@^1.4.4":
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.4.4.tgz#a30e1eec8b83ed440f83cf8465b8653580d36c2b"
-  integrity sha512-BSPz9PRT9GGRpURW51aLzCutTomH71BsOWr+MYdVQv++lJeyNht/qcbklCC4JLb0ImA3bKkQraiwDeHdg2pOsA==
+"@nevermined-io/sdk@1.5.0", "@nevermined-io/sdk@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.5.0.tgz#538db356917697e6377619abdd4741ce40c152a1"
+  integrity sha512-i1Sjc6feZodCIYbEr3K8xqfIXBihXWAER2su7kF236Z7X7ntH+j/XlsNymRTnsDK1g2bx0DsptmC6fu51AhenQ==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.1"
     assert "^2.0.0"
