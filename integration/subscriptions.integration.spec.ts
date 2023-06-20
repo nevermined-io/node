@@ -264,7 +264,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should not allow expired subscription', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -275,7 +275,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow unlimited subscriptions', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 0)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 0)
       const spyGetExpirationTime = jest.spyOn(subscriptionsService, 'getExpirationTime')
 
       const response = await request(app.getHttpServer())
@@ -297,7 +297,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow limited duration subscriptions', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1000)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1000)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -306,7 +306,7 @@ describe('SubscriptionsController', () => {
       expect(response.statusCode).toEqual(200)
     })
 
-    it('should throw 403 if any event is found', async () => {
+    it('should throw 403 if no event is found', async () => {
       jest
         .spyOn(
           neverminedService.nevermined.keeper.conditions.transferNft721Condition.events,
@@ -319,6 +319,25 @@ describe('SubscriptionsController', () => {
         .set('Authorization', `Bearer ${subscriberToken}`)
 
       expect(response.statusCode).toEqual(403)
+    })
+
+    it('should allow the owner to retrieve the token', async () => {
+      const signer = await nevermined.accounts.findSigner(ownerAddress)
+      const ownerToken = await authService.createToken({}, signer)
+
+      const response = await request(app.getHttpServer())
+        .get(`/${ddoWebService.id}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+
+      expect(response.statusCode).toEqual(200)
+
+      const { accessToken } = response.body
+      const { jwtSecret } = configService.subscriptionsConfig()
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+
+      expect(payload.did).toEqual(ddoWebService.id)
+      expect(payload.owner).toEqual(ownerAddress)
+      expect(payload.userId).toEqual(ownerAddress)
     })
   })
 })
