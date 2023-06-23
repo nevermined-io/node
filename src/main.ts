@@ -10,12 +10,13 @@ import { RolesGuard } from './common/guards/auth/roles.guards'
 import { ConfigService } from './shared/config/config.service'
 
 const bootstrap = async () => {
+  console.log(process.env.NODE_ENV)
   const app = await NestFactory.create<NestExpressApplication>(ApplicationModule, {
     cors: true,
-    logger:
-      process.env.NODE_ENV !== 'production'
-        ? ['error', 'log', 'warn', 'debug']
-        : ['error', 'log', 'warn'],
+    logger: ['error', 'log', 'warn', 'debug'],
+    // process.env.NODE_ENV !== 'production'
+    //   ? ['error', 'log', 'warn', 'debug']
+    //   : ['error', 'log', 'warn'],
   })
   app.enable('trust proxy')
   app.useGlobalPipes(new ValidationPipe())

@@ -36,26 +36,31 @@ export class SubscriptionsController {
       await this.subscriptionService.validateDid(did)
 
     // validate that the subscription is valid
-    const isValid = await this.subscriptionService.isSubscriptionValid(
-      contractAddress,
-      numberNfts,
-      req.user.address,
-    )
+    let expiryTime: string
+    if (req.user.address !== owner) {
+      const isValid = await this.subscriptionService.isSubscriptionValid(
+        contractAddress,
+        numberNfts,
+        req.user.address,
+      )
 
-    if (!isValid) {
-      Logger.debug(
-        `[GET /subscriptions] ${did}: user ${req.user.address} does not have access to subscription`,
+      if (!isValid) {
+        Logger.debug(
+          `[GET /subscriptions] ${did}: user ${req.user.address} does not have access to subscription`,
+        )
+        throw new ForbiddenException(
+          `user ${req.user.address} does not have access to subscription ${did}`,
+        )
+      }
+
+      // get expiry time
+      expiryTime = await this.subscriptionService.getExpirationTime(
+        contractAddress,
+        req.user.address,
       )
-      throw new ForbiddenException(
-        `user ${req.user.address} does not have access to subscription ${did}`,
-      )
+    } else {
+      expiryTime = this.subscriptionService.defaultExpiryTime
     }
-
-    // get expiry time
-    const expiryTime = await this.subscriptionService.getExpirationTime(
-      contractAddress,
-      req.user.address,
-    )
 
     Logger.debug(`Generating access token with expiration time: ${expiryTime}`)
     // get access token
