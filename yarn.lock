@@ -1383,10 +1383,34 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@1.5.0", "@nevermined-io/sdk@^1.5.0":
+"@nevermined-io/sdk@1.5.0":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.5.0.tgz#538db356917697e6377619abdd4741ce40c152a1"
   integrity sha512-i1Sjc6feZodCIYbEr3K8xqfIXBihXWAER2su7kF236Z7X7ntH+j/XlsNymRTnsDK1g2bx0DsptmC6fu51AhenQ==
+  dependencies:
+    "@nevermined-io/subgraphs" "0.5.1"
+    assert "^2.0.0"
+    codegen-graph-ts "npm:@nevermined-io/codegen-graph-ts@0.1.4"
+    crypto-browserify "^3.12.0"
+    deprecated-decorator "^0.1.6"
+    ethers "^5.6.9"
+    https-browserify "^1.0.0"
+    jose "^4.5.1"
+    js-file-download "^0.4.12"
+    node-fetch "^2.6.1"
+    os-browserify "^0.3.0"
+    path-browserify "^1.0.1"
+    save-file "^2.3.1"
+    stream-browserify "^3.0.0"
+    stream-http "^3.2.0"
+    url "^0.11.0"
+    uuid "^3.4.0"
+    whatwg-url "^7.1.0"
+
+"@nevermined-io/sdk@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-1.5.2.tgz#15017996984a541036798ffa5cdfd6797f06be1d"
+  integrity sha512-UiI7U4aDNIoiLhMK//YmEXIHK+6Moqx4DHKGwnqyl0WPin0Lg/xKYbfuZxd+EZTadaRvs4JmWhTM0m9ilu1Z+Q==
   dependencies:
     "@nevermined-io/subgraphs" "0.5.1"
     assert "^2.0.0"
@@ -2865,6 +2889,11 @@ builtin-modules@^1.1.1:
   resolved "https://registry.npmjs.org/builtin-modules/-/builtin-modules-1.1.1.tgz"
   integrity sha512-wxXCdllwGhI2kCC0MnvTGYTMvnVZTvqgypkiTI8Pa5tcz2i6VqsqwYGgqwXji+4RgCzms6EajE4IxiUH6HH8nQ==
 
+builtin-modules@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/builtin-modules/-/builtin-modules-3.3.0.tgz#cae62812b89801e9656336e46223e030386be7b6"
+  integrity sha512-zhaCDicdLuWN5UbN5IMnFqNMhNfo919sH85y2/ea+5Yg9TsTkeZxpL+JLbp6cgYFS4sRLp3YV4S6yDuqVWHYOw==
+
 builtin-status-codes@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz"
@@ -3913,10 +3942,10 @@ eslint-plugin-import@^2.26.0:
     resolve "^1.22.0"
     tsconfig-paths "^3.14.1"
 
-eslint-plugin-jsdoc@^46.2.4:
-  version "46.2.4"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-46.2.4.tgz#90734a47cd746863e40d0e57e5f273672d50f94e"
-  integrity sha512-QVURyOFEqkUswFOou0w1rfHshRfah7EeTd9laVllO6tb/+ymjPY1IkP16e24yX0BB7jRy8krJi99jHG2UWAPog==
+eslint-plugin-jsdoc@^46.3.0:
+  version "46.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-46.3.0.tgz#9e19138b108f7289d5a5d5bacdfb75242f5ebcb7"
+  integrity sha512-nfSvsR8YJRZyKrWwcXPSQyQC8jllfdEjcRhTXFr7RxfB5Wyl7AxrfjCUz72WwalkXMF4u+R6F/oDoW46ah69HQ==
   dependencies:
     "@es-joy/jsdoccomment" "~0.39.4"
     are-docs-informative "^0.0.2"
@@ -3924,6 +3953,7 @@ eslint-plugin-jsdoc@^46.2.4:
     debug "^4.3.4"
     escape-string-regexp "^4.0.0"
     esquery "^1.5.0"
+    is-builtin-module "^3.2.1"
     semver "^7.5.1"
     spdx-expression-parse "^3.0.1"
 
@@ -5160,6 +5190,13 @@ is-buffer@^2.0.0:
   version "2.0.5"
   resolved "https://registry.npmjs.org/is-buffer/-/is-buffer-2.0.5.tgz"
   integrity sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==
+
+is-builtin-module@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/is-builtin-module/-/is-builtin-module-3.2.1.tgz#f03271717d8654cfcaf07ab0463faa3571581169"
+  integrity sha512-BSLE3HnV2syZ0FK0iMA/yUGplUeMmNz4AW5fnTunbCIqZi4vG3WjJT9FHMy5D69xmAYBHXQhJdALdpwVxV501A==
+  dependencies:
+    builtin-modules "^3.3.0"
 
 is-callable@^1.1.3, is-callable@^1.1.4, is-callable@^1.2.7:
   version "1.2.7"
