@@ -1216,7 +1216,7 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@nestjs/axios@^1.0.0":
+"@nestjs/axios@^1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@nestjs/axios/-/axios-1.0.1.tgz#7a872e032b9d12037f2663a7316b81507cd7957a"
   integrity sha512-TpoZM/0ZJ9xiC04qkRDFod93LCZ12TQARRU3ejDvBK2E8emvzM4HThOs5ePklVxce4Q1ZsnrIWqnImvoDmJYnQ==
@@ -3961,7 +3961,7 @@ eslint-plugin-import@^2.26.0:
     semver "^6.3.0"
     tsconfig-paths "^3.14.1"
 
-eslint-plugin-jsdoc@^46.2.4:
+eslint-plugin-jsdoc@^46.3.0:
   version "46.3.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-46.3.0.tgz#9e19138b108f7289d5a5d5bacdfb75242f5ebcb7"
   integrity sha512-nfSvsR8YJRZyKrWwcXPSQyQC8jllfdEjcRhTXFr7RxfB5Wyl7AxrfjCUz72WwalkXMF4u+R6F/oDoW46ah69HQ==
@@ -6316,9 +6316,9 @@ media-typer@0.3.0:
   integrity sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==
 
 memfs@^3.4.1:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/memfs/-/memfs-3.5.3.tgz#d9b40fe4f8d5788c5f895bda804cd0d9eeee9f3b"
-  integrity sha512-UERzLsxzllchadvbPs5aolHh65ISpKpM+ccLbOJ8/vvpBKmAWf+la7dXFy7Mr0ySHbdHrFv5kGFCUHHe6GFEmw==
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/memfs/-/memfs-3.6.0.tgz#d7a2110f86f79dd950a8b6df6d57bc984aa185f6"
+  integrity sha512-EGowvkkgbMcIChjMTMkESFDbZeSh8xZ7kNSF0hAiAN4Jh6jgHCRS0Ga/+C8y6Au+oqpezRHCfPsmJ2+DwAgiwQ==
   dependencies:
     fs-monkey "^1.0.4"
 
