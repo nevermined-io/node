@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common'
+import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   DDO,
   DDOError,
@@ -10,13 +10,13 @@ import {
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
-import { Logger } from '../shared/logger/logger.service'
 
 export interface SubscriptionData {
   numberNfts: number
   contractAddress: string
   endpoints: string[]
   headers: { [key: string]: string }[]
+  owner: string
 }
 
 @Injectable()
@@ -56,6 +56,7 @@ export class SubscriptionsService {
     try {
       ddo = await this.nvmService.nevermined.assets.resolve(did)
     } catch (e) {
+      Logger.error(e)
       throw new BadRequestException(`${did} not found.`)
     }
     if (!ddo) {
@@ -121,11 +122,15 @@ export class SubscriptionsService {
       'PSK-RSA',
     )
 
+    // get the owner of the DID
+    const [{ owner }] = ddo.publicKey
+
     return {
       numberNfts,
       contractAddress,
       endpoints,
       headers,
+      owner,
     }
   }
 
@@ -173,6 +178,7 @@ export class SubscriptionsService {
     userAddress: string,
     endpoints: any,
     expiryTime: number | string,
+    owner: string,
     headers?: any,
   ): Promise<string> {
     return await new jose.EncryptJWT({
@@ -180,6 +186,7 @@ export class SubscriptionsService {
       userId: userAddress,
       endpoints,
       headers,
+      owner,
     })
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()

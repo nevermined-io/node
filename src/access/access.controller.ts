@@ -14,6 +14,7 @@ import {
   UploadedFile,
   UseInterceptors,
   ForbiddenException,
+  Logger,
 } from '@nestjs/common'
 import {
   ApiBearerAuth,
@@ -30,7 +31,6 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
-import { Logger } from '../shared/logger/logger.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
@@ -40,6 +40,9 @@ import {
   BigNumber,
   AgreementData,
   ServiceType,
+  DID,
+  zeroX,
+  ZeroAddress,
 } from '@nevermined-io/sdk'
 import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
 
@@ -136,21 +139,52 @@ export class AccessController {
   ): Promise<string> {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
-    let agreement: AgreementData
+
+    // Check the agreement exists on-chain
     try {
-      agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
-        transferData.agreementId,
+      const templateId: string = await nevermined.keeper.agreementStoreManager.call(
+        'getAgreementTemplate',
+        [zeroX(transferData.agreementId)],
       )
+      if (templateId.toLowerCase() === ZeroAddress) {
+        throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
+      }
     } catch (e) {
-      Logger.error(`Error resolving agreement ${transferData.agreementId}`)
-      throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
-    }
-    if (!agreement) {
       Logger.error(`Agreement ${transferData.agreementId} not found`)
+      Logger.error(e)
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
 
-    const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(agreement.did)
+    let did: DID
+    try {
+      // If we get DID from the request, we use it
+      if (transferData.did) {
+        did = DID.parse(transferData.did)
+      }
+    } catch (e) {
+      Logger.debug(`Unable to parse DID from the HTTP parameter: ${transferData.did}`)
+    }
+
+    if (!did) {
+      // If we don't have a DID, we get it from the events
+      let agreement: AgreementData
+      try {
+        agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
+          transferData.agreementId,
+        )
+        did = DID.parse(agreement.did)
+      } catch (e) {
+        Logger.error(`Error resolving agreement ${transferData.agreementId}`)
+        Logger.error((e as Error).toString())
+        throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+      }
+      if (!agreement) {
+        Logger.error(`Agreement ${transferData.agreementId} not found`)
+        throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
+      }
+    }
+
+    const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(did.getDid())
     const duration = await this.nvmService.getDuration(subscriptionDDO, template as ServiceType)
 
     let expiration = 0
@@ -161,7 +195,7 @@ export class AccessController {
 
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
-      did: agreement.did,
+      did: did.getDid(),
       agreement_id: transferData.agreementId,
       nft_amount: BigNumber.from(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
@@ -176,7 +210,7 @@ export class AccessController {
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
       throw new ForbiddenException(
-        `Could not transfer nft ${agreement.did} to ${transferData.nftReceiver}`,
+        `Could not transfer nft ${did.getDid()} to ${transferData.nftReceiver}`,
       )
     }
 

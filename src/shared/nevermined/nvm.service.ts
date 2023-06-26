@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   generateId,
   generateIntantiableConfigFromConfig,
@@ -22,7 +22,6 @@ import {
 } from '@nestjs/common'
 import AWS from 'aws-sdk'
 import { default as FormData } from 'form-data'
-import { Logger } from '../logger/logger.service'
 import { ConfigService } from '../config/config.service'
 import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/sdk-dtp'
 import { ethers } from 'ethers'
@@ -46,10 +45,21 @@ export class NeverminedService {
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm()
+    Logger.debug(
+      `Starting NeverminedService with config:\n${JSON.stringify(
+        config,
+        (k, v) => {
+          return typeof v === 'undefined' ? null : v
+        },
+        2,
+      )}`,
+    )
+
     const web3 = new ethers.providers.JsonRpcProvider(config.web3ProviderUri)
     try {
       await web3.getNetwork()
     } catch (e) {
+      Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
     }
     this.nevermined = await Nevermined.getInstance(config)
@@ -86,6 +96,7 @@ export class NeverminedService {
       asset = await this.nevermined.assets.resolve(did)
     } catch (e) {
       Logger.error(`Cannot resolve DID ${did}`)
+      Logger.error(e)
       throw new BadRequestException(`No such DID ${did}`)
     }
     const service = asset.findServiceByType('metadata')
@@ -239,6 +250,7 @@ export class NeverminedService {
 
       res.set({
         'Content-Type': content_type,
+        'Access-Control-Expose-Headers': 'Content-Disposition',
         'Content-Disposition': `attachment;filename=${filename}`,
       })
       return new StreamableFile(contents)

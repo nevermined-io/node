@@ -20,10 +20,11 @@ jobs:
           yarn run lint
       - name: Check code formatting
         run: yarn format:check
-      - uses: nevermined-io/nvm-tools-actions@v0.10.0
+      - uses: nevermined-io/nvm-tools-actions@v0.12.0
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
+          node: 'false'
           contracts-version: 'v3.2.1'
       - name: Check artifacts
         run: |
@@ -31,21 +32,14 @@ jobs:
           ls -l artifacts
           nvm-tools copy-circuits ./circuits
           ls -l circuits
-      - name: Run tests
-        env:
-          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+      - name: Run node
         run: |
-          export PROVIDER_KEYFILE=accounts/provider.json
-          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
-          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
-          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
-          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
-          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
-          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
-          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
-          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
-          export NO_GRAPH=true
-          export PROVIDER_PASSWORD=secret
           yarn run setup:dev
+          yarn start &
+
+          # wait for node to start
+          wget --retry-connrefused --tries=20 http://localhost:8030
+      - name: Run tests
+        run: |
           # HDWalletProvider keeps jest from exiting
           yarn run integration:cov -- --forceExit

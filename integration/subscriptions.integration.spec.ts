@@ -20,6 +20,7 @@ import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
 import { AuthService } from '../src/auth/auth.service.mock'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
+import * as jose from 'jose'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -31,12 +32,14 @@ import { getMetadata } from './utils'
 // @ts-ignore
 import NFT721SubscriptionUpgradeableABI from './resources/NFT721SubscriptionUpgradeable.json'
 import { NeverminedService } from '../src/shared/nevermined/nvm.service'
+import { ConfigService } from '../src/shared/config/config.service'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
   let authService: AuthService
   let subscriptionsService: SubscriptionsService
   let neverminedService: NeverminedService
+  let configService: ConfigService
   let bearerToken: string
   let nevermined: Nevermined
 
@@ -60,6 +63,7 @@ describe('SubscriptionsController', () => {
     authService = moduleRef.get<AuthService>(AuthService)
     subscriptionsService = moduleRef.get<SubscriptionsService>(SubscriptionsService)
     neverminedService = moduleRef.get<NeverminedService>(NeverminedService)
+    configService = moduleRef.get<ConfigService>(ConfigService)
     app.useGlobalGuards(new JwtAuthGuard(new Reflector()))
     await app.init()
 
@@ -172,9 +176,13 @@ describe('SubscriptionsController', () => {
     let ddoSubscription: DDO
     let notSubscriberToken: string
     let subscriberToken: string
+    let subscriberAddress: string
+    let ownerAddress: string
 
     beforeAll(async () => {
       const [publisher, subscriber, notSubscriber] = await nevermined.accounts.list()
+      subscriberAddress = subscriber.getId()
+      ownerAddress = publisher.getId()
 
       // deploy contract
       const subscriptionNFT = await SubscriptionNFTApi.deployInstance(
@@ -238,7 +246,12 @@ describe('SubscriptionsController', () => {
 
       // buy subscription
       const agreementId = await nevermined.nfts721.order(ddoSubscription.id, subscriber)
-      await nevermined.nfts721.claim(agreementId, publisher.getId(), subscriber.getId())
+      await nevermined.nfts721.claim(
+        agreementId,
+        publisher.getId(),
+        subscriber.getId(),
+        ddoSubscription.id,
+      )
     })
 
     it('should not allow subscriptions the user does not own', async () => {
@@ -251,7 +264,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should not allow expired subscription', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -262,7 +275,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow unlimited subscriptions', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 0)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 0)
       const spyGetExpirationTime = jest.spyOn(subscriptionsService, 'getExpirationTime')
 
       const response = await request(app.getHttpServer())
@@ -273,10 +286,18 @@ describe('SubscriptionsController', () => {
         Promise.resolve(subscriptionsService.defaultExpiryTime),
       )
       expect(response.statusCode).toEqual(200)
+
+      const { accessToken } = response.body
+      const { jwtSecret } = configService.subscriptionsConfig()
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+
+      expect(payload.did).toEqual(ddoWebService.id)
+      expect(payload.owner).toEqual(ownerAddress)
+      expect(payload.userId).toEqual(subscriberAddress)
     })
 
     it('should allow limited duration subscriptions', async () => {
-      jest.spyOn(neverminedService, 'getDuration').mockImplementation(async () => 1000)
+      jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1000)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -285,7 +306,7 @@ describe('SubscriptionsController', () => {
       expect(response.statusCode).toEqual(200)
     })
 
-    it('should throw 403 if any event is found', async () => {
+    it('should throw 403 if no event is found', async () => {
       jest
         .spyOn(
           neverminedService.nevermined.keeper.conditions.transferNft721Condition.events,
@@ -298,6 +319,25 @@ describe('SubscriptionsController', () => {
         .set('Authorization', `Bearer ${subscriberToken}`)
 
       expect(response.statusCode).toEqual(403)
+    })
+
+    it('should allow the owner to retrieve the token', async () => {
+      const signer = await nevermined.accounts.findSigner(ownerAddress)
+      const ownerToken = await authService.createToken({}, signer)
+
+      const response = await request(app.getHttpServer())
+        .get(`/${ddoWebService.id}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+
+      expect(response.statusCode).toEqual(200)
+
+      const { accessToken } = response.body
+      const { jwtSecret } = configService.subscriptionsConfig()
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+
+      expect(payload.did).toEqual(ddoWebService.id)
+      expect(payload.owner).toEqual(ownerAddress)
+      expect(payload.userId).toEqual(ownerAddress)
     })
   })
 })

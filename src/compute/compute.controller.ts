@@ -7,6 +7,7 @@ import {
   Delete,
   NotFoundException,
   InternalServerErrorException,
+  Logger,
 } from '@nestjs/common'
 import {
   ApiOperation,
@@ -24,7 +25,6 @@ import { ExecuteWorkflowResultDto } from './dto/executeWorkflowResultDto'
 import { StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
 import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto'
 import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
-import { Logger } from '../shared/logger/logger.service'
 import { ConfigService } from '../shared/config/config.service'
 import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
 

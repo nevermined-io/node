@@ -1,4 +1,4 @@
-import { Get, Req, Controller } from '@nestjs/common'
+import { Get, Req, Controller, Logger } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -10,7 +10,6 @@ import { ethers } from 'ethers'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { ConfigService } from '../shared/config/config.service'
-import { Logger } from '../shared/logger/logger.service'
 
 @ApiTags('Info')
 @Controller()

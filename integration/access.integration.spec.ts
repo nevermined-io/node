@@ -91,6 +91,18 @@ describe('Info', () => {
     expect(response.statusCode).toBe(404)
     expect((response.error as any).text).toContain('Agreement')
   })
+  it('nft-transfer / unknown did', async () => {
+    const response = await request(app.getHttpServer()).post(`/nft-transfer`).send({
+      nftType: 1155,
+      agreementId: '0ebed8226ada17fde24b6bf2b95d27f8f05fcce09139ff5cec31f6d81a7cd2ea',
+      did: 'did:nv:xxx',
+      nftReceiver: '0x123',
+      nftHolder: '0x123',
+      nftAmount: '1',
+    })
+    expect(response.statusCode).toBe(404)
+    expect((response.error as any).text).toContain('Agreement')
+  })
   it('upload / no params', async () => {
     const response = await request(app.getHttpServer()).post(`/upload/ipfs`)
     expect(response.statusCode).toBe(400)

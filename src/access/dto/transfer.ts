@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumber, IsString } from 'class-validator'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class TransferDto {
   @ApiProperty({
@@ -8,6 +8,14 @@ export class TransferDto {
   })
   @IsString()
   agreementId: string
+
+  @ApiProperty({
+    description: 'The asset DID',
+    example: 'did:nv:aaa',
+  })
+  @IsOptional()
+  @IsString()
+  did: string
 
   @ApiProperty({
     description: 'NFT holder address',

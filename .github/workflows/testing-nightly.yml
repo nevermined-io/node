@@ -36,23 +36,23 @@ jobs:
           cd ..
           ./scripts/wait-nevermined.sh
       - name: Start node
+        env:
+          PROVIDER_KEYFILE: accounts/provider.json
+          RSA_PRIVKEY_FILE: accounts/rsa_priv_key.pem
+          RSA_PUBKEY_FILE: accounts/rsa_pub_key.pem
+          PROVIDER_BABYJUB_SECRET: ${{ secrets.PROVIDER_BABYJUB_SECRET }}
+          BUYER_BABYJUB_SECRET: ${{ secrets.BUYER_BABYJUB_SECRET }}
+          PROVIDER_BABYJUB_PUBLIC1: ${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
+          PROVIDER_BABYJUB_PUBLIC2: ${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
+          BUYER_BABYJUB_PUBLIC1: ${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
+          BUYER_BABYJUB_PUBLIC2: ${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
+          SEED_WORDS: ${{ secrets.TEST_MNEMONIC }}
+          PROVIDER_PASSWORD: secret
+          ESTUARY_TOKEN: ${{ secrets.ESTUARY_TOKEN }}
+          IPFS_GATEWAY: 'https://ipfs.infura.io:5001'
+          IPFS_PROJECT_ID: ${{ secrets.IPFS_PROJECT_ID }}
+          IPFS_PROJECT_SECRET: ${{ secrets.IPFS_PROJECT_SECRET }}
         run: |
-          export PROVIDER_KEYFILE=accounts/provider.json
-          export RSA_PRIVKEY_FILE=accounts/rsa_priv_key.pem
-          export RSA_PUBKEY_FILE=accounts/rsa_pub_key.pem
-          export PROVIDER_BABYJUB_SECRET=${{ secrets.PROVIDER_BABYJUB_SECRET }}
-          export BUYER_BABYJUB_SECRET=${{ secrets.BUYER_BABYJUB_SECRET }}
-          export PROVIDER_BABYJUB_PUBLIC1=${{ secrets.PROVIDER_BABYJUB_PUBLIC1 }}
-          export PROVIDER_BABYJUB_PUBLIC2=${{ secrets.PROVIDER_BABYJUB_PUBLIC2 }}
-          export BUYER_BABYJUB_PUBLIC1=${{ secrets.BUYER_BABYJUB_PUBLIC1 }}
-          export BUYER_BABYJUB_PUBLIC2=${{ secrets.BUYER_BABYJUB_PUBLIC2 }}
-          export NO_GRAPH=true
-          export SEED_WORDS=${{ secrets.TEST_MNEMONIC }}
-          export PROVIDER_PASSWORD=secret
-          export ESTUARY_TOKEN=${{ secrets.ESTUARY_TOKEN }}
-          export IPFS_GATEWAY="https://ipfs.infura.io:5001"
-          export IPFS_PROJECT_ID=${{ secrets.IPFS_PROJECT_ID }}
-          export IPFS_PROJECT_SECRET=${{ secrets.IPFS_PROJECT_SECRET }}
           yarn run start &
       - uses: actions/checkout@v3
         with:

@@ -9,12 +9,12 @@ export class HttpLoggerMiddleware implements NestMiddleware {
   use(request: Request, response: Response, next: NextFunction): void {
     const { method, originalUrl } = request
 
-    this.logger.log(`Req ${method} ${originalUrl}`)
+    this.logger.debug(`Req ${method} ${originalUrl}`)
 
     response.on('finish', () => {
       const { statusCode } = response
 
-      this.logger.log(`Res ${method} ${originalUrl} ${statusCode}`)
+      this.logger.debug(`Res ${method} ${originalUrl} ${statusCode}`)
     })
 
     next()
