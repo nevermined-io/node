@@ -70,14 +70,11 @@ describe('ComputeService Testing', () => {
   }
   ddo.addDefaultMetadataService(metadataMock)
 
-  beforeAll(async () => {
-    const mockResolve = jest.fn()
-    mockResolve.mockReturnValue(ddo)
-
+  beforeEach(async () => {
     nvmServiceMock = createMock<NeverminedService>({
       getNevermined: () => ({
         keeper: {
-          getNetworkName: () => 'geth_localnet',
+          getNetworkName: async () => 'geth_localnet',
         },
         search: {
           query: () => queryResult,
@@ -85,7 +82,7 @@ describe('ComputeService Testing', () => {
       }),
       nevermined: {
         assets: {
-          resolve: mockResolve,
+          resolve: () => ddo,
         },
       },
     })
@@ -137,7 +134,7 @@ describe('ComputeService Testing', () => {
     const neverminedNodeAddress = configServiceMock.nvm().neverminedNodeAddress
     expect(neverminedNodeAddress).toBe('0x068ed00cf0441e4829d9784fcbe7b9e26d4bd8d0')
 
-    const network = nvmServiceMock.getNevermined().keeper.getNetworkName()
+    const network = await nvmServiceMock.getNevermined().keeper.getNetworkName()
     expect(network).toBe('geth_localnet')
 
     const resolvedDdo = await nvmServiceMock.nevermined.assets.resolve('did:nv:112233')
@@ -184,6 +181,9 @@ describe('ComputeService Testing', () => {
         nodes: statusNodes,
       },
     }
+
+    const network = await nvmServiceMock.getNevermined().keeper.getNetworkName()
+    expect(network).toBe('geth_localnet')
 
     const workflowStatus = await computeService.createWorkflowStatus(responseBody, workflowId)
     expect(workflowStatus.status).toBe('Succeeded')
