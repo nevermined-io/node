@@ -106,6 +106,11 @@ describe('Info', () => {
   it('upload / no params', async () => {
     const response = await request(app.getHttpServer()).post(`/upload/ipfs`)
     expect(response.statusCode).toBe(400)
+    expect((response.error as any).text).toContain('message must be a string')
+  })
+  it('upload / no message', async () => {
+    const response = await request(app.getHttpServer()).post(`/upload/ipfs`).send({ message: '' })
+    expect(response.statusCode).toBe(400)
     expect((response.error as any).text).toContain('No file or message')
   })
   it('upload wrong backend', async () => {
