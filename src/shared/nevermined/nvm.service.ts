@@ -256,11 +256,9 @@ export class NeverminedService {
       return new StreamableFile(contents)
     } catch (e) {
       if (e instanceof NotFoundException) {
-        console.log('not found')
         Logger.error(e)
         throw e
       } else {
-        console.log('error')
         Logger.error(e)
         throw new InternalServerErrorException(e.toString())
       }
