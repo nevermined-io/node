@@ -26,7 +26,7 @@
     "artifacts:mumbai": "sh ./scripts/download-artifacts.sh $CONTRACT_VERSION mumbai"
   },
   "dependencies": {
-    "@nestjs/axios": "^1.0.0",
+    "@nestjs/axios": "^1.0.1",
     "@nestjs/common": "^8.4.5",
     "@nestjs/core": "^8.4.5",
     "@nestjs/jwt": "^10.0.3",
@@ -99,7 +99,7 @@
     "eslint-config-next": "^12.3.1",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsdoc": "^46.2.4",
+    "eslint-plugin-jsdoc": "^46.3.0",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "husky": "^8.0.3",
     "jest": "^29.5.0",
