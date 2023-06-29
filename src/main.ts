@@ -8,16 +8,26 @@ import { ApplicationModule } from './app.module'
 import { JwtAuthGuard } from './common/guards/auth/jwt-auth.guard'
 import { RolesGuard } from './common/guards/auth/roles.guards'
 import { ConfigService } from './shared/config/config.service'
+import morgan from 'morgan'
 
 const bootstrap = async () => {
   console.log(process.env.NODE_ENV)
   const app = await NestFactory.create<NestExpressApplication>(ApplicationModule, {
     cors: true,
     logger: ['error', 'log', 'warn', 'debug'],
-    // process.env.NODE_ENV !== 'production'
-    //   ? ['error', 'log', 'warn', 'debug']
-    //   : ['error', 'log', 'warn'],
   })
+
+  // http middleware logger
+  app.use(
+    morgan('dev', {
+      stream: {
+        write: (message: string) => {
+          Logger.log(message.trim())
+        },
+      },
+    }),
+  )
+
   app.enable('trust proxy')
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalGuards(new JwtAuthGuard(new Reflector()), new RolesGuard(new Reflector()))

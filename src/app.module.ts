@@ -9,7 +9,6 @@ import { EncryptModule } from './encrypt/encrypt.module'
 import { AccessModule } from './access/access.module'
 import { NeverminedModule } from './shared/nevermined/nvm.module'
 import { ComputeModule } from './compute/compute.module'
-import { HttpLoggerMiddleware } from './common/middlewares/http-logger/http-logger.middleware'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
 @Module({
@@ -28,6 +27,5 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 export class ApplicationModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(HttpsRedirectMiddleware).forRoutes({ path: '*', method: RequestMethod.ALL })
-    consumer.apply(HttpLoggerMiddleware).forRoutes('*')
   }
 }

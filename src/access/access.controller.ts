@@ -137,7 +137,9 @@ export class AccessController {
     @Req() req: Request<unknown>,
     template: string,
   ): Promise<string> {
-    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
+    Logger.debug(
+      `[${transferData.did}] Transferring NFT with agreement ${transferData.agreementId}`,
+    )
     const nevermined = this.nvmService.getNevermined()
 
     // Check the agreement exists on-chain
@@ -206,6 +208,9 @@ export class AccessController {
     const [from] = await nevermined.accounts.list()
 
     try {
+      Logger.debug(
+        `[${transferData.did}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
+      )
       await plugin.process(params, from, undefined)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)

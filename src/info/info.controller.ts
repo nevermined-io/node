@@ -1,4 +1,4 @@
-import { Get, Req, Controller, Logger } from '@nestjs/common'
+import { Get, Req, Controller } from '@nestjs/common'
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { readFileSync } from 'fs'
 import path from 'path'
@@ -27,7 +27,6 @@ export class InfoController {
   })
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
-    Logger.debug('Serving info')
     const nevermined = this.nvmService.getNevermined()
     const contractHandler = new ContractHandler(this.nvmService.instanceConfig())
     const pathEndpoint = `${req.protocol}://${req.hostname}${
