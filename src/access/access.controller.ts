@@ -137,9 +137,7 @@ export class AccessController {
     @Req() req: Request<unknown>,
     template: string,
   ): Promise<string> {
-    Logger.debug(
-      `[${transferData.did}] Transferring NFT with agreement ${transferData.agreementId}`,
-    )
+    Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
 
     // Check the agreement exists on-chain
@@ -209,7 +207,7 @@ export class AccessController {
 
     try {
       Logger.debug(
-        `[${transferData.did}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
+        `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
       await plugin.process(params, from, undefined)
     } catch (e) {
