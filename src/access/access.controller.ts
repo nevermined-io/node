@@ -206,6 +206,9 @@ export class AccessController {
     const [from] = await nevermined.accounts.list()
 
     try {
+      Logger.debug(
+        `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
+      )
       await plugin.process(params, from, undefined)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
