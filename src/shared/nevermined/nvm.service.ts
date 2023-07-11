@@ -466,7 +466,6 @@ export class NeverminedService {
     userAddress: string,
   ): Promise<number> {
     const eventOptions: EventOptions = {
-      methodName: 'getFulfilleds',
       eventName: 'Fulfilled',
       filterSubgraph: {
         where: {
