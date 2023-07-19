@@ -482,6 +482,7 @@ export class NeverminedService {
         _agreementId: true,
         _did: true,
         _receiver: true,
+        blockNumber: true,
       },
     }
 
@@ -496,12 +497,6 @@ export class NeverminedService {
       )
     }
 
-    if (event.blockNumber) {
-      return event.blockNumber
-    } else if (event.id) {
-      const [transactionHash] = event.id.split('-')
-      const transactionReceipt = await this.nevermined.utils.web3.getTransaction(transactionHash)
-      return transactionReceipt.blockNumber
-    }
+    return Number(event.blockNumber)
   }
 }
