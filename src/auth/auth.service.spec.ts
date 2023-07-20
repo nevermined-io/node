@@ -2,7 +2,7 @@ import { AuthService } from './auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { Test } from '@nestjs/testing'
-import { Babysig, BigNumber, ServiceType, ValidationParams } from '@nevermined-io/sdk'
+import { Babysig, ServiceType, ValidationParams } from '@nevermined-io/sdk'
 import { UnauthorizedException } from '@nestjs/common'
 
 describe('AuthService', () => {
@@ -38,7 +38,7 @@ describe('AuthService', () => {
           },
         },
         nfts1155: {
-          balance: jest.fn().mockResolvedValue(BigNumber.from(1)),
+          balance: jest.fn().mockResolvedValue(1n),
           servicePlugin: {
             accessNFT: {
               accept: jest.fn().mockResolvedValue(true),

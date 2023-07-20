@@ -55,7 +55,7 @@ export class NeverminedService {
       )}`,
     )
 
-    const web3 = new ethers.providers.JsonRpcProvider(config.web3ProviderUri)
+    const web3 = new ethers.JsonRpcProvider(config.web3ProviderUri)
     try {
       await web3.getNetwork()
     } catch (e) {
@@ -238,7 +238,7 @@ export class NeverminedService {
             didZeroX(did),
             userAddress,
             generateId(),
-            ethers.utils.hexZeroPad('0x0', 32),
+            ethers.zeroPadValue('0x', 32),
             'download',
             from,
           )

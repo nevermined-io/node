@@ -159,7 +159,7 @@ export class SubscriptionsService {
 
     const balance = await nft.balanceOf(userAddress)
 
-    return balance.toNumber() >= numberNfts
+    return Number(balance) >= numberNfts
   }
 
   /**
