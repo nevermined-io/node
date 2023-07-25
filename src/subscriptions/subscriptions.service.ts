@@ -152,6 +152,7 @@ export class SubscriptionsService {
 
     const balance = await nft.balanceOf(userAddress)
 
+    numberNfts = numberNfts >= 1 ? numberNfts : 1 // The number of NFTs must be at least 1
     return Number(balance) >= numberNfts
   }
 
