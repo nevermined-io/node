@@ -37,7 +37,6 @@ import { UploadResult } from './dto/upload-result'
 import {
   generateId,
   ValidationParams,
-  BigNumber,
   AgreementData,
   ServiceType,
   DID,
@@ -197,7 +196,7 @@ export class AccessController {
       consumer_address: transferData.nftReceiver,
       did: did.getDid(),
       agreement_id: transferData.agreementId,
-      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
+      nft_amount: BigInt(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
       expiration,
     }

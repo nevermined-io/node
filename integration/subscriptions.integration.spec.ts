@@ -191,7 +191,7 @@ describe('SubscriptionsController', () => {
         publisher,
         [
           publisher.getId(),
-          nevermined.keeper.didRegistry.getAddress(),
+          nevermined.keeper.didRegistry.address,
           'Subscription Service NFT',
           '',
           '',

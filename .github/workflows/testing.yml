@@ -16,11 +16,11 @@ jobs:
           yarn
       - name: Compile and lint
         run: |
-          yarn run build
-          yarn run lint
+          yarn build
+          yarn lint
       - name: Check code formatting
         run: yarn format:check
       - name: Run tests
         run: |
-          yarn run setup:dev
-          yarn run test:cov -- --forceExit
+          yarn setup:dev
+          yarn test:cov --forceExit

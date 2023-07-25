@@ -10,7 +10,6 @@ import {
   Logger,
   Account,
   Babysig,
-  BigNumber,
   findServiceConditionByName,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
@@ -34,14 +33,14 @@ export class AuthService {
         return null
       }
       if (service.attributes.main.ercType == 721) {
-        return BigNumber.from(1)
+        return 1n
       }
       const holder = findServiceConditionByName(service, 'nftHolder')
       if (!holder) {
-        return BigNumber.from(1)
+        return 1n
       }
-      const num = holder.parameters.find((p) => p.name === '_numberNfts')?.value
-      return BigNumber.from(num)
+      const num = holder.parameters.find((p) => p.name === '_numberNfts')?.value as string
+      return BigInt(num)
     }
 
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
@@ -51,7 +50,7 @@ export class AuthService {
     if (!granted) {
       const limit = await getNftAccess()
       const balance = await nevermined.nfts1155.balance(did, new Account(consumer_address))
-      if (!limit || !balance.gte(limit)) {
+      if (!limit || balance < limit) {
         throw new UnauthorizedException(
           `Address ${consumer_address} has no permission to access ${did}`,
         )

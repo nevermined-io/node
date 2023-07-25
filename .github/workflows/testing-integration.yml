@@ -34,7 +34,7 @@ jobs:
           ls -l circuits
       - name: Run node
         run: |
-          yarn run setup:dev
+          yarn setup:dev
           yarn start &
 
           # wait for node to start
@@ -42,4 +42,4 @@ jobs:
       - name: Run tests
         run: |
           # HDWalletProvider keeps jest from exiting
-          yarn run integration:cov -- --forceExit
+          yarn integration:cov --forceExit
