@@ -207,11 +207,14 @@ describe('SubscriptionsController', () => {
       // get the subscription ddo
       const nftAttributesSubscription = NFTAttributes.getSubscriptionInstance({
         metadata: getMetadata(),
-        serviceTypes: ['nft-sales'],
+        services: [
+          {
+            serviceType: 'nft-sales',
+            nft: { duration: 1000, nftTransfer: false },
+          },
+        ],
         providers: [config.neverminedNodeAddress],
-        duration: 1000,
         nftContractAddress: subscriptionNFT.address,
-        nftTransfer: false,
         preMint: false,
       })
       ddoSubscription = await nevermined.nfts721.create(nftAttributesSubscription, publisher)
@@ -230,7 +233,11 @@ describe('SubscriptionsController', () => {
       }
       const nftAttributesNoContractAddress = NFTAttributes.getNFT721Instance({
         metadata: serviceMetadata,
-        serviceTypes: ['nft-access'],
+        services: [
+          {
+            serviceType: 'nft-access',
+          },
+        ],
         providers: [config.neverminedNodeAddress],
         nftContractAddress: subscriptionNFT.address,
       })
