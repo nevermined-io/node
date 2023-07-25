@@ -10,7 +10,7 @@ import {
   Logger,
   Account,
   Babysig,
-  findServiceConditionByName,
+  DDO,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { JWTPayload } from '@nevermined-io/passport-nevermined'
@@ -35,7 +35,7 @@ export class AuthService {
       if (service.attributes.main.ercType == 721) {
         return 1n
       }
-      const holder = findServiceConditionByName(service, 'nftHolder')
+      const holder = DDO.findServiceConditionByName(service, 'nftHolder')
       if (!holder) {
         return 1n
       }

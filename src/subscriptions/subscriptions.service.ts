@@ -1,12 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
-import {
-  DDO,
-  DDOError,
-  DID,
-  findServiceConditionByName,
-  NFT721Api,
-  Service,
-} from '@nevermined-io/sdk'
+import { DDO, DDOError, DID, NFT721Api, Service } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
@@ -105,7 +98,7 @@ export class SubscriptionsService {
     }
 
     // get the nft-holder condition
-    const nftHolderCondition = findServiceConditionByName(nftAccessService, 'nftHolder')
+    const nftHolderCondition = DDO.findServiceConditionByName(nftAccessService, 'nftHolder')
     const numberNfts = Number(
       nftHolderCondition.parameters.find((p) => p.name === '_numberNfts').value,
     )
@@ -159,6 +152,7 @@ export class SubscriptionsService {
 
     const balance = await nft.balanceOf(userAddress)
 
+    numberNfts = numberNfts >= 1 ? numberNfts : 1 // The number of NFTs must be at least 1
     return Number(balance) >= numberNfts
   }
 

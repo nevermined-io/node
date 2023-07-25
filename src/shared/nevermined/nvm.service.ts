@@ -11,7 +11,6 @@ import {
   EventOptions,
   Service,
   DDOServiceNotFoundError,
-  findServiceConditionByName,
   ServiceType,
 } from '@nevermined-io/sdk'
 import {
@@ -446,7 +445,7 @@ export class NeverminedService {
     }
 
     // get the nft-holder condition
-    const transferNftCondition = findServiceConditionByName(nftSalesService, 'transferNFT')
+    const transferNftCondition = DDO.findServiceConditionByName(nftSalesService, 'transferNFT')
     const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
 
     // non-subscription nfts have no expiration
