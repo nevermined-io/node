@@ -1398,17 +1398,17 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.0-rc1":
-  version "2.0.0-rc1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc1.tgz#92639e9ca61f672d5bc351ae29640a359f6b19c1"
-  integrity sha512-u8nhX3xbd01JPdgK0zZiYbDWoHghz3Gme3AaqZhnOZYOlDODQUI9nQKPSaBsfWptsmXT47DnvXCzPVK0lGxodw==
+"@nevermined-io/sdk@^2.0.0-rc2":
+  version "2.0.0-rc2"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc2.tgz#d0ad7f629eaf67d04971759a9e225dc8cb81917d"
+  integrity sha512-wEUDbIL9Z1iRSxyEzpv3rFkZcm4VT9HXLZYv9zaLNnyzyaO+Y0piE5TwZ5q1o+WZMFB6WbcUiQTYbuLBfgnY4A==
   dependencies:
     "@apollo/client" "^3.7.16"
     assert "^2.0.0"
     cross-fetch "^4.0.0"
     crypto-browserify "^3.12.0"
     deprecated-decorator "^0.1.6"
-    ethers "^6.6.4"
+    ethers "^6.6.5"
     graphql "^16.7.1"
     https-browserify "^1.0.0"
     jose "^4.5.1"
@@ -4264,10 +4264,10 @@ ethers@^5.5.1, ethers@^5.7.2:
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
 
-ethers@^6.6.4:
-  version "6.6.4"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.4.tgz#f03a86effcd55e82aed96a2fb9a56a9febd3e3d5"
-  integrity sha512-r3myN2hEnydmu23iiIj5kjWnCh5JNzlqrE/z+Kw5UqH173F+JOWzU6qkFB4HVC50epgxzKSL2Hq1oNXA877vwQ==
+ethers@^6.6.5:
+  version "6.6.5"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.5.tgz#b6c29fb45dec93b339a9c984fc62de93c3db8efe"
+  integrity sha512-Tc3HXzI0UJ9EhPp6E0fntkgMIA2//rhcB0UsmiRMCR+Bii5iu0RjtwJV55IhlLJ4K39pd0ku+eE4WRgqrLLW2Q==
   dependencies:
     "@adraffy/ens-normalize" "1.9.2"
     "@noble/hashes" "1.1.2"
@@ -4485,20 +4485,13 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-fetch-blob@^3.1.2:
+fetch-blob@^3.1.2, fetch-blob@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
   integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
   dependencies:
     node-domexception "^1.0.0"
     web-streams-polyfill "^3.0.3"
-
-fetch-blob@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-4.0.0.tgz#7175579ab41933d047293c8e71dd5a49f9620a52"
-  integrity sha512-nPmnhRmpNMjYWnp9EBMGs6z5lq9RXed5W1vuZcECrsDVQInM8AMQSooVb3X183Aole60adzjWbH9qlRFWzDDTA==
-  dependencies:
-    node-domexception "^1.0.0"
 
 ffjavascript@0.2.55:
   version "0.2.55"
