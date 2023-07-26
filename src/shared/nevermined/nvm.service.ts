@@ -63,7 +63,7 @@ export class NeverminedService {
     }
     this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
+      ...(await generateIntantiableConfigFromConfig(config)),
       nevermined: this.nevermined,
     }
     this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
