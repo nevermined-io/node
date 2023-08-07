@@ -80,7 +80,7 @@
     "@commitlint/cli": "^17.4.2",
     "@commitlint/config-conventional": "^17.4.2",
     "@faker-js/faker": "^8.0.2",
-    "@golevelup/ts-jest": "0.3.4",
+    "@golevelup/ts-jest": "0.4.0",
     "@nestjs/cli": "^9.4.2",
     "@nestjs/schematics": "^9.0.4",
     "@nestjs/testing": "^8.4.0",
