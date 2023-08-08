@@ -51,7 +51,7 @@
     "cli-color": "^2.0.1",
     "dotenv": "^16.0.0",
     "eciesjs": "^0.4.0",
-    "ethers": "^5.6.3",
+    "ethers": "^6.7.0",
     "fetch-blob": "^4.0.0",
     "form-data": "^4.0.0",
     "formdata-polyfill": "^4.0.10",
