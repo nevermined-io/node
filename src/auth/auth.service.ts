@@ -70,8 +70,9 @@ export class AuthService {
 
     const metadataService = ddo.findServiceByType('metadata')
     const isNft1155Credit =
+      metadataService.attributes.main.nftType &&
       metadataService.attributes.main.nftType.toString() ===
-      NeverminedNFT1155Type.nft1155Credit.toString()
+        NeverminedNFT1155Type.nft1155Credit.toString()
     if (isNft1155Credit) {
       Logger.debug(`Validating NFT1155 Credit for ${params.did}`)
       const [from] = await nevermined.accounts.list()
