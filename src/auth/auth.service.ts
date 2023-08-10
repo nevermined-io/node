@@ -11,7 +11,6 @@ import {
   Account,
   Babysig,
   DDO,
-  jsonReplacer,
   NeverminedNFT1155Type,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
@@ -94,10 +93,6 @@ export class AuthService {
     const plugin =
       nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
-    console.debug(`Params: ${JSON.stringify(params, jsonReplacer)}`)
-    console.debug(`Service Type: ${service}`)
-    // console.debug(`Plugin: ${JSON.stringify(plugin, jsonReplacer)}`)
-
     try {
       const [from] = await nevermined.accounts.list()
       const granted = await plugin.accept(params)
@@ -105,7 +100,7 @@ export class AuthService {
         await plugin.process(params, from, undefined)
       }
 
-      await plugin.track(params, from)
+      if (plugin.track) await plugin.track(params, from)
     } catch (error) {
       throw new UnauthorizedException(`Error processing request: ${error.message}`)
     }

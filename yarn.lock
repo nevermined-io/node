@@ -1386,10 +1386,10 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@^0.7.0-rc2":
-  version "0.7.0-rc2"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.7.0-rc2.tgz#828d4bbb30f9c0ecea5ba744cec79170fb359046"
-  integrity sha512-CIYdcSqMkCwff28O9hWVAGfet471mNgTAw3XIsQk7Rv28MOVB5O/90e3xOSvbyNSd6DHgsgH02CNweM/CQ0/UA==
+"@nevermined-io/sdk-dtp@^0.7.0-rc4":
+  version "0.7.0-rc4"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.7.0-rc4.tgz#f91050c2b7fdc44279e395f257a56bde0c91194e"
+  integrity sha512-0OQ/HlqOMWt2fv86+pjbZsXFmte2bkYIIQ7iVkdNzaQq+ly6WRAlS2/Y7YBrm2QTJT1rbAtwi+dKcGvl2e1ynw==
   dependencies:
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
@@ -1398,8 +1398,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@file:.yalc/@nevermined-io/sdk":
-  version "2.0.0-rc5"
+"@nevermined-io/sdk@^2.0.0-rc7":
+  version "2.0.0-rc7"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc7.tgz#fdd385991a5974b0ac01bccdfd51771f619e9093"
+  integrity sha512-fkJzd7vYxCTIiAHekPDeGJSPwPWZDierRKHOvqXlf+5EYeip3txNVEHWwe99MvV91sJM0yop6CSgqUxhZJYDyQ==
   dependencies:
     "@apollo/client" "^3.7.16"
     assert "^2.0.0"
