@@ -71,7 +71,6 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  // @ApiBearerAuth('Authorization')
   async doAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -193,11 +192,9 @@ export class AccessController {
 
     const duration = await this.nvmService.getDuration(subscriptionDDO, serviceReference)
 
-    Logger.debug(` -- Service Reference ${serviceReference}`)
-    Logger.debug(` -- Service Index ${service.index}`)
-    Logger.debug(` -- Duration ${duration}`)
-    Logger.debug(` -- Template ${template}`)
-    Logger.debug(` -- NFT Amount ${transferData.nftAmount}`)
+    Logger.debug(
+      `Transferring NFT with Service Reference ${serviceReference} and duration ${duration} with amount ${transferData.nftAmount}`,
+    )
 
     let expiration = 0
     if (duration > 0) {
@@ -266,7 +263,6 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  // @ApiBearerAuth('Authorization')
   async doDownload(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -342,8 +338,5 @@ export const jsonReplacer = (key, value) => {
   if (typeof value === 'bigint') {
     return value.toString()
   }
-  // } else if (typeof value === 'object') {
-  //     return ''
-  // }
   return value
 }

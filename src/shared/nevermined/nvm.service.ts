@@ -445,9 +445,6 @@ export class NeverminedService {
     }
 
     // get the duration parameter from the transferNFT condition
-    // const transferNftCondition = DDO.findServiceConditionByName(nftSalesService, 'transferNFT')
-    // const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
-    // return Number(duration?.value) || 0
     const duration = DDO.getParameterFromCondition(nftSalesService, 'transferNFT', '_duration')
     // non-subscription nfts have no expiration
     return Number(duration) || 0
