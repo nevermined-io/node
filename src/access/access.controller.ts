@@ -71,7 +71,7 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  @ApiBearerAuth('Authorization')
+  // @ApiBearerAuth('Authorization')
   async doAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -184,7 +184,20 @@ export class AccessController {
     }
 
     const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(did.getDid())
-    const duration = await this.nvmService.getDuration(subscriptionDDO, template as ServiceType)
+    const serviceReference =
+      transferData.serviceIndex && transferData.serviceIndex >= 0
+        ? transferData.serviceIndex
+        : (template as ServiceType)
+
+    const service = subscriptionDDO.findServiceByReference(serviceReference)
+
+    const duration = await this.nvmService.getDuration(subscriptionDDO, serviceReference)
+
+    Logger.debug(` -- Service Reference ${serviceReference}`)
+    Logger.debug(` -- Service Index ${service.index}`)
+    Logger.debug(` -- Duration ${duration}`)
+    Logger.debug(` -- Template ${template}`)
+    Logger.debug(` -- NFT Amount ${transferData.nftAmount}`)
 
     let expiration = 0
     if (duration > 0) {
@@ -195,12 +208,14 @@ export class AccessController {
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: did.getDid(),
+      service_index: service.index,
       agreement_id: transferData.agreementId,
       nft_amount: BigInt(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
       expiration,
     }
 
+    Logger.debug(` -- Params ${JSON.stringify(params, jsonReplacer)}`)
     const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
 
@@ -251,7 +266,7 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  @ApiBearerAuth('Authorization')
+  // @ApiBearerAuth('Authorization')
   async doDownload(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -321,4 +336,14 @@ export class AccessController {
       throw new InternalServerErrorException(error.message)
     }
   }
+}
+export const jsonReplacer = (key, value) => {
+  // Modify the value or return undefined to exclude the property
+  if (typeof value === 'bigint') {
+    return value.toString()
+  }
+  // } else if (typeof value === 'object') {
+  //     return ''
+  // }
+  return value
 }

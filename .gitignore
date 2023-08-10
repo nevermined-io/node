@@ -400,3 +400,5 @@ tsconfig.build.
 
 circuits
 *.tgz
+.yalc*
+.env*
