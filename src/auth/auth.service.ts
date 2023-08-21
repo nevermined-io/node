@@ -11,6 +11,7 @@ import {
   Account,
   Babysig,
   DDO,
+  NeverminedNFT1155Type,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { JWTPayload } from '@nevermined-io/passport-nevermined'
@@ -21,14 +22,20 @@ const BASE_URL = '/api/v1/node/services/'
 export class AuthService {
   constructor(private jwtService: JwtService, private nvmService: NeverminedService) {}
 
-  async validateOwner(did: string, consumer_address: string): Promise<void> {
+  async validateOwner(params: ValidationParams): Promise<void> {
     const nevermined = this.nvmService.getNevermined()
-    const getNftAccess = async () => {
-      const ddo = await nevermined.assets.resolve(did)
+    const ddo = await nevermined.assets.resolve(params.did)
+    Logger.debug(`Validating owner for ${params.did}`)
+
+    const getNftAccess = async (ddo: DDO, serviceIndex?: number) => {
       if (!ddo) {
         return null
       }
-      const service = ddo.findServiceByType('nft-access')
+      const service =
+        serviceIndex && serviceIndex > 0
+          ? ddo.findServiceByIndex(serviceIndex)
+          : ddo.findServiceByType('nft-access')
+
       if (!service) {
         return null
       }
@@ -44,15 +51,37 @@ export class AuthService {
     }
 
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
-      consumer_address,
-      did,
+      params.consumer_address,
+      params.did,
     )
     if (!granted) {
-      const limit = await getNftAccess()
-      const balance = await nevermined.nfts1155.balance(did, new Account(consumer_address))
+      const limit = await getNftAccess(ddo, params.service_index)
+      const balance = await nevermined.nfts1155.balance(
+        params.did,
+        new Account(params.consumer_address),
+      )
       if (!limit || balance < limit) {
         throw new UnauthorizedException(
-          `Address ${consumer_address} has no permission to access ${did}`,
+          `Address ${params.consumer_address} has no permission to access ${params.did}`,
+        )
+      }
+    }
+
+    const metadataService = ddo.findServiceByType('metadata')
+    const isNft1155Credit =
+      metadataService.attributes.main.nftType &&
+      metadataService.attributes.main.nftType.toString() ===
+        NeverminedNFT1155Type.nft1155Credit.toString()
+    if (isNft1155Credit) {
+      Logger.debug(`Validating NFT1155 Credit for ${params.did}`)
+      const [from] = await nevermined.accounts.list()
+      const plugin = nevermined.nfts1155.servicePlugin['nft-access']
+
+      try {
+        await plugin.track(params, from)
+      } catch (error) {
+        throw new UnauthorizedException(
+          `Address ${params.consumer_address} could not use the credits to access ${params.did}`,
         )
       }
     }
@@ -64,10 +93,16 @@ export class AuthService {
     const plugin =
       nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
-    const granted = await plugin.accept(params)
-    if (!granted) {
+    try {
       const [from] = await nevermined.accounts.list()
-      await plugin.process(params, from, undefined)
+      const granted = await plugin.accept(params)
+      if (!granted) {
+        await plugin.process(params, from, undefined)
+      }
+
+      if (plugin.track) await plugin.track(params, from)
+    } catch (error) {
+      throw new UnauthorizedException(`Error processing request: ${error.message}`)
     }
   }
 
@@ -96,12 +131,13 @@ export class AuthService {
         agreement_id: payload.sub,
         buyer: payload.buyer as string,
         babysig: payload.babysig as Babysig,
+        service_index: payload.service_index as number,
       }
 
       if (payload.aud === BASE_URL + 'access') {
         await this.validateAccess(params, 'access')
       } else if (payload.aud === BASE_URL + 'download') {
-        await this.validateOwner(payload.did as string, payload.iss)
+        await this.validateOwner(params)
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateAccess(params, 'nft-access')
       } else if (payload.aud === BASE_URL + 'nft-sales-proof') {

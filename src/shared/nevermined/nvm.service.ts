@@ -421,35 +421,33 @@ export class NeverminedService {
    * Get the duration of the subscription in number of blocks
    *
    * @param subscriptionDDO - The DDO of the subscription
-   * @param serviceType - The service to fetch the duration from. Usually 'nft-sales' and 'nft-sales-proof'
+   * @param serviceReference - The service reference to fetch the duration from. Usually 'nft-sales' and 'nft-sales-proof'
    *
    * @throws {@link BadRequestException}
    * @returns {@link Promise<number>} The duration in number of blocks
    */
   public async getDuration(
     subscriptionDDO: DDO,
-    serviceType: ServiceType = 'nft-sales',
+    serviceReference: number | ServiceType = 'nft-sales',
   ): Promise<number> {
     // get the nft-sales service
     let nftSalesService: Service
     try {
-      nftSalesService = subscriptionDDO.findServiceByType(serviceType)
+      nftSalesService = subscriptionDDO.findServiceByReference(serviceReference)
     } catch (e) {
       if (e instanceof DDOServiceNotFoundError) {
         throw new BadRequestException(
-          `${subscriptionDDO.id} does not contain an '${serviceType}' service`,
+          `${subscriptionDDO.id} does not contain an '${serviceReference}' service`,
         )
       } else {
         throw e
       }
     }
 
-    // get the nft-holder condition
-    const transferNftCondition = DDO.findServiceConditionByName(nftSalesService, 'transferNFT')
-    const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
-
+    // get the duration parameter from the transferNFT condition
+    const duration = DDO.getParameterFromCondition(nftSalesService, 'transferNFT', '_duration')
     // non-subscription nfts have no expiration
-    return Number(duration?.value) || 0
+    return Number(duration) || 0
   }
 
   /**

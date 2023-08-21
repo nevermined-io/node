@@ -44,4 +44,12 @@ export class TransferDto {
   })
   @IsNumber()
   nftType: number
+
+  @ApiProperty({
+    description: 'The service index of the NFT to claim',
+    example: '3',
+  })
+  @IsOptional()
+  @IsNumber()
+  serviceIndex: number
 }

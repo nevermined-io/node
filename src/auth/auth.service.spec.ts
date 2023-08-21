@@ -80,7 +80,8 @@ describe('AuthService', () => {
     it('should validate the owner and return true if the owner has permission to access', async () => {
       const did = 'did:nft:0x123'
       const consumer_address = '0x456'
-      await authService.validateOwner(did, consumer_address)
+      const params: ValidationParams = { agreement_id: '0x789', did, consumer_address }
+      await authService.validateOwner(params)
       expect(
         nvmServiceMock.getNevermined().keeper.conditions.accessCondition.checkPermissions,
       ).toHaveBeenCalledWith(consumer_address, did)
