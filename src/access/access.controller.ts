@@ -209,10 +209,10 @@ export class AccessController {
       agreement_id: transferData.agreementId,
       nft_amount: BigInt(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
+      duration,
       expiration,
     }
 
-    Logger.debug(` -- Params ${JSON.stringify(params, jsonReplacer)}`)
     const plugin = nevermined.assets.servicePlugin[template]
     const [from] = await nevermined.accounts.list()
 
@@ -221,6 +221,7 @@ export class AccessController {
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
       await plugin.process(params, from, undefined)
+      Logger.debug(`NFT Transfered to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
       throw new ForbiddenException(
