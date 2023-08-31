@@ -1386,10 +1386,10 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@^0.7.0-rc4":
-  version "0.7.0-rc4"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.7.0-rc4.tgz#f91050c2b7fdc44279e395f257a56bde0c91194e"
-  integrity sha512-0OQ/HlqOMWt2fv86+pjbZsXFmte2bkYIIQ7iVkdNzaQq+ly6WRAlS2/Y7YBrm2QTJT1rbAtwi+dKcGvl2e1ynw==
+"@nevermined-io/sdk-dtp@^0.7.0-rc5":
+  version "0.7.0-rc5"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.7.0-rc5.tgz#60c21313c357711163126119d89b68021af57c3f"
+  integrity sha512-bwQ42SBrja3NSLgxOSrJXhs+jGkZbIE71itTfCikUL6xz+mGsfSsVeTnF/8kf2m+A+qOGvEB/pkV/3U9T1ee+w==
   dependencies:
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
@@ -4263,19 +4263,6 @@ ethers@^5.5.1, ethers@^5.7.2:
     "@ethersproject/wallet" "5.7.0"
     "@ethersproject/web" "5.7.1"
     "@ethersproject/wordlists" "5.7.0"
-
-ethers@^6.6.5:
-  version "6.6.5"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.6.5.tgz#b6c29fb45dec93b339a9c984fc62de93c3db8efe"
-  integrity sha512-Tc3HXzI0UJ9EhPp6E0fntkgMIA2//rhcB0UsmiRMCR+Bii5iu0RjtwJV55IhlLJ4K39pd0ku+eE4WRgqrLLW2Q==
-  dependencies:
-    "@adraffy/ens-normalize" "1.9.2"
-    "@noble/hashes" "1.1.2"
-    "@noble/secp256k1" "1.7.1"
-    "@types/node" "18.15.13"
-    aes-js "4.0.0-beta.5"
-    tslib "2.4.0"
-    ws "8.5.0"
 
 ethers@^6.7.1:
   version "6.7.1"
