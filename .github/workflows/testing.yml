@@ -23,4 +23,4 @@ jobs:
       - name: Run tests
         run: |
           yarn setup:dev
-          yarn test:cov --detectOpenHandles
+          yarn test --detectOpenHandles
