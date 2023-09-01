@@ -292,10 +292,11 @@ describe('SubscriptionsController', () => {
         .get(`/${ddoWebService.id}`)
         .set('Authorization', `Bearer ${subscriberToken}`)
 
-      expect(spyGetExpirationTime).toHaveLastReturnedWith(
-        Promise.resolve(subscriptionsService.defaultExpiryTime),
-      )
       expect(response.statusCode).toEqual(200)
+
+      expect(await spyGetExpirationTime.mock.results[0].value).toEqual(
+        subscriptionsService.defaultExpiryTime,
+      )
 
       const { accessToken } = response.body
       const { jwtSecret } = configService.subscriptionsConfig()
