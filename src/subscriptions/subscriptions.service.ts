@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
-import { DDO, DDOError, DID, NFT721Api, Service } from '@nevermined-io/sdk'
+import { DDO, DDOError, DID, NFT1155Api, NFT721Api, Service } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
@@ -10,6 +10,8 @@ export interface SubscriptionData {
   endpoints: string[]
   headers: { [key: string]: string }[]
   owner: string
+  ercType: number
+  tokenId?: string
 }
 
 @Injectable()
@@ -97,16 +99,15 @@ export class SubscriptionsService {
       }
     }
 
-    // get the nft-holder condition
-    const nftHolderCondition = DDO.findServiceConditionByName(nftAccessService, 'nftHolder')
-    const numberNfts = Number(
-      nftHolderCondition.parameters.find((p) => p.name === '_numberNfts').value,
-    )
-    const contractAddress = nftHolderCondition.parameters.find((p) => p.name === '_contractAddress')
-      .value as string
+    const numberNfts = Number(DDO.getNftAmountFromService(nftAccessService))
+
+    const contractAddress = DDO.getNftContractAddressFromService(nftAccessService)
+
+    const tokenId = DDO.getTokenIdFromService(nftAccessService) || ddo.id
 
     // get the web-service endpoints
     const metadata = ddo.findServiceByType('metadata')
+    const ercType = metadata.attributes.main.ercType
     const endpoints = metadata.attributes.main.webService.endpoints.flatMap((e) => Object.values(e))
 
     // decrypt the headers
@@ -124,6 +125,8 @@ export class SubscriptionsService {
       endpoints,
       headers,
       owner,
+      ercType,
+      tokenId,
     }
   }
 
@@ -131,17 +134,33 @@ export class SubscriptionsService {
    * Validates if a subscription is valid or not
    *
    * @param contractAddress - The NFT-721 contract address
+   * @param ercType - The type of the NFT contract (1155 or 721)
    * @param numberNfts - Amount of `contractAddress` nfts a user needs to hold in order to get access to the subscription
    * @param userAddress - The ethereum address of the user
+   * @param tokenId - The NFT-1155 token id (DID)
    *
    * @returns {@link boolean}
    */
   public async isSubscriptionValid(
     contractAddress: string,
+    ercType: number,
     numberNfts: number,
     userAddress: string,
+    tokenId?: string,
   ): Promise<boolean> {
-    // load the contract
+    const balance =
+      ercType === 721
+        ? await this.getSubscriptionERC721Balance(contractAddress, userAddress)
+        : await this.getSubscriptionERC1155Balance(contractAddress, tokenId, userAddress)
+
+    numberNfts = numberNfts >= 1 ? numberNfts : 1 // The number of NFTs must be at least 1
+    return Number(balance) >= numberNfts
+  }
+
+  private async getSubscriptionERC721Balance(
+    contractAddress: string,
+    userAddress: string,
+  ): Promise<bigint> {
     let nft: NFT721Api
     try {
       nft = await this.nvmService.nevermined.contracts.loadNft721(contractAddress)
@@ -150,10 +169,23 @@ export class SubscriptionsService {
       throw new BadRequestException(`Failed to load contract with address '${contractAddress}'`)
     }
 
-    const balance = await nft.balanceOf(userAddress)
+    return await nft.balanceOf(userAddress)
+  }
 
-    numberNfts = numberNfts >= 1 ? numberNfts : 1 // The number of NFTs must be at least 1
-    return Number(balance) >= numberNfts
+  private async getSubscriptionERC1155Balance(
+    contractAddress: string,
+    tokenId: string,
+    userAddress: string,
+  ): Promise<bigint> {
+    let nft: NFT1155Api
+    try {
+      nft = await this.nvmService.nevermined.contracts.loadNft1155(contractAddress)
+    } catch (e) {
+      Logger.debug(`failed to loadNft1155 for contract '${contractAddress}': ${e}`)
+      throw new BadRequestException(`Failed to load contract with address '${contractAddress}'`)
+    }
+
+    return await nft.balance(tokenId, userAddress)
   }
 
   /**
@@ -193,13 +225,18 @@ export class SubscriptionsService {
    * The expiration time is generated in string format using common abbreviations:
    * `seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y`
    *
-   * @param contractAddress - The NFT-721 contract address of the subscription
+   * @param contractAddress - The NFT contract address of the subscription
    * @param userAddress - The address of the user requesting a JWT token
+   * @param ercType - The type of NFT contract (1155 or 721)
    *
    * @throws {@link ForbiddenException}
    * @returns {@link Promise<string>} The expiration time
    */
-  public async getExpirationTime(contractAddress: string, userAddress: string): Promise<string> {
+  public async getExpirationTime(
+    contractAddress: string,
+    userAddress: string,
+    ercType: number,
+  ): Promise<string> {
     // get subscription DDO
     const subscriptionDdo = await this.getSubscriptionDdo(contractAddress)
     // get duration
@@ -212,7 +249,11 @@ export class SubscriptionsService {
 
     // get nft transfer block number
     const subscriptionTransferBlockNumber =
-      await this.nvmService.getSubscriptionTransferBlockNumber(subscriptionDdo.id, userAddress)
+      await this.nvmService.getSubscriptionTransferBlockNumber(
+        subscriptionDdo.id,
+        userAddress,
+        ercType,
+      )
 
     // get current block number
     const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()

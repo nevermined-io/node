@@ -455,12 +455,13 @@ export class NeverminedService {
    *
    * @param subscriptionDid - The DID of the asset with associated subscription
    * @param userAddress - The address of the user that bough the subscription
-   *
+   * @param ercType - The type of the NFT subscription
    * @returns {@link Promise<number>} The block number the user bought the subscription
    */
   public async getSubscriptionTransferBlockNumber(
     subscriptionDid: string,
     userAddress: string,
+    ercType: number,
   ): Promise<number> {
     const eventOptions: EventOptions = {
       eventName: 'Fulfilled',
@@ -482,11 +483,11 @@ export class NeverminedService {
         blockNumber: true,
       },
     }
-
-    const [event] =
-      await this.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
-        eventOptions,
-      )
+    const transferCondtion =
+      ercType === 721
+        ? this.nevermined.keeper.conditions.transferNft721Condition
+        : this.nevermined.keeper.conditions.transferNftCondition
+    const [event] = await transferCondtion.events.getPastEvents(eventOptions)
 
     if (!event) {
       throw new ForbiddenException(
