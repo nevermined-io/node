@@ -1398,10 +1398,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.0-rc9":
-  version "2.0.0-rc9"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc9.tgz#4e0ad7777f0bf8287e7ca6d1bab24cd20c5a16ee"
-  integrity sha512-e2uHci8O/AyZq1LGrLv0H5LaUnQSk+2mHEXR92lEZbYsLIGnnhCQcK/RAYNcNQZSoM38EorcRj5DfLrvCO6HPA==
+"@nevermined-io/sdk@^2.0.0-rc11":
+  version "2.0.0-rc11"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc11.tgz#e9157e10ffd5d1cf96eb6611092ff8e113de7bde"
+  integrity sha512-dgdZwiH2WL4aaH73T/7QId0O03/0BuInOVuPDE7c3D1S8LSOuT9CbjkIC2ff08LW5/ooPW6rSvaJFU8k7e+K4A==
   dependencies:
     "@apollo/client" "^3.7.16"
     assert "^2.0.0"
@@ -1409,6 +1409,7 @@
     crypto-browserify "^3.12.0"
     deprecated-decorator "^0.1.6"
     ethers "^6.7.1"
+    form-data "^4.0.0"
     graphql "^16.7.1"
     https-browserify "^1.0.0"
     jose "^4.5.1"
