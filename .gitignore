@@ -394,6 +394,7 @@ dist
 development.env
 /config/local.js
 package-lock.json
+yalc.lock
 yarn.lock
 .vscode
 tsconfig.build.
