@@ -1398,10 +1398,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.0-rc11":
-  version "2.0.0-rc11"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc11.tgz#e9157e10ffd5d1cf96eb6611092ff8e113de7bde"
-  integrity sha512-dgdZwiH2WL4aaH73T/7QId0O03/0BuInOVuPDE7c3D1S8LSOuT9CbjkIC2ff08LW5/ooPW6rSvaJFU8k7e+K4A==
+"@nevermined-io/sdk@^2.0.0-rc12":
+  version "2.0.0-rc12"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc12.tgz#dcc054a601a84c930d427912086b3e50a934c12b"
+  integrity sha512-FbAkjp8tUmvASSmtgEjINK/GoO4k2aw+CEJh2S8GBqOe+CSqDTiOGMecqpFSguv8CC7f1Uayix2xFuj9u6y25g==
   dependencies:
     "@apollo/client" "^3.7.16"
     assert "^2.0.0"

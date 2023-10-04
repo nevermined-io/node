@@ -1,5 +1,15 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
-import { DDO, DDOError, DID, NFT1155Api, NFT721Api, Service } from '@nevermined-io/sdk'
+import {
+  DDO,
+  DDOError,
+  DID,
+  NFT1155Api,
+  NFT721Api,
+  NeverminedNFT1155Type,
+  NeverminedNFT721Type,
+  QueryResult,
+  Service,
+} from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
@@ -238,7 +248,7 @@ export class SubscriptionsService {
     ercType: number,
   ): Promise<string> {
     // get subscription DDO
-    const subscriptionDdo = await this.getSubscriptionDdo(contractAddress)
+    const subscriptionDdo = await this.getSubscriptionDdo(contractAddress, ercType)
     // get duration
     const duration = await this.nvmService.getDuration(subscriptionDdo)
 
@@ -275,15 +285,38 @@ export class SubscriptionsService {
    * Get the subscription DDO
    *
    * @param contractAddress - The NFT-721 contract address for the subscription
+   * @param ercType - Type of erc contract
    *
    * @throws {@link BadRequestException}
    * @returns {@link Promise<DDO>} The DDO for the subscription
    */
-  private async getSubscriptionDdo(contractAddress: string): Promise<DDO> {
+  private async getSubscriptionDdo(contractAddress: string, ercType?: number): Promise<DDO> {
     // retrieve the subscription DDO
-    const result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
-      contractAddress,
-    )
+    let result: QueryResult
+    switch (ercType) {
+      case 721: {
+        result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
+          contractAddress,
+          NeverminedNFT721Type.nft721Subscription,
+        )
+        break
+      }
+      case 1155: {
+        result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
+          contractAddress,
+          NeverminedNFT1155Type.nft1155Credit,
+        )
+        break
+      }
+      default: {
+        result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
+          contractAddress,
+          undefined,
+        )
+        break
+      }
+    }
+
     const ddo = result.results.pop()
     if (!ddo) {
       throw new BadRequestException(
