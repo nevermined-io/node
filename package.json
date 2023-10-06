@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "1.4.1",
+  "version": "2.0.0-rc7",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
@@ -21,8 +21,8 @@
     "test:cov": "jest ./src --setupFiles dotenv/config --coverage",
     "integration": "jest ./integration --setupFiles dotenv/config",
     "integration:cov": "jest ./integration --setupFiles dotenv/config --coverage",
-    "prettier": "prettier --config ./.prettierrc.js --write \"**/*.{js,json,md,sol,ts,yml}\"",
-    "prettier:check": "prettier --check --config ./.prettierrc.json \"**/*.{js,json,md,sol,ts,yml}\"",
+    "prettier": "prettier --config ./.prettierrc.js --write \"**/*.{json,md,sol,ts,yml}\"",
+    "prettier:check": "prettier --check --config ./.prettierrc.json \"**/*.{json,md,sol,ts,yml}\"",
     "artifacts:mumbai": "sh ./scripts/download-artifacts.sh $CONTRACT_VERSION mumbai"
   },
   "dependencies": {
@@ -36,8 +36,8 @@
     "@nestjs/typeorm": "^10.0.0",
     "@nevermined-io/argo-workflows-api": "^0.1.3",
     "@nevermined-io/passport-nevermined": "^0.2.0",
-    "@nevermined-io/sdk": "^1.6.0-rc1",
-    "@nevermined-io/sdk-dtp": "^0.6.0",
+    "@nevermined-io/sdk": "^2.0.0-rc15",
+    "@nevermined-io/sdk-dtp": "^0.7.0-rc5",
     "@sideway/address": "^5.0.0",
     "@sideway/formula": "^3.0.1",
     "@sideway/pinpoint": "^2.0.0",
@@ -51,7 +51,7 @@
     "cli-color": "^2.0.1",
     "dotenv": "^16.0.0",
     "eciesjs": "^0.4.4",
-    "ethers": "^5.6.3",
+    "ethers": "^6.7.1",
     "fetch-blob": "^4.0.0",
     "form-data": "^4.0.0",
     "formdata-polyfill": "^4.0.10",
