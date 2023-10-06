@@ -54,9 +54,9 @@ export class InfoController {
 
     const contractInstances = nevermined.keeper.getAllInstances()
     const keys = Object.keys(contractInstances).filter(
-      (key) => contractInstances[key]?.contract?.address !== undefined,
+      (key) => contractInstances[key]?.address !== undefined,
     )
-    const contracts = keys.map((key) => ({ [key]: contractInstances[key].contract.address }))
+    const contracts = keys.map((key) => ({ [key]: contractInstances[key].address }))
 
     return {
       APIversion: packageJson.version,
@@ -70,7 +70,7 @@ export class InfoController {
       'external-contracts': [],
       'keeper-version': await contractHandler.getVersion('DIDRegistry', artifactDir),
       'provider-address': provider.getId(),
-      'ecdsa-public-key': wallet.publicKey,
+      'ecdsa-public-key': wallet.signingKey.publicKey,
       'rsa-public-key': key.exportKey('public'),
       'babyjub-public-key': {
         x: baby.x,
