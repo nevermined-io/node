@@ -1433,6 +1433,11 @@
   dependencies:
     glob "7.1.7"
 
+"@noble/ciphers@^0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@noble/ciphers/-/ciphers-0.1.4.tgz#96327dca147829ed9eee0d96cfdf7c57915765f0"
+  integrity sha512-d3ZR8vGSpy3v/nllS+bD/OMN5UZqusWiQqkyj7AwzTnhXFH72pF5oB4Ach6DQ50g5kXxC28LdaYBEpsyv9KOUQ==
+
 "@noble/curves@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.1.0.tgz#f13fc667c89184bc04cccb9b11e8e7bae27d8c3d"
@@ -3709,11 +3714,12 @@ eciesjs@^0.3.15:
     futoin-hkdf "^1.5.1"
     secp256k1 "^5.0.0"
 
-eciesjs@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/eciesjs/-/eciesjs-0.4.0.tgz#44d2ae963683dfd29a1e26ddcd847fc191b5b99a"
-  integrity sha512-z4dEeaH16xxYVgtxJ8YVwpifH4Keg4gyp5F451mnDNwbAN3MgL5jcoEQGpqJrapv/zW8KwDnXG21Dw5B0hqvmw==
+eciesjs@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/eciesjs/-/eciesjs-0.4.4.tgz#29e619eac9f2809514d1d2d24418d4b9249b7785"
+  integrity sha512-mmpjwW8hF/FDNDVRpBG2MRj+UUexdUkVtzVd3zhCym6COJ5KijuZA6HbT+HpB0yMNj396EH5RX50NDVcnKcWPw==
   dependencies:
+    "@noble/ciphers" "^0.1.4"
     "@noble/curves" "^1.1.0"
 
 ee-first@1.1.1:
