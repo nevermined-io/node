@@ -1,5 +1,14 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
-import { DDO, DDOError, DID, NFT1155Api, NFT721Api, Service } from '@nevermined-io/sdk'
+import {
+  DDO,
+  DDOError,
+  DID,
+  NFT1155Api,
+  NFT721Api,
+  NeverminedNFT1155Type,
+  NeverminedNFT721Type,
+  Service,
+} from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
@@ -287,12 +296,14 @@ export class SubscriptionsService {
     // retrieve the subscription DDO
     const result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
       contractAddress,
-      ercType.toString(),
+      ercType === 721
+        ? NeverminedNFT721Type.nft721Subscription
+        : NeverminedNFT1155Type.nft1155Credit,
     )
     const ddo = result.results.pop()
     if (!ddo) {
       throw new BadRequestException(
-        `Subscription DDO for contract address ${contractAddress} not found.`,
+        `Subscription DDO for contract address ${contractAddress} and ercType ${ercType} not found.`,
       )
     }
 
