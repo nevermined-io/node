@@ -61,6 +61,7 @@ export class NeverminedService {
       Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
     }
+
     this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
       ...(await generateInstantiableConfigFromConfig(config)),
