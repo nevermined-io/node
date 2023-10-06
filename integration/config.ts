@@ -1,4 +1,8 @@
-import { makeAccounts, NeverminedOptions } from '@nevermined-io/sdk'
+import { LoggerInstance, LogLevel, makeAccounts, NeverminedOptions } from '@nevermined-io/sdk'
+
+LoggerInstance.setLevel(LogLevel.Error)
+
+const logLevel = Number(process.env['LOG_LEVEL']) || 1 // warn by default
 
 const configBase: NeverminedOptions = {
   web3ProviderUri: 'http://contracts.nevermined.localnet',
@@ -9,10 +13,12 @@ const configBase: NeverminedOptions = {
   artifactsFolder: './artifacts',
   circuitsFolder: './circuits',
   gasMultiplier: 1.1,
+  verbose: logLevel,
 }
 
 if (process.env.SEED_WORDS) {
   configBase.accounts = makeAccounts(process.env.SEED_WORDS)
 }
 
-export const config: NeverminedOptions = configBase
+export const config: NeverminedOptions & { forceVerbose: NeverminedOptions } = configBase as any
+;(config as any).forceVerbose = { ...configBase, verbose: true }
