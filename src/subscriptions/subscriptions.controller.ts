@@ -73,6 +73,7 @@ export class SubscriptionsController {
       endpoints,
       expiryTime,
       owner,
+      ercType,
       headers,
     )
 

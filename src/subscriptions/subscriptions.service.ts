@@ -195,6 +195,7 @@ export class SubscriptionsService {
    * @param userAddress - The ethereum address of the user requesting the JWT token
    * @param endpoints - The web service endpoints provided with the subscription
    * @param expiryTime - The expiry time for the JWT token. Set as the time left in the subscription or 2 years for unlimited subscriptions
+   * @param ercType - The NFT ERC type
    * @param headers - The headers that should be passed when calling the endpoints
    *
    * @returns {@link Promise<string>} The base64 encoded JWT Token
@@ -205,11 +206,13 @@ export class SubscriptionsService {
     endpoints: any,
     expiryTime: number | string,
     owner: string,
+    ercType: number,
     headers?: any,
   ): Promise<string> {
     return await new jose.EncryptJWT({
       did: did,
       userId: userAddress,
+      ercType,
       endpoints,
       headers,
       owner,
@@ -238,7 +241,7 @@ export class SubscriptionsService {
     ercType: number,
   ): Promise<string> {
     // get subscription DDO
-    const subscriptionDdo = await this.getSubscriptionDdo(contractAddress)
+    const subscriptionDdo = await this.getSubscriptionDdo(contractAddress, ercType)
     // get duration
     const duration = await this.nvmService.getDuration(subscriptionDdo)
 
@@ -279,10 +282,11 @@ export class SubscriptionsService {
    * @throws {@link BadRequestException}
    * @returns {@link Promise<DDO>} The DDO for the subscription
    */
-  private async getSubscriptionDdo(contractAddress: string): Promise<DDO> {
+  private async getSubscriptionDdo(contractAddress: string, ercType: number): Promise<DDO> {
     // retrieve the subscription DDO
     const result = await this.nvmService.nevermined.search.bySubscriptionContractAddress(
       contractAddress,
+      ercType.toString(),
     )
     const ddo = result.results.pop()
     if (!ddo) {

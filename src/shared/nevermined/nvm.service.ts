@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   generateId,
-  generateIntantiableConfigFromConfig,
   didZeroX,
   DDO,
   MetaDataMain,
@@ -12,6 +11,7 @@ import {
   Service,
   DDOServiceNotFoundError,
   ServiceType,
+  generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -63,7 +63,7 @@ export class NeverminedService {
     }
     this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
-      ...(await generateIntantiableConfigFromConfig(config)),
+      ...(await generateInstantiableConfigFromConfig(config)),
       nevermined: this.nevermined,
     }
     this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
@@ -76,7 +76,7 @@ export class NeverminedService {
   }
   instanceConfig(): InstantiableConfig {
     const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(this.config.nvm()),
+      ...generateInstantiableConfigFromConfig(this.config.nvm()),
       nevermined: this.nevermined,
     }
     return instanceConfig
