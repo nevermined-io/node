@@ -278,6 +278,7 @@ export class SubscriptionsService {
    * Get the subscription DDO
    *
    * @param contractAddress - The NFT-721 contract address for the subscription
+   * @param ercType - Type of erc contract
    *
    * @throws {@link BadRequestException}
    * @returns {@link Promise<DDO>} The DDO for the subscription
