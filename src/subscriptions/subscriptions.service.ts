@@ -108,20 +108,27 @@ export class SubscriptionsService {
       }
     }
 
-    const numberNfts = Number(DDO.getNftAmountFromService(nftAccessService))
-
-    const contractAddress = DDO.getNftContractAddressFromService(nftAccessService)
-
-    const tokenId = DDO.getTokenIdFromService(nftAccessService) || ddo.id
+    let numberNfts, contractAddress, tokenId: string
+    try {
+      numberNfts = Number(DDO.getNftAmountFromService(nftAccessService))
+      contractAddress = DDO.getNftContractAddressFromService(nftAccessService)
+      tokenId = DDO.getTokenIdFromService(nftAccessService)
+    } catch (e) {
+      Logger.error(
+        `[GET /subscriptions] ${did}: getting numberNfts, contractAddress, tokenId from nft-access service`,
+      )
+      throw e
+    }
 
     // get the web-service endpoints
-    const metadata = ddo.findServiceByType('metadata')
-    const ercType = metadata.attributes.main.ercType
-    const endpoints = metadata.attributes.main.webService.endpoints.flatMap((e) => Object.values(e))
+    const ercType = metadataService.attributes.main.ercType
+    const endpoints = metadataService.attributes.main.webService.endpoints.flatMap((e) =>
+      Object.values(e),
+    )
 
     // decrypt the headers
     const headers = await this.nvmService.decrypt(
-      metadata.attributes.main.webService.encryptedAttributes,
+      metadataService.attributes.main.webService.encryptedAttributes,
       'PSK-RSA',
     )
 
@@ -248,11 +255,19 @@ export class SubscriptionsService {
     contractAddress: string,
     userAddress: string,
     ercType: number,
+    tokenId?: string,
   ): Promise<string> {
     // get subscription DDO
-    const subscriptionDdo = await this.getSubscriptionDdo(contractAddress, ercType)
+    const subscriptionDdo =
+      ercType === 1155
+        ? await this.nvmService.nevermined.assets.resolve(`did:nv:${tokenId}`)
+        : await this.getSubscriptionDdo(contractAddress, ercType)
     // get duration
     const duration = await this.nvmService.getDuration(subscriptionDdo)
+
+    console.log(`--- Token ID: ${tokenId}`)
+    console.log(`--- Subscription DID: ${subscriptionDdo.id}`)
+    console.log(`--- Duration: ${duration}`)
 
     // if duration is unlimited
     if (duration === 0) {
@@ -274,7 +289,7 @@ export class SubscriptionsService {
     const subscriptionBlocksLeft = subscriptionTransferBlockNumber + duration - currentBlockNumber
     if (subscriptionBlocksLeft <= 0) {
       throw new ForbiddenException(
-        `Subscription with contract address ${contractAddress} for user ${userAddress} is expired.`,
+        `Subscription with DID/TokenId ${tokenId} for user ${userAddress} is expired.`,
       )
     }
 

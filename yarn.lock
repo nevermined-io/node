@@ -1431,10 +1431,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.0-rc15":
-  version "2.0.0-rc15"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc15.tgz#dbc9097ef861a2dbcbde40a447f9734324caa18d"
-  integrity sha512-Bx26JYTlwX2at0OdPzgAlRCxnAt1/5XRs7PY/diKZnv9TROG7LZJlqssT/v9ytQ6Ge7R2QTpYbPu/934b2aLSQ==
+"@nevermined-io/sdk@^2.0.0-rc18":
+  version "2.0.0-rc18"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.0-rc18.tgz#e51e506337911bc04a00d7aaeb964573df382dd2"
+  integrity sha512-su7uA/3PQ6TNN7rAaZ1h1WL9Z80lz9PH8dd43zyCFRnFuapD1cD36Q98eUdBRH3ByL/KaJ00A5GhGSFo2kE3hA==
   dependencies:
     "@apollo/client" "^3.7.16"
     assert "^2.0.0"
@@ -4569,13 +4569,20 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "2.1.1"
 
-fetch-blob@^3.1.2, fetch-blob@^3.2.0:
+fetch-blob@^3.1.2:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-3.2.0.tgz#f09b8d4bbd45adc6f0c20b7e787e793e309dcce9"
   integrity sha512-7yAQpD2UMJzLi1Dqv7qFYnPbaPx7ZfFK6PiIxQ4PfkGPyNyl2Ugx+a/umUonmKqjhM4DnfbMvdX6otXq83soQQ==
   dependencies:
     node-domexception "^1.0.0"
     web-streams-polyfill "^3.0.3"
+
+fetch-blob@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/fetch-blob/-/fetch-blob-4.0.0.tgz#7175579ab41933d047293c8e71dd5a49f9620a52"
+  integrity sha512-nPmnhRmpNMjYWnp9EBMGs6z5lq9RXed5W1vuZcECrsDVQInM8AMQSooVb3X183Aole60adzjWbH9qlRFWzDDTA==
+  dependencies:
+    node-domexception "^1.0.0"
 
 ffjavascript@0.2.55:
   version "0.2.55"
