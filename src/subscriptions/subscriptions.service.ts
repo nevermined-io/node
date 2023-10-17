@@ -265,10 +265,6 @@ export class SubscriptionsService {
     // get duration
     const duration = await this.nvmService.getDuration(subscriptionDdo)
 
-    console.log(`--- Token ID: ${tokenId}`)
-    console.log(`--- Subscription DID: ${subscriptionDdo.id}`)
-    console.log(`--- Duration: ${duration}`)
-
     // if duration is unlimited
     if (duration === 0) {
       return this.defaultExpiryTime

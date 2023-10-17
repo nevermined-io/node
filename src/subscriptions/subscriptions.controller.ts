@@ -36,8 +36,6 @@ export class SubscriptionsController {
     const { contractAddress, numberNfts, endpoints, headers, owner, ercType, tokenId } =
       await this.subscriptionService.validateDid(did)
 
-    console.log(`--- Service [${ercType}] DID: ${did} and tokenId: ${tokenId}`)
-
     // validate that the subscription is valid
     let expiryTime: string
     if (req.user.address !== owner) {

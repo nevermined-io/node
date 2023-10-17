@@ -403,7 +403,7 @@ describe('SubscriptionsController', () => {
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
-      ddoSubscription = await nevermined.nfts721.create(nftAttributesSubscription, publisher)
+      ddoSubscription = await nevermined.nfts1155.create(nftAttributesSubscription, publisher)
 
       // ddo web service
       const serviceMetadata = getMetadata(undefined, 'Service Metadata')
@@ -430,7 +430,7 @@ describe('SubscriptionsController', () => {
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
-      ddoWebService = await nevermined.nfts721.create(nftAttributesNoContractAddress, publisher)
+      ddoWebService = await nevermined.nfts1155.create(nftAttributesNoContractAddress, publisher)
 
       // not a subscriber bearer token
       let signer = await nevermined.accounts.findSigner(notSubscriber.getId())
