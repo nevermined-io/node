@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Reclaim some disk space
+        run: docker system prune --all --volumes -f
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: 18
       - name: Install dependencies
         run: |
           yarn
@@ -20,7 +22,7 @@ jobs:
           yarn run lint
       - name: Check code formatting
         run: yarn format:check
-      - uses: nevermined-io/nvm-tools-actions@v0.14.0
+      - uses: nevermined-io/nvm-tools-actions@v0.15.0
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
