@@ -37,7 +37,6 @@ import { UploadResult } from './dto/upload-result'
 import {
   generateId,
   ValidationParams,
-  BigNumber,
   AgreementData,
   ServiceType,
   DID,
@@ -72,7 +71,6 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  @ApiBearerAuth('Authorization')
   async doAccess(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -185,7 +183,18 @@ export class AccessController {
     }
 
     const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(did.getDid())
-    const duration = await this.nvmService.getDuration(subscriptionDDO, template as ServiceType)
+    const serviceReference =
+      transferData.serviceIndex && transferData.serviceIndex >= 0
+        ? transferData.serviceIndex
+        : (template as ServiceType)
+
+    const service = subscriptionDDO.findServiceByReference(serviceReference)
+
+    const duration = await this.nvmService.getDuration(subscriptionDDO, serviceReference)
+
+    Logger.debug(
+      `Transferring NFT with Service Reference ${serviceReference} and duration ${duration} with amount ${transferData.nftAmount}`,
+    )
 
     let expiration = 0
     if (duration > 0) {
@@ -196,9 +205,11 @@ export class AccessController {
     const params: ValidationParams = {
       consumer_address: transferData.nftReceiver,
       did: did.getDid(),
+      service_index: service.index,
       agreement_id: transferData.agreementId,
-      nft_amount: BigNumber.from(transferData.nftAmount || '0'),
+      nft_amount: BigInt(transferData.nftAmount || '0'),
       buyer: (req.user || {}).buyer,
+      duration,
       expiration,
     }
 
@@ -210,6 +221,7 @@ export class AccessController {
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
       await plugin.process(params, from, undefined)
+      Logger.debug(`NFT Transfered to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
       throw new ForbiddenException(
@@ -252,7 +264,6 @@ export class AccessController {
     description: 'Bad Request. DID missing',
     type: BadRequestException,
   })
-  @ApiBearerAuth('Authorization')
   async doDownload(
     @Req() req: Request<unknown>,
     @Response({ passthrough: true }) res,
@@ -322,4 +333,11 @@ export class AccessController {
       throw new InternalServerErrorException(error.message)
     }
   }
+}
+export const jsonReplacer = (key, value) => {
+  // Modify the value or return undefined to exclude the property
+  if (typeof value === 'bigint') {
+    return value.toString()
+  }
+  return value
 }

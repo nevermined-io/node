@@ -1,7 +1,6 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
   generateId,
-  generateIntantiableConfigFromConfig,
   didZeroX,
   DDO,
   MetaDataMain,
@@ -11,8 +10,8 @@ import {
   EventOptions,
   Service,
   DDOServiceNotFoundError,
-  findServiceConditionByName,
   ServiceType,
+  generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -55,16 +54,17 @@ export class NeverminedService {
       )}`,
     )
 
-    const web3 = new ethers.providers.JsonRpcProvider(config.web3ProviderUri)
+    const web3 = new ethers.JsonRpcProvider(config.web3ProviderUri)
     try {
       await web3.getNetwork()
     } catch (e) {
       Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
     }
+
     this.nevermined = await Nevermined.getInstance(config)
     const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(config),
+      ...(await generateInstantiableConfigFromConfig(config)),
       nevermined: this.nevermined,
     }
     this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
@@ -77,7 +77,7 @@ export class NeverminedService {
   }
   instanceConfig(): InstantiableConfig {
     const instanceConfig = {
-      ...generateIntantiableConfigFromConfig(this.config.nvm()),
+      ...generateInstantiableConfigFromConfig(this.config.nvm()),
       nevermined: this.nevermined,
     }
     return instanceConfig
@@ -238,7 +238,7 @@ export class NeverminedService {
             didZeroX(did),
             userAddress,
             generateId(),
-            ethers.utils.hexZeroPad('0x0', 32),
+            ethers.zeroPadValue('0x', 32),
             'download',
             from,
           )
@@ -422,35 +422,33 @@ export class NeverminedService {
    * Get the duration of the subscription in number of blocks
    *
    * @param subscriptionDDO - The DDO of the subscription
-   * @param serviceType - The service to fetch the duration from. Usually 'nft-sales' and 'nft-sales-proof'
+   * @param serviceReference - The service reference to fetch the duration from. Usually 'nft-sales' and 'nft-sales-proof'
    *
    * @throws {@link BadRequestException}
    * @returns {@link Promise<number>} The duration in number of blocks
    */
   public async getDuration(
     subscriptionDDO: DDO,
-    serviceType: ServiceType = 'nft-sales',
+    serviceReference: number | ServiceType = 'nft-sales',
   ): Promise<number> {
     // get the nft-sales service
     let nftSalesService: Service
     try {
-      nftSalesService = subscriptionDDO.findServiceByType(serviceType)
+      nftSalesService = subscriptionDDO.findServiceByReference(serviceReference)
     } catch (e) {
       if (e instanceof DDOServiceNotFoundError) {
         throw new BadRequestException(
-          `${subscriptionDDO.id} does not contain an '${serviceType}' service`,
+          `${subscriptionDDO.id} does not contain an '${serviceReference}' service`,
         )
       } else {
         throw e
       }
     }
 
-    // get the nft-holder condition
-    const transferNftCondition = findServiceConditionByName(nftSalesService, 'transferNFT')
-    const duration = transferNftCondition.parameters.find((p) => p.name === '_duration')
-
+    // get the duration parameter from the transferNFT condition
+    const duration = DDO.getParameterFromCondition(nftSalesService, 'transferNFT', '_duration')
     // non-subscription nfts have no expiration
-    return Number(duration?.value) || 0
+    return Number(duration) || 0
   }
 
   /**
@@ -458,12 +456,13 @@ export class NeverminedService {
    *
    * @param subscriptionDid - The DID of the asset with associated subscription
    * @param userAddress - The address of the user that bough the subscription
-   *
+   * @param ercType - The type of the NFT subscription
    * @returns {@link Promise<number>} The block number the user bought the subscription
    */
   public async getSubscriptionTransferBlockNumber(
     subscriptionDid: string,
     userAddress: string,
+    ercType: number,
   ): Promise<number> {
     const eventOptions: EventOptions = {
       eventName: 'Fulfilled',
@@ -485,11 +484,11 @@ export class NeverminedService {
         blockNumber: true,
       },
     }
-
-    const [event] =
-      await this.nevermined.keeper.conditions.transferNft721Condition.events.getPastEvents(
-        eventOptions,
-      )
+    const transferCondtion =
+      ercType === 721
+        ? this.nevermined.keeper.conditions.transferNft721Condition
+        : this.nevermined.keeper.conditions.transferNftCondition
+    const [event] = await transferCondtion.events.getPastEvents(eventOptions)
 
     if (!event) {
       throw new ForbiddenException(

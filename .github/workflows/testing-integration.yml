@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Reclaim some disk space
+        run: docker system prune --all --volumes -f
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: 18
       - name: Install dependencies
         run: |
           yarn
@@ -20,12 +22,13 @@ jobs:
           yarn run lint
       - name: Check code formatting
         run: yarn format:check
-      - uses: nevermined-io/nvm-tools-actions@v0.12.0
+      - uses: nevermined-io/nvm-tools-actions@v0.15.0
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
+          # TODO: Update to tagged versions when everything is relased and in main branches
+          contracts-version: 'latest'
           node: 'false'
-          contracts-version: 'v3.2.1'
       - name: Check artifacts
         run: |
           nvm-tools copy-artifacts ./artifacts
@@ -34,7 +37,7 @@ jobs:
           ls -l circuits
       - name: Run node
         run: |
-          yarn run setup:dev
+          yarn setup:dev
           yarn start &
 
           # wait for node to start
@@ -42,4 +45,4 @@ jobs:
       - name: Run tests
         run: |
           # HDWalletProvider keeps jest from exiting
-          yarn run integration:cov -- --forceExit
+          yarn integration --detectOpenHandles

@@ -32,7 +32,8 @@ export class SubscriptionsController {
   @ApiBearerAuth('Authorization')
   async getAccessToken(@Req() req, @Param('did') did: string): Promise<SubscriptionTokenDto> {
     // get subscription data
-    const { contractAddress, numberNfts, endpoints, headers, owner } =
+
+    const { contractAddress, numberNfts, endpoints, headers, owner, ercType, tokenId } =
       await this.subscriptionService.validateDid(did)
 
     // validate that the subscription is valid
@@ -40,8 +41,10 @@ export class SubscriptionsController {
     if (req.user.address !== owner) {
       const isValid = await this.subscriptionService.isSubscriptionValid(
         contractAddress,
+        ercType,
         numberNfts,
         req.user.address,
+        tokenId,
       )
 
       if (!isValid) {
@@ -57,6 +60,8 @@ export class SubscriptionsController {
       expiryTime = await this.subscriptionService.getExpirationTime(
         contractAddress,
         req.user.address,
+        ercType,
+        tokenId,
       )
     } else {
       expiryTime = this.subscriptionService.defaultExpiryTime
@@ -70,6 +75,7 @@ export class SubscriptionsController {
       endpoints,
       expiryTime,
       owner,
+      ercType,
       headers,
     )
 

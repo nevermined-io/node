@@ -5,7 +5,6 @@ import path from 'path'
 import { Public } from '../common/decorators/auth.decorator'
 import { Request } from '../common/helpers/request.interface'
 import { GetInfoDto } from './dto/get-info.dto'
-import { ContractHandler } from '@nevermined-io/sdk'
 import { ethers } from 'ethers'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
@@ -28,7 +27,7 @@ export class InfoController {
   @Public()
   async getInfo(@Req() req: Request<unknown>): Promise<GetInfoDto> {
     const nevermined = this.nvmService.getNevermined()
-    const contractHandler = new ContractHandler(this.nvmService.instanceConfig())
+
     const pathEndpoint = `${req.protocol}://${req.hostname}${
       req.client.localPort ? `:${req.client.localPort}` : ''
     }${req.url}`
@@ -54,10 +53,10 @@ export class InfoController {
 
     const contractInstances = nevermined.keeper.getAllInstances()
     const keys = Object.keys(contractInstances).filter(
-      (key) => contractInstances[key]?.contract?.address !== undefined,
+      (key) => contractInstances[key]?.address !== undefined,
     )
-    const contracts = keys.map((key) => ({ [key]: contractInstances[key].contract.address }))
-
+    const contracts = keys.map((key) => ({ [key]: contractInstances[key].address }))
+    nevermined.keeper.didRegistry.version
     return {
       APIversion: packageJson.version,
       docs: `${pathEndpoint}api/v1/docs`,
@@ -68,9 +67,9 @@ export class InfoController {
       'circuits-folder': circuitDir,
       contracts: contracts,
       'external-contracts': [],
-      'keeper-version': await contractHandler.getVersion('DIDRegistry', artifactDir),
+      'keeper-version': nevermined.keeper.didRegistry.version,
       'provider-address': provider.getId(),
-      'ecdsa-public-key': wallet.publicKey,
+      'ecdsa-public-key': wallet.signingKey.publicKey,
       'rsa-public-key': key.exportKey('public'),
       'babyjub-public-key': {
         x: baby.x,
