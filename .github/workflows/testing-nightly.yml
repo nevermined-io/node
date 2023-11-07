@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: 18
       - name: Install dependencies
         run: |
           yarn
@@ -30,7 +30,7 @@ jobs:
           export KEEPER_OWNER_ROLE_ADDRESS="0xe2DD09d719Da89e5a3D0F2549c7E24566e947260"
           rm -rf "${HOME}/.nevermined/nevermined-contracts/artifacts"
 
-          export KEEPER_VERSION=develop          
+          export KEEPER_VERSION=latest          
 
           ./start_nevermined.sh --no-graph --no-node --opengsn 2>&1 | tee nevermined_tools.txt &
           cd ..
@@ -71,7 +71,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           repository: nevermined-io/sdk-js
-          ref: 'develop' # TODO: Remove this when ready to use main branch
           path: sdk-js
           token: ${{ secrets.API_TOKEN_GITHUB }}
       - name: Run tests from SDK

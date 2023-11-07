@@ -26,8 +26,6 @@ jobs:
         with:
           token: ${{ secrets.API_TOKEN_GITHUB }}
           estuary: 'true'
-          # TODO: Update to tagged versions when everything is relased and in main branches
-          contracts-version: 'latest'
           node: 'false'
       - name: Check artifacts
         run: |
