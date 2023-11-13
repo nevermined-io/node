@@ -1574,10 +1574,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.2.tgz#621d22e186775b8aa3736827fd7e66948261230a"
-  integrity sha512-QgMjvDFGa6X48n+KK72vIPv2Xw8fti5TP8x3/9EYZfSHJYhUrstdJTEnqLPZ0rLVDfbY+G4dxbhIEVT8K7h4zw==
+"@nevermined-io/sdk@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.3.tgz#590cea5e2ee853540b7ebe678caae52354b993d8"
+  integrity sha512-OOeJsge0kYJYMbLqmbzjURw5Al4enz6W/E7lOwdOCH4Fd5t/pnb/KrskeD1zjTgLSLv/U7mxNRUiD6ByOHDH0g==
   dependencies:
     "@alchemy/aa-core" "0.1.1"
     "@apollo/client" "^3.7.16"
@@ -2880,10 +2880,10 @@ aws-sdk-mock@^5.8.0:
     sinon "^14.0.1"
     traverse "^0.6.6"
 
-aws-sdk@^2.1231.0, aws-sdk@^2.1421.0:
-  version "2.1421.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1421.0.tgz#c99867401d25a78f1c30bb6c493e0a904898dbbb"
-  integrity sha512-t262eTnaP6mQrntuNV3f2mxNn12EFcAGdy9ipY805+YUtyJ0oUKqrJZB5Zjkd4xhEKIF9AcDAB0u1ApTX+8Ogg==
+aws-sdk@^2.1231.0, aws-sdk@^2.1494.0:
+  version "2.1494.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1494.0.tgz#b1a4b9a1cd8878ee4d272a5f86a6a35a72c1df5b"
+  integrity sha512-i7wIEBUzhIOuCeE8moB4rXUr7y+5rviiGJ6hsdQJdqwDxzStkmV7+cvKllNVx3+kuv0jdNbkVZ+wHBANi91Wxw==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
