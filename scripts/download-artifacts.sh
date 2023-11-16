@@ -20,7 +20,23 @@ fi
 
 REPO_URL=https://artifacts.nevermined.network
 declare -A NETWORKS_MAP
-NETWORKS_MAP=(["mainnet"]="1" ["rinkeby"]="4" ["kovan"]="42" ["matic"]="137" ["mumbai"]="80001" ["celo-alfajores"]="44787" ["celo"]="42220" ["aurora"]="1313161554" ["aurora-testnet"]="1313161555")
+NETWORKS_MAP=(
+  ["mainnet"]="1"
+  ["rinkeby"]="4"
+  ["goerli"]="5"
+  ["gnosis"]="100"
+  ["matic"]="137"
+  ["chiado"]="10200"
+  ["arbitrum-one"]="42161"
+  ["celo-alfajores"]="44787"
+  ["hyperspace"]="3141"
+  ["celo"]="42220"
+  ["mumbai"]="80001"
+  ["arbitrum-goerli"]="421613"
+  ["arbitrum-sepolia"]="421614"
+  ["aurora"]="1313161554"
+  ["aurora-testnet"]="1313161555"
+ )
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 UNPACK_DIR="$SCRIPT_DIR/../artifacts"
