@@ -239,7 +239,7 @@ export class NeverminedService {
             userAddress,
             generateId(),
             ethers.zeroPadValue('0x', 32),
-            'download',
+            `download file ${index}`,
             from,
           )
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
