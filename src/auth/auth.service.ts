@@ -8,10 +8,11 @@ import {
   zeroX,
   BabyjubPublicKey,
   Logger,
-  Account,
   Babysig,
   DDO,
   NeverminedNFT1155Type,
+  ServiceNFTAccess,
+  NFTServiceAttributes,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { JWTPayload } from '@nevermined-io/passport-nevermined'
@@ -27,42 +28,39 @@ export class AuthService {
     const ddo = await nevermined.assets.resolve(params.did)
     Logger.debug(`Validating owner for ${params.did}`)
 
-    const getNftAccess = async (ddo: DDO, serviceIndex?: number) => {
-      if (!ddo) {
-        return null
-      }
-      const service =
-        serviceIndex && serviceIndex > 0
-          ? ddo.findServiceByIndex(serviceIndex)
-          : ddo.findServiceByType('nft-access')
-
-      if (!service) {
-        return null
-      }
-      if (service.attributes.main.ercType == 721) {
-        return 1n
-      }
-      const holder = DDO.findServiceConditionByName(service, 'nftHolder')
-      if (!holder) {
-        return 1n
-      }
-      const num = holder.parameters.find((p) => p.name === '_numberNfts')?.value as string
-      return BigInt(num)
-    }
-
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
       params.consumer_address,
       params.did,
     )
     if (!granted) {
-      const limit = await getNftAccess(ddo, params.service_index)
-      const balance = await nevermined.nfts1155.balance(
-        params.did,
-        new Account(params.consumer_address),
-      )
-      if (!limit || balance < limit) {
+      Logger.debug(`User not granted yet, checking balance`)
+      try {
+        const service = ddo.findServiceByReference(params.service_index) as ServiceNFTAccess
+
+        const balance =
+          service.attributes.main.ercType == 721
+            ? await nevermined.nfts721.balanceOf(params.consumer_address)
+            : await nevermined.nfts1155.balance(
+                DDO.getTokenIdFromService(service),
+                params.consumer_address,
+              )
+
+        if (
+          !NFTServiceAttributes.isCreditsBalanceEnough(
+            service.attributes.main.nftAttributes,
+            balance,
+          )
+        )
+          throw new UnauthorizedException(
+            `Address ${
+              params.consumer_address
+            } has no enough credits (${balance.toString()}) to access: ${params.did}`,
+          )
+      } catch (error) {
         throw new UnauthorizedException(
-          `Address ${params.consumer_address} has no permission to access ${params.did}`,
+          `Error validating access by address ${params.consumer_address} to ${params.did}: ${
+            (error as Error).message
+          }`,
         )
       }
     }
