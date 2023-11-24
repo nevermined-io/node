@@ -133,7 +133,7 @@ export class SubscriptionsService {
     )
 
     // get the owner of the DID
-    const [{ owner }] = ddo.publicKey
+    const owner = await this.nvmService.nevermined.keeper.didRegistry.getDIDOwner(did)
 
     return {
       numberNfts,
