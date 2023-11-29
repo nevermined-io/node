@@ -89,6 +89,7 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **SUBSCRIPTION_DEFAULT_EXPIRY_TIME** | The default subscription token expiry time in seconds to be used for unlimited subscriptions. Defaults to 2 years (63072000 seconds)                             | `63072000`                                                                |
 | **NETWORK_AVERAGE_BLOCK_TIME**       | The average block time in milliseconds for the connected network. Used to calculate the expiry time of the subscriptions token. Defaults 2100 milliseconds       | `2100`                                                                    |
 | **NEVERMINED_SDK_LOG_LEVEL**         | The log level of the nevermined sdk (0: Error, 1: Warn, 2: Log, 3: Verbose). Defaults to `0`                                                                     | `0`                                                                       |
+| **ZERODEV_PROJECT_ID**               | Optional [zerodev](https://zerodev.app/) _project id_ to allow the node to use a smart contract wallet                                                           | `4b1b45db-d7hg-864c-357a-8e9581b86358`                                    |
 
 ## Install and run:
 

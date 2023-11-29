@@ -95,10 +95,11 @@ export class AuthService {
       const [from] = await nevermined.accounts.list()
       const granted = await plugin.accept(params)
       if (!granted) {
-        await plugin.process(params, from, undefined)
+        await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
       }
 
-      if (plugin.track) await plugin.track(params, from)
+      if (plugin.track)
+        await plugin.track(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
     } catch (error) {
       throw new UnauthorizedException(`Error processing request: ${error.message}`)
     }

@@ -17,6 +17,7 @@ export interface CryptoConfig {
   provider_password: string
   provider_rsa_public: string
   provider_rsa_private: string
+  zerodevProjectId: string
 }
 
 export interface ComputeConfig {
@@ -86,6 +87,7 @@ const DOTENV_SCHEMA = Joi.object({
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
   NEVERMINED_PROXY_URI: Joi.string(),
+  ZERODEV_PROJECT_ID: Joi.string(),
 })
 
 type DotenvSchemaKeys =
@@ -124,6 +126,7 @@ type DotenvSchemaKeys =
   | 'NEVERMINED_PROXY_URI'
   | 'SUBSCRIPTION_DEFAULT_EXPIRY_TIME'
   | 'NETWORK_AVERAGE_BLOCK_TIME'
+  | 'ZERODEV_PROJECT_ID'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig
@@ -138,6 +141,7 @@ export class ConfigService {
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
+      zerodevProjectId: this.get('ZERODEV_PROJECT_ID'),
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),

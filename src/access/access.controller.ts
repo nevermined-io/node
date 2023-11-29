@@ -220,8 +220,8 @@ export class AccessController {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
-      await plugin.process(params, from, undefined)
-      Logger.debug(`NFT Transfered to ${transferData.nftReceiver}`)
+      await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+      Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
       throw new ForbiddenException(
