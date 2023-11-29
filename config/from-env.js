@@ -39,6 +39,8 @@ const keys = [
   'SUBSCRIPTION_DEFAULT_EXPIRY_TIME',
   'NETWORK_AVERAGE_BLOCK_TIME',
 
+  'ZERODEV_PROJECT_ID',
+
   // for testing
   'SEED_WORDS',
 ]

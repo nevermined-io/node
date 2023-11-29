@@ -1574,10 +1574,10 @@
     snarkjs "^0.4.26"
     web3-utils "^1.7.4"
 
-"@nevermined-io/sdk@^2.0.6":
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.6.tgz#6a6a4bce9b5398aeee95473cbc5fa22084297cec"
-  integrity sha512-udukXSkspLFkmd1YdDxMZbyYdQIPDfFZ95pU0Yyfb7qpDpAHXo9AwYwN6CivesepEhyeOmZrm4NOaLWEuJe9xQ==
+"@nevermined-io/sdk@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-2.0.7.tgz#b08129f22f0f0982d7b7f3930d7c423af2cfefbf"
+  integrity sha512-1k5eSK2kWDDb+6jjcK9Z1ayQCab7HRdShcYzAWXIj3O2qerM/kBPSbtHvFTYufsUThP+elGC/LfuTvSPyzClEA==
   dependencies:
     "@alchemy/aa-core" "0.1.1"
     "@apollo/client" "^3.7.16"
@@ -2524,7 +2524,7 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
-"@zerodev/sdk@^4.3.3":
+"@zerodev/sdk@^4.3.3", "@zerodev/sdk@^4.3.4":
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/@zerodev/sdk/-/sdk-4.3.4.tgz#56f27929cff6dc2c47751c70ff53c1f846a27690"
   integrity sha512-Rz49GzMR1A80AmUBPAz2UQxSWRHMHRerzbxlqXn3L3g5Dtcj2g0lnc0re7cptJmzdXcfgIjzY70LQz4neB3EHQ==
