@@ -13,6 +13,8 @@ import {
   ServiceType,
   generateInstantiableConfigFromConfig,
   convertEthersV6SignerToAccountSigner,
+  ServiceCommon,
+  DDOError,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -487,6 +489,13 @@ export class NeverminedService {
     const duration = DDO.getParameterFromCondition(nftSalesService, 'transferNFT', '_duration')
     // non-subscription nfts have no expiration
     return Number(duration) || 0
+  }
+
+  public getAssetPrice(service: ServiceCommon): bigint {
+    const assetPrice = DDO.getAssetPriceFromService(service)
+
+    if (assetPrice) return assetPrice.getTotalPrice()
+    throw new DDOError(`No price found for asset ${service.index}`)
   }
 
   /**

@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module'
 import { EncryptModule } from './encrypt/encrypt.module'
 import { AccessModule } from './access/access.module'
 import { NeverminedModule } from './shared/nevermined/nvm.module'
+import { BackendModule } from './shared/backend/backend.module'
 import { ComputeModule } from './compute/compute.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
@@ -22,6 +23,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
     NeverminedModule,
     ComputeModule,
     SubscriptionsModule,
+    BackendModule,
   ],
 })
 export class ApplicationModule {

@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing'
 import { JwtAuthGuard } from '../src/common/guards/auth/jwt-auth.guard'
 import { AccessController } from '../src/access/access.controller'
 import { NeverminedModule } from '../src/shared/nevermined/nvm.module'
+import { BackendModule } from '../src/shared/backend/backend.module'
 import request from 'supertest'
 import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
@@ -20,6 +21,7 @@ describe('Info', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         NeverminedModule,
+        BackendModule,
         ConfigModule,
         PassportModule,
         JwtModule.register({
