@@ -41,6 +41,10 @@ const keys = [
 
   'ZERODEV_PROJECT_ID',
 
+  'NVM_BACKEND_URL',
+  'NVM_BACKEND_AUTH',
+  'TRACK_BACKEND_TXS',
+
   // for testing
   'SEED_WORDS',
 ]

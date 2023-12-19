@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { AuthService } from '../src/auth/auth.service.mock'
 import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
 import { ConfigModule } from '../src/shared/config/config.module'
+import { BackendModule } from 'src/shared/backend/backend.module'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
@@ -20,6 +21,7 @@ describe('Info', () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         NeverminedModule,
+        BackendModule,
         ConfigModule,
         PassportModule,
         JwtModule.register({

@@ -31,6 +31,7 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
+import { AssetTransaction, BackendService } from '../shared/backend/backend.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
@@ -54,7 +55,7 @@ export enum UploadBackends {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
-  constructor(private nvmService: NeverminedService) {}
+  constructor(private nvmService: NeverminedService, private backendService: BackendService) {}
 
   @Get('access/:agreement_id/:index')
   @ApiOperation({
@@ -227,6 +228,31 @@ export class AccessController {
       throw new ForbiddenException(
         `Could not transfer nft ${did.getDid()} to ${transferData.nftReceiver}`,
       )
+    }
+
+    try {
+      if (!this.backendService.isBackendEnabled()) {
+        Logger.log(`NVM Backend not enabled, skipping tracking transaction in the database`)
+      } else {
+        const assetPrice = this.nvmService.getAssetPrice(service) / 10n ** BigInt(4)
+        const assetTx: AssetTransaction = {
+          assetDid: did.getDid(),
+          assetOwner: subscriptionDDO.proof.creator,
+          assetConsumer: transferData.nftReceiver,
+          txType: 'Mint',
+          price: (Number(assetPrice) / 100).toString(),
+          currency: 'USDC',
+          paymentType: 'Crypto',
+          txHash: '0x0',
+          metadata: '',
+        }
+
+        const assetTxResult = await this.backendService.recordAssetTransaction(assetTx)
+        Logger.log(`Recording asset transaction with result: ${assetTxResult}`)
+        Logger.debug(`Asset transaction: ${JSON.stringify(assetTx)}`)
+      }
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${e.message}`)
     }
 
     return 'success'

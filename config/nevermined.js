@@ -1,5 +1,6 @@
 const LogLevel = require('@nevermined-io/sdk').LogLevel
 const ethers = require('ethers').ethers
+const { NeverminedOptions } = require('@nevermined-io/sdk')
 const fs = require('fs')
 
 const configBase = {

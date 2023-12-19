@@ -90,6 +90,9 @@ The Nevermined Node reads the following environment variables allowing the confi
 | **NETWORK_AVERAGE_BLOCK_TIME**       | The average block time in milliseconds for the connected network. Used to calculate the expiry time of the subscriptions token. Defaults 2100 milliseconds       | `2100`                                                                    |
 | **NEVERMINED_SDK_LOG_LEVEL**         | The log level of the nevermined sdk (0: Error, 1: Warn, 2: Log, 3: Verbose). Defaults to `0`                                                                     | `0`                                                                       |
 | **ZERODEV_PROJECT_ID**               | Optional [zerodev](https://zerodev.app/) _project id_ to allow the node to use a smart contract wallet                                                           | `4b1b45db-d7hg-864c-357a-8e9581b86358`                                    |
+| **NVM_BACKEND_URL**                  | Optional url of the Nevermined Backend. If given the backend can be used to store asset transactions                                                             |                                                                           |
+| **NVM_BACKEND_AUTH**                 | JWT token to authenticate in the Nevermined Backend                                                                                                              |                                                                           |
+| **TRACK_BACKEND_TXS**                | If `true` and the Nevermined Backend is configured via the `NVM_BACKEND_URL` env variable it will track the mint asset transactions                              |                                                                           |
 
 ## Install and run:
 
