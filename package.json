@@ -44,7 +44,7 @@
     "@types/multer": "^1.4.7",
     "@types/node-rsa": "^1.1.1",
     "@zerodev/sdk": "^4.5.5",
-    "aws-sdk": "^2.1500.0",
+    "aws-sdk": "^2.1540.0",
     "axios": "^1.6.0",
     "cache-manager": "^5.2.3",
     "class-transformer": "0.5.1",
