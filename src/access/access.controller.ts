@@ -31,7 +31,11 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
-import { AssetTransaction, BackendService } from '../shared/backend/backend.service'
+import {
+  AssetTransaction,
+  BackendService,
+  UserNotification,
+} from '../shared/backend/backend.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
@@ -253,6 +257,55 @@ export class AccessController {
       }
     } catch (e) {
       Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${e.message}`)
+    }
+
+    let link
+    try {
+      link = new URL(`/subscriptions/${did}`, this.backendService.appUrl).toString()
+    } catch (e) {
+      link = `https://nevermined.app/subscriptions/${did}`
+    }
+
+    try {
+      const subscriberNotification: UserNotification = {
+        notificationType: 'SubscriptionReceived',
+        receiver: '',
+        originator: 'Nevermined',
+        readStatus: 'Pending',
+        deliveredStatus: 'Pending',
+        title: 'Subscription Received',
+        body: `You have received a subscription`,
+        link,
+      }
+
+      const subsNotifResult = await this.backendService.sendMintingNotification(
+        subscriberNotification,
+      )
+      Logger.log(`Sending notification with result: ${subsNotifResult}`)
+      Logger.debug(`Subscriber Notification: ${JSON.stringify(subscriberNotification)}`)
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+    }
+
+    try {
+      const publisherNotification: UserNotification = {
+        notificationType: 'SubscriptionPurchased',
+        receiver: subscriptionDDO._nvm.userId,
+        originator: 'Nevermined',
+        readStatus: 'Pending',
+        deliveredStatus: 'Pending',
+        title: 'Subscription Purchased',
+        body: `A user has purchased your subscription`,
+        link,
+      }
+
+      const pubNotifResult = await this.backendService.sendMintingNotification(
+        publisherNotification,
+      )
+      Logger.log(`Sending notification with result: ${pubNotifResult}`)
+      Logger.debug(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
     }
 
     return 'success'

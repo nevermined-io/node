@@ -16,12 +16,24 @@ export interface AssetTransaction {
   metadata?: string
 }
 
+export interface UserNotification {
+  notificationType: 'SubscriptionReceived' | 'SubscriptionPurchased' | 'Other'
+  receiver: string
+  originator: 'Nevermined' | 'Other'
+  readStatus: 'Pending' | 'Other'
+  deliveredStatus: 'Pending' | 'Other'
+  title: string
+  body: string
+  link: string
+}
+
 @Injectable()
 export class BackendService {
   isNVMBackendEnabled = false
   trackBackendTxs: boolean
   backendUrl: string
   backendAuth: string
+  appUrl: string
 
   constructor(private config: ConfigService, private readonly httpService: HttpService) {}
 
@@ -33,6 +45,7 @@ export class BackendService {
       this.backendUrl = this.config.backendConfig().backendUrl
       this.backendAuth = this.config.backendConfig().backendAuth
       this.isNVMBackendEnabled = this.config.backendConfig().isNVMBackendEnabled
+      this.appUrl = this.config.backendConfig().appUrl
 
       Logger.log(`Backend Config: `)
       Logger.log(`Is Backend Enabled: ${this.isNVMBackendEnabled}`)
@@ -62,6 +75,33 @@ export class BackendService {
         'Content-Type': 'application/json',
       },
       data: assetTx,
+    }
+
+    const response = await firstValueFrom(this.httpService.request(requestConfig))
+    const obj = response.data
+
+    if (obj.error) {
+      Logger.error('Backend returned an error message:', obj.error)
+      throw new InternalServerErrorException(obj.error)
+    }
+
+    return true
+  }
+
+  public async sendMintingNotification(userNotification: UserNotification): Promise<boolean> {
+    if (!this.isNVMBackendEnabled) {
+      Logger.warn('Backend is disabled by config')
+      return false
+    }
+
+    const requestConfig: HttpModuleOptions = {
+      url: `${this.backendUrl}/api/v1/notifications/notification`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.backendAuth}`,
+        'Content-Type': 'application/json',
+      },
+      data: userNotification,
     }
 
     const response = await firstValueFrom(this.httpService.request(requestConfig))
