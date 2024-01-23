@@ -15,6 +15,7 @@ import {
   convertEthersV6SignerToAccountSigner,
   ServiceCommon,
   DDOError,
+  Profile,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -544,5 +545,19 @@ export class NeverminedService {
     }
 
     return Number(event.blockNumber)
+  }
+
+  /**
+   * It gets the user profile information from the marketplace api given the user address
+   * @param address user address
+   * @returns {@link Promise<Profile>}
+   */
+  async getUserProfileFromAddress(address: string): Promise<Profile> {
+    try {
+      return this.nevermined.services.profiles.findOneByAddress(address)
+    } catch (e) {
+      Logger.warn(`Cannot find the user profile with address ${address}`)
+      throw new NotFoundException(`Profile with address ${address} not found`)
+    }
   }
 }

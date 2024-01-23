@@ -44,6 +44,7 @@ const keys = [
   'NVM_BACKEND_URL',
   'NVM_BACKEND_AUTH',
   'TRACK_BACKEND_TXS',
+  'NVM_APP_URL',
 
   // for testing
   'SEED_WORDS',
