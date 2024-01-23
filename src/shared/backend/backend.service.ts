@@ -21,7 +21,7 @@ export interface UserNotification {
   receiver: string
   originator: 'Nevermined' | 'Other'
   readStatus: 'Pending' | 'Other'
-  deliveredStatus: 'Pending' | 'Other'
+  deliveryStatus: 'Pending' | 'Other'
   title: string
   body: string
   link: string

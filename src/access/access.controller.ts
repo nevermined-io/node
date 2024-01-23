@@ -261,28 +261,30 @@ export class AccessController {
 
     let link
     try {
-      link = new URL(`/subscriptions/${did}`, this.backendService.appUrl).toString()
+      link = new URL(`/subscriptions/${did.getDid()}`, this.backendService.appUrl).toString()
     } catch (e) {
-      link = `https://nevermined.app/subscriptions/${did}`
+      link = `https://nevermined.app/subscriptions/${did.getDid()}`
     }
 
     try {
+      const profile = await this.nvmService.getUserProfileFromAddress(params.consumer_address)
+      this.nvmService
       const subscriberNotification: UserNotification = {
         notificationType: 'SubscriptionReceived',
-        receiver: '',
+        receiver: profile.userId,
         originator: 'Nevermined',
         readStatus: 'Pending',
-        deliveredStatus: 'Pending',
-        title: 'Subscription Received',
-        body: `You have received a subscription`,
+        deliveryStatus: 'Pending',
+        title: 'Subscription Ready',
+        body: `You have received a subscription and you can start accessing all the content associated to it.`,
         link,
       }
+      Logger.log(`Subscriber Notification: ${JSON.stringify(subscriberNotification)}`)
 
       const subsNotifResult = await this.backendService.sendMintingNotification(
         subscriberNotification,
       )
       Logger.log(`Sending notification with result: ${subsNotifResult}`)
-      Logger.debug(`Subscriber Notification: ${JSON.stringify(subscriberNotification)}`)
     } catch (e) {
       Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
     }
@@ -293,17 +295,17 @@ export class AccessController {
         receiver: subscriptionDDO._nvm.userId,
         originator: 'Nevermined',
         readStatus: 'Pending',
-        deliveredStatus: 'Pending',
+        deliveryStatus: 'Pending',
         title: 'Subscription Purchased',
         body: `A user has purchased your subscription`,
         link,
       }
+      Logger.log(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
 
       const pubNotifResult = await this.backendService.sendMintingNotification(
         publisherNotification,
       )
       Logger.log(`Sending notification with result: ${pubNotifResult}`)
-      Logger.debug(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
     } catch (e) {
       Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
     }
