@@ -35,13 +35,11 @@ export class InfoController {
     const packageJsonString = readFileSync(packageJsonPath, 'utf8')
     const packageJson = JSON.parse(packageJsonString) as { version: string }
 
-    const [provider] = await nevermined.accounts.list()
-
-    const provider_key_file = readFileSync(this.config.get<string>('PROVIDER_KEYFILE')).toString()
-    const provider_password = this.config.get<string>('PROVIDER_PASSWORD')
+    const provider_key_file = this.config.cryptoConfig().provider_key
+    const provider_password = this.config.cryptoConfig().provider_password
     const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
 
-    const rsa_key_file = readFileSync(this.config.get<string>('RSA_PUBKEY_FILE')).toString()
+    const rsa_key_file = this.config.cryptoConfig().provider_rsa_public
     const key = new NodeRSA(rsa_key_file)
 
     const baby = this.config.getProviderBabyjub()
@@ -68,7 +66,7 @@ export class InfoController {
       contracts: contracts,
       'external-contracts': [],
       'keeper-version': nevermined.keeper.didRegistry.version,
-      'provider-address': provider.getId(),
+      'provider-address': this.nvmService.providerAddress,
       'ecdsa-public-key': wallet.signingKey.publicKey,
       'rsa-public-key': key.exportKey('public'),
       'babyjub-public-key': {

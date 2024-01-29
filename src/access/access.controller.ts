@@ -31,6 +31,11 @@ import { Public } from '../common/decorators/auth.decorator'
 import { FileInterceptor } from '@nestjs/platform-express'
 import crypto from 'crypto'
 import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
+import {
+  AssetTransaction,
+  BackendService,
+  UserNotification,
+} from '../shared/backend/backend.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
@@ -54,7 +59,7 @@ export enum UploadBackends {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
-  constructor(private nvmService: NeverminedService) {}
+  constructor(private nvmService: NeverminedService, private backendService: BackendService) {}
 
   @Get('access/:agreement_id/:index')
   @ApiOperation({
@@ -220,13 +225,89 @@ export class AccessController {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
-      await plugin.process(params, from, undefined)
-      Logger.debug(`NFT Transfered to ${transferData.nftReceiver}`)
+      await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+      Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
       throw new ForbiddenException(
         `Could not transfer nft ${did.getDid()} to ${transferData.nftReceiver}`,
       )
+    }
+
+    try {
+      if (!this.backendService.isBackendEnabled()) {
+        Logger.log(`NVM Backend not enabled, skipping tracking transaction in the database`)
+      } else {
+        const assetPrice = this.nvmService.getAssetPrice(service) / 10n ** BigInt(4)
+        const assetTx: AssetTransaction = {
+          assetDid: did.getDid(),
+          assetOwner: subscriptionDDO.proof.creator,
+          assetConsumer: transferData.nftReceiver,
+          txType: 'Mint',
+          price: (Number(assetPrice) / 100).toString(),
+          currency: 'USDC',
+          paymentType: 'Crypto',
+          txHash: '0x0',
+          metadata: '',
+        }
+
+        const assetTxResult = await this.backendService.recordAssetTransaction(assetTx)
+        Logger.log(`Recording asset transaction with result: ${assetTxResult}`)
+        Logger.debug(`Asset transaction: ${JSON.stringify(assetTx)}`)
+      }
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${e.message}`)
+    }
+
+    let link
+    try {
+      link = new URL(`/subscriptions/${did.getDid()}`, this.backendService.appUrl).toString()
+    } catch (e) {
+      link = `https://nevermined.app/subscriptions/${did.getDid()}`
+    }
+
+    try {
+      const profile = await this.nvmService.getUserProfileFromAddress(params.consumer_address)
+      this.nvmService
+      const subscriberNotification: UserNotification = {
+        notificationType: 'SubscriptionReceived',
+        receiver: profile.userId,
+        originator: 'Nevermined',
+        readStatus: 'Pending',
+        deliveryStatus: 'Pending',
+        title: 'Subscription Ready',
+        body: `You have received a subscription and you can start accessing all the content associated to it.`,
+        link,
+      }
+      Logger.log(`Subscriber Notification: ${JSON.stringify(subscriberNotification)}`)
+
+      const subsNotifResult = await this.backendService.sendMintingNotification(
+        subscriberNotification,
+      )
+      Logger.log(`Sending notification with result: ${subsNotifResult}`)
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+    }
+
+    try {
+      const publisherNotification: UserNotification = {
+        notificationType: 'SubscriptionPurchased',
+        receiver: subscriptionDDO._nvm.userId,
+        originator: 'Nevermined',
+        readStatus: 'Pending',
+        deliveryStatus: 'Pending',
+        title: 'Subscription Purchased',
+        body: `A user has purchased your subscription`,
+        link,
+      }
+      Logger.log(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
+
+      const pubNotifResult = await this.backendService.sendMintingNotification(
+        publisherNotification,
+      )
+      Logger.log(`Sending notification with result: ${pubNotifResult}`)
+    } catch (e) {
+      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
     }
 
     return 'success'

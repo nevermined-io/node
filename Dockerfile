@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:18-alpine
 LABEL maintainer="Nevermined <root@nevermined.io>"
 
 RUN apk add --no-cache autoconf automake alpine-sdk

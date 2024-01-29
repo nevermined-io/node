@@ -12,6 +12,10 @@ import {
   DDOServiceNotFoundError,
   ServiceType,
   generateInstantiableConfigFromConfig,
+  convertEthersV6SignerToAccountSigner,
+  ServiceCommon,
+  DDOError,
+  Profile,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -29,6 +33,7 @@ import { firstValueFrom } from 'rxjs'
 import { AxiosError } from 'axios'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { UploadBackends } from 'src/access/access.controller'
+import { ZeroDevAccountSigner, ZeroDevEthersProvider } from '@zerodev/sdk'
 
 export enum AssetResult {
   DATA = 'data',
@@ -40,6 +45,9 @@ export enum AssetResult {
 export class NeverminedService {
   nevermined: Nevermined
   dtp: Dtp
+  zerodevSigner: ZeroDevAccountSigner<'ECDSA'>
+  public providerAddress: string
+
   constructor(private config: ConfigService, private readonly httpService: HttpService) {}
   // TODO: handle configuration properly
   async onModuleInit() {
@@ -68,13 +76,27 @@ export class NeverminedService {
       nevermined: this.nevermined,
     }
     this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
+
+    // setup zerodev
+    this.zerodevSigner = await this.setupZerodev()
+
+    // set provider address
+    if (this.zerodevSigner) {
+      this.providerAddress = await this.zerodevSigner.getAddress()
+    } else {
+      const [provider] = await this.nevermined.accounts.list()
+      this.providerAddress = provider.getId()
+    }
   }
+
   getNevermined() {
     return this.nevermined
   }
+
   getDtp() {
     return this.dtp
   }
+
   instanceConfig(): InstantiableConfig {
     const instanceConfig = {
       ...generateInstantiableConfigFromConfig(this.config.nvm()),
@@ -82,8 +104,26 @@ export class NeverminedService {
     }
     return instanceConfig
   }
+
   web3ProviderUri(): string {
     return this.config.nvm().web3ProviderUri
+  }
+
+  private async setupZerodev(): Promise<ZeroDevAccountSigner<'ECDSA'>> {
+    const projectId = this.config.cryptoConfig().zerodevProjectId
+    if (projectId && projectId !== '') {
+      const keyfile = this.config.cryptoConfig().provider_key
+      const providerAccount = ethers.Wallet.fromEncryptedJsonSync(
+        keyfile,
+        this.config.cryptoConfig().provider_password,
+      )
+      const zerodevProvider = await ZeroDevEthersProvider.init('ECDSA', {
+        projectId,
+        owner: convertEthersV6SignerToAccountSigner(providerAccount),
+      })
+
+      return zerodevProvider.getAccountSigner()
+    }
   }
 
   async getAssetUrl(
@@ -241,6 +281,7 @@ export class NeverminedService {
             ethers.zeroPadValue('0x', 32),
             `download file ${index}`,
             from,
+            { zeroDevSigner: this.zerodevSigner },
           )
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }
@@ -451,6 +492,13 @@ export class NeverminedService {
     return Number(duration) || 0
   }
 
+  public getAssetPrice(service: ServiceCommon): bigint {
+    const assetPrice = DDO.getAssetPriceFromService(service)
+
+    if (assetPrice) return assetPrice.getTotalPrice()
+    throw new DDOError(`No price found for asset ${service.index}`)
+  }
+
   /**
    * Get the block number when a user bought the subscription
    *
@@ -484,11 +532,11 @@ export class NeverminedService {
         blockNumber: true,
       },
     }
-    const transferCondtion =
+    const transferCondition =
       ercType === 721
         ? this.nevermined.keeper.conditions.transferNft721Condition
         : this.nevermined.keeper.conditions.transferNftCondition
-    const [event] = await transferCondtion.events.getPastEvents(eventOptions)
+    const [event] = await transferCondition.events.getPastEvents(eventOptions)
 
     if (!event) {
       throw new ForbiddenException(
@@ -497,5 +545,19 @@ export class NeverminedService {
     }
 
     return Number(event.blockNumber)
+  }
+
+  /**
+   * It gets the user profile information from the marketplace api given the user address
+   * @param address user address
+   * @returns {@link Promise<Profile>}
+   */
+  async getUserProfileFromAddress(address: string): Promise<Profile> {
+    try {
+      return this.nevermined.services.profiles.findOneByAddress(address)
+    } catch (e) {
+      Logger.warn(`Cannot find the user profile with address ${address}`)
+      throw new NotFoundException(`Profile with address ${address} not found`)
+    }
   }
 }

@@ -17,6 +17,7 @@ export interface CryptoConfig {
   provider_password: string
   provider_rsa_public: string
   provider_rsa_private: string
+  zerodevProjectId: string
 }
 
 export interface ComputeConfig {
@@ -34,6 +35,14 @@ export interface SubscriptionsConfig {
   neverminedProxyUri: string
   defaultExpiryTime: string
   averageBlockTime: number
+}
+
+export interface BackendConfig {
+  isNVMBackendEnabled: boolean
+  trackBackendTxs: boolean
+  backendUrl: string
+  backendAuth: string
+  appUrl: string
 }
 
 const configProfile = require('../../../config')
@@ -86,6 +95,11 @@ const DOTENV_SCHEMA = Joi.object({
   COMPUTE_PROVIDER_KEYFILE: Joi.string(),
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
   NEVERMINED_PROXY_URI: Joi.string(),
+  ZERODEV_PROJECT_ID: Joi.string(),
+  NVM_BACKEND_URL: Joi.string(),
+  NVM_BACKEND_AUTH: Joi.string(),
+  TRACK_BACKEND_TXS: Joi.string(),
+  NVM_APP_URL: Joi.string(),
 })
 
 type DotenvSchemaKeys =
@@ -124,12 +138,18 @@ type DotenvSchemaKeys =
   | 'NEVERMINED_PROXY_URI'
   | 'SUBSCRIPTION_DEFAULT_EXPIRY_TIME'
   | 'NETWORK_AVERAGE_BLOCK_TIME'
+  | 'ZERODEV_PROJECT_ID'
+  | 'NVM_BACKEND_URL'
+  | 'NVM_BACKEND_AUTH'
+  | 'TRACK_BACKEND_TXS'
+  | 'NVM_APP_URL'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig
   private readonly crypto: CryptoConfig
   private readonly compute: ComputeConfig
   private readonly subscriptions: SubscriptionsConfig
+  private readonly backend: BackendConfig
 
   constructor() {
     this.envConfig = this.validateInput(configProfile)
@@ -138,6 +158,7 @@ export class ConfigService {
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
+      zerodevProjectId: this.get('ZERODEV_PROJECT_ID'),
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE'),
@@ -161,6 +182,13 @@ export class ConfigService {
       defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
       averageBlockTime: this.get<number>('NETWORK_AVERAGE_BLOCK_TIME'),
     }
+    this.backend = {
+      isNVMBackendEnabled: this.get<string>('NVM_BACKEND_URL') !== '',
+      trackBackendTxs: this.get<string>('TRACK_BACKEND_TXS') === 'true',
+      backendUrl: this.get<string>('NVM_BACKEND_URL'),
+      backendAuth: this.get<string>('NVM_BACKEND_AUTH'),
+      appUrl: this.get<string>('NVM_APP_URL'),
+    }
   }
 
   get<T>(path: DotenvSchemaKeys): T | undefined {
@@ -181,6 +209,10 @@ export class ConfigService {
 
   subscriptionsConfig(): SubscriptionsConfig {
     return this.subscriptions
+  }
+
+  backendConfig(): BackendConfig {
+    return this.backend
   }
 
   getProviderBabyjub() {
