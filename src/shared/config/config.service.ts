@@ -42,6 +42,7 @@ export interface BackendConfig {
   trackBackendTxs: boolean
   backendUrl: string
   backendAuth: string
+  appUrl: string
 }
 
 const configProfile = require('../../../config')
@@ -98,6 +99,7 @@ const DOTENV_SCHEMA = Joi.object({
   NVM_BACKEND_URL: Joi.string(),
   NVM_BACKEND_AUTH: Joi.string(),
   TRACK_BACKEND_TXS: Joi.string(),
+  NVM_APP_URL: Joi.string(),
 })
 
 type DotenvSchemaKeys =
@@ -140,6 +142,7 @@ type DotenvSchemaKeys =
   | 'NVM_BACKEND_URL'
   | 'NVM_BACKEND_AUTH'
   | 'TRACK_BACKEND_TXS'
+  | 'NVM_APP_URL'
 
 export class ConfigService {
   private readonly envConfig: EnvConfig
@@ -184,6 +187,7 @@ export class ConfigService {
       trackBackendTxs: this.get<string>('TRACK_BACKEND_TXS') === 'true',
       backendUrl: this.get<string>('NVM_BACKEND_URL'),
       backendAuth: this.get<string>('NVM_BACKEND_AUTH'),
+      appUrl: this.get<string>('NVM_APP_URL'),
     }
   }
 
