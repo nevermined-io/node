@@ -1,5 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, Logger } from '@nestjs/common'
 import {
+  ChargeType,
   DDO,
   DDOError,
   DID,
@@ -8,6 +9,8 @@ import {
   NeverminedNFT1155Type,
   NeverminedNFT721Type,
   Service,
+  SubscriptionType,
+  didPrefixed,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
@@ -21,6 +24,11 @@ export interface SubscriptionData {
   owner: string
   ercType: number
   tokenId?: string
+  subscriptionType?: SubscriptionType
+  chargeType?: ChargeType
+  minCreditsRequired?: bigint
+  minCreditsToCharge?: bigint
+  maxCreditsToCharge?: bigint
 }
 
 @Injectable()
@@ -30,7 +38,10 @@ export class SubscriptionsService {
   public readonly defaultExpiryTime: string
   private readonly averageBlockTime: number
 
-  constructor(private nvmService: NeverminedService, private config: ConfigService) {
+  constructor(
+    private nvmService: NeverminedService,
+    private config: ConfigService,
+  ) {
     this.jwtSecret = this.config.subscriptionsConfig().jwtSecret
     this.neverminedProxyUri = this.config.subscriptionsConfig().neverminedProxyUri
     this.defaultExpiryTime = this.config.subscriptionsConfig().defaultExpiryTime
@@ -45,7 +56,7 @@ export class SubscriptionsService {
    * @throws {@link BadRequestException}
    * @returns {@link SubscriptionData}
    */
-  public async validateDid(did: string): Promise<SubscriptionData> {
+  public async validateServiceDid(did: string): Promise<SubscriptionData> {
     let ddo: DDO
 
     // validate DID
@@ -113,9 +124,43 @@ export class SubscriptionsService {
       numberNfts = Number(DDO.getNftAmountFromService(nftAccessService))
       contractAddress = DDO.getNftContractAddressFromService(nftAccessService)
       tokenId = DDO.getTokenIdFromService(nftAccessService)
+
+      Logger.log(`Token Id obtained from nft-access service: ${tokenId} - ${didPrefixed(tokenId)}`)
     } catch (e) {
       Logger.error(
         `[GET /subscriptions] ${did}: getting numberNfts, contractAddress, tokenId from nft-access service`,
+      )
+      throw e
+    }
+
+    let subscriptionType = SubscriptionType.Time
+    let chargeType = ChargeType.Fixed
+
+    let minCreditsRequired = 1n
+    let minCreditsToCharge = 1n
+    let maxCreditsToCharge = 1n
+    try {
+      const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(didPrefixed(tokenId))
+      const subscriptionMetadata = subscriptionDDO.findServiceByType('metadata')
+
+      subscriptionType = subscriptionMetadata.attributes.main.subscription?.subscriptionType
+      if (subscriptionType === SubscriptionType.Credits) {
+        minCreditsRequired = nftAccessService.attributes.main.nftAttributes?.minCreditsRequired
+          ? nftAccessService.attributes.main.nftAttributes?.minCreditsRequired
+          : 1n
+        minCreditsToCharge = nftAccessService.attributes.main.nftAttributes?.minCreditsToCharge
+          ? nftAccessService.attributes.main.nftAttributes?.minCreditsToCharge
+          : 1n
+        maxCreditsToCharge = nftAccessService.attributes.main.nftAttributes?.maxCreditsToCharge
+          ? nftAccessService.attributes.main.nftAttributes?.maxCreditsToCharge
+          : 1n
+        chargeType = subscriptionMetadata.attributes.main.webService?.chargeType
+          ? subscriptionMetadata.attributes.main.webService?.chargeType
+          : ChargeType.Fixed
+      }
+    } catch (e) {
+      Logger.error(
+        `[GET /subscriptions] ${did}: error getting subscriptionType from subscription DDO - tokenId: ${tokenId}`,
       )
       throw e
     }
@@ -143,6 +188,11 @@ export class SubscriptionsService {
       owner,
       ercType,
       tokenId,
+      subscriptionType,
+      chargeType,
+      minCreditsRequired,
+      minCreditsToCharge,
+      maxCreditsToCharge,
     }
   }
 
@@ -208,6 +258,7 @@ export class SubscriptionsService {
    * Generates a JWT token for a web services subscription
    *
    * @param did - The did of the web services ddo with an associated subscription
+   * @param tokenId - The tokenId representing the DID of the subscription
    * @param userAddress - The ethereum address of the user requesting the JWT token
    * @param endpoints - The web service endpoints provided with the subscription
    * @param expiryTime - The expiry time for the JWT token. Set as the time left in the subscription or 2 years for unlimited subscriptions
@@ -218,20 +269,32 @@ export class SubscriptionsService {
    */
   public async generateToken(
     did: string,
+    tokenId: string,
     userAddress: string,
     endpoints: any,
     expiryTime: number | string,
     owner: string,
     ercType: number,
     headers?: any,
+    subscriptionType?: SubscriptionType,
+    chargeType?: ChargeType,
+    minCreditsRequired?: bigint,
+    minCreditsToCharge?: bigint,
+    maxCreditsToCharge?: bigint,
   ): Promise<string> {
     return await new jose.EncryptJWT({
       did: did,
+      subscriptionDid: tokenId,
       userId: userAddress,
       ercType,
       endpoints,
       headers,
       owner,
+      subscriptionType,
+      chargeType,
+      minCreditsRequired,
+      minCreditsToCharge,
+      maxCreditsToCharge,
     })
       .setProtectedHeader({ alg: 'dir', enc: 'A128CBC-HS256' })
       .setIssuedAt()

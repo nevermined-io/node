@@ -33,19 +33,18 @@ export class SubscriptionsController {
   async getAccessToken(@Req() req, @Param('did') did: string): Promise<SubscriptionTokenDto> {
     // get subscription data
 
-    const { contractAddress, numberNfts, endpoints, headers, owner, ercType, tokenId } =
-      await this.subscriptionService.validateDid(did)
+    const subscriptionData = await this.subscriptionService.validateServiceDid(did)
 
     // validate that the subscription is valid
     let expiryTime: string
-    const isOwner = req.user.address.toLowerCase() === owner.toLowerCase()
+    const isOwner = req.user.address.toLowerCase() === subscriptionData.owner.toLowerCase()
     if (!isOwner) {
       const isValid = await this.subscriptionService.isSubscriptionValid(
-        contractAddress,
-        ercType,
-        numberNfts,
+        subscriptionData.contractAddress,
+        subscriptionData.ercType,
+        subscriptionData.numberNfts,
         req.user.address,
-        tokenId,
+        subscriptionData.tokenId,
       )
 
       if (!isValid) {
@@ -59,10 +58,10 @@ export class SubscriptionsController {
 
       // get expiry time
       expiryTime = await this.subscriptionService.getExpirationTime(
-        contractAddress,
+        subscriptionData.contractAddress,
         req.user.address,
-        ercType,
-        tokenId,
+        subscriptionData.ercType,
+        subscriptionData.tokenId,
       )
     } else {
       expiryTime = this.subscriptionService.defaultExpiryTime
@@ -72,12 +71,13 @@ export class SubscriptionsController {
     // get access token
     const accessToken = await this.subscriptionService.generateToken(
       did,
+      subscriptionData.tokenId,
       req.user.address,
-      endpoints,
+      subscriptionData.endpoints,
       expiryTime,
-      owner,
-      ercType,
-      headers,
+      subscriptionData.owner,
+      subscriptionData.ercType,
+      subscriptionData.headers,
     )
 
     return {

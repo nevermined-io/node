@@ -13,7 +13,10 @@ import { ConfigService } from '../shared/config/config.service'
 @ApiTags('Info')
 @Controller()
 export class InfoController {
-  constructor(private nvmService: NeverminedService, private config: ConfigService) {}
+  constructor(
+    private nvmService: NeverminedService,
+    private config: ConfigService,
+  ) {}
   @Get()
   @ApiOperation({
     description: 'Get API info',

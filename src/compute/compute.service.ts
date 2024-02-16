@@ -27,7 +27,10 @@ export type PodStatus = {
 export class ComputeService {
   private networkName: string
 
-  constructor(private configService: ConfigService, private nvmService: NeverminedService) {}
+  constructor(
+    private configService: ConfigService,
+    private nvmService: NeverminedService,
+  ) {}
 
   private async getNetworkName(): Promise<string> {
     if (!this.networkName)
@@ -143,9 +146,8 @@ export class ComputeService {
     const transformationDid = workflow.stages[0].transformation.id
     Logger.debug(`Resolving transformation Did ${transformationDid}`)
 
-    const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(
-      transformationDid,
-    )
+    const transformationDdo: DDO =
+      await this.nvmService.nevermined.assets.resolve(transformationDid)
     const transformationMetadata = transformationDdo.findServiceByType('metadata')
 
     // get args and container

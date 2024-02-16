@@ -31,7 +31,10 @@ import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
 @ApiTags('Compute')
 @Controller()
 export class ComputeController {
-  constructor(private computeService: ComputeService, private configService: ConfigService) {}
+  constructor(
+    private computeService: ComputeService,
+    private configService: ConfigService,
+  ) {}
 
   private argoNamespace = this.configService.computeConfig().argo_namespace
   private argoWorkflowApi = new WorkflowServiceApi({
