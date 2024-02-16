@@ -12,6 +12,7 @@ import {
   generateId,
   Nevermined,
   NFTAttributes,
+  NvmAppMetadata,
   SubscriptionCreditsNFTApi,
   SubscriptionNFTApi,
 } from '@nevermined-io/sdk'
@@ -208,9 +209,14 @@ describe('SubscriptionsController', () => {
         publisher,
       )
 
+      const subscriptionMetadata = NvmAppMetadata.getTimeSubscriptionMetadataTemplate(
+        'NVM App Time only Node Subscription test',
+        'Nevermined',
+        'hours',
+      )
       // get the subscription ddo
       const nftAttributesSubscription = NFTAttributes.getSubscriptionInstance({
-        metadata: getMetadata(),
+        metadata: subscriptionMetadata,
         services: [
           {
             serviceType: 'nft-sales',
@@ -241,7 +247,10 @@ describe('SubscriptionsController', () => {
         services: [
           {
             serviceType: 'nft-access',
-            nft: { nftTransfer: false },
+            nft: {
+              tokenId: ddoSubscription.shortId(),
+              nftTransfer: false,
+            },
           },
         ],
         providers: [config.neverminedNodeAddress],

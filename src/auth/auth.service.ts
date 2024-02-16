@@ -21,7 +21,10 @@ const BASE_URL = '/api/v1/node/services/'
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService, private nvmService: NeverminedService) {}
+  constructor(
+    private jwtService: JwtService,
+    private nvmService: NeverminedService,
+  ) {}
 
   async validateOwner(params: ValidationParams): Promise<void> {
     const nevermined = this.nvmService.getNevermined()

@@ -59,7 +59,10 @@ export enum UploadBackends {
 @ApiTags('Access')
 @Controller()
 export class AccessController {
-  constructor(private nvmService: NeverminedService, private backendService: BackendService) {}
+  constructor(
+    private nvmService: NeverminedService,
+    private backendService: BackendService,
+  ) {}
 
   @Get('access/:agreement_id/:index')
   @ApiOperation({
@@ -281,9 +284,8 @@ export class AccessController {
       }
       Logger.log(`Subscriber Notification: ${JSON.stringify(subscriberNotification)}`)
 
-      const subsNotifResult = await this.backendService.sendMintingNotification(
-        subscriberNotification,
-      )
+      const subsNotifResult =
+        await this.backendService.sendMintingNotification(subscriberNotification)
       Logger.log(`Sending notification with result: ${subsNotifResult}`)
     } catch (e) {
       Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
@@ -302,9 +304,8 @@ export class AccessController {
       }
       Logger.log(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
 
-      const pubNotifResult = await this.backendService.sendMintingNotification(
-        publisherNotification,
-      )
+      const pubNotifResult =
+        await this.backendService.sendMintingNotification(publisherNotification)
       Logger.log(`Sending notification with result: ${pubNotifResult}`)
     } catch (e) {
       Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)

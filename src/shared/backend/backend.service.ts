@@ -35,7 +35,10 @@ export class BackendService {
   backendAuth: string
   appUrl: string
 
-  constructor(private config: ConfigService, private readonly httpService: HttpService) {}
+  constructor(
+    private config: ConfigService,
+    private readonly httpService: HttpService,
+  ) {}
 
   async onModuleInit() {
     Logger.debug(`Starting BackendService`)

@@ -48,7 +48,10 @@ export class NeverminedService {
   zerodevSigner: ZeroDevAccountSigner<'ECDSA'>
   public providerAddress: string
 
-  constructor(private config: ConfigService, private readonly httpService: HttpService) {}
+  constructor(
+    private config: ConfigService,
+    private readonly httpService: HttpService,
+  ) {}
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm()
