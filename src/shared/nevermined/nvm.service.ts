@@ -15,7 +15,7 @@ import {
   convertEthersV6SignerToAccountSigner,
   ServiceCommon,
   DDOError,
-  Profile,
+  ReducedProfile,
 } from '@nevermined-io/sdk'
 import {
   BadRequestException,
@@ -555,7 +555,7 @@ export class NeverminedService {
    * @param address user address
    * @returns {@link Promise<Profile>}
    */
-  async getUserProfileFromAddress(address: string): Promise<Profile> {
+  async getUserProfileFromAddress(address: string): Promise<ReducedProfile> {
     try {
       return this.nevermined.services.profiles.findOneByAddress(address)
     } catch (e) {
