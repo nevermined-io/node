@@ -88,7 +88,7 @@
     "@types/jest": "^29.5.2",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/lodash": "^4.14.179",
-    "@types/node": "^20.9.2",
+    "@types/node": "^20.11.24",
     "@types/passport-jwt": "^3.0.9",
     "@types/passport-local": "^1.0.34",
     "@types/supertest": "^2.0.11",
