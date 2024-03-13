@@ -37,6 +37,9 @@ export class SubscriptionsController {
 
     // validate that the subscription is valid
     let expiryTime: string
+    Logger.debug(
+      `Getting Access Token: Req.user.address: ${req.user.address} Subscription Owner: ${subscriptionData.owner}`,
+    )
     const isOwner = req.user.address.toLowerCase() === subscriptionData.owner.toLowerCase()
     if (!isOwner) {
       const isValid = await this.subscriptionService.isSubscriptionValid(
