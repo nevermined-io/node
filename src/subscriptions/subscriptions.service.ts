@@ -10,6 +10,7 @@ import {
   NeverminedNFT721Type,
   Service,
   SubscriptionType,
+  ZeroAddress,
   didPrefixed,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
@@ -177,9 +178,23 @@ export class SubscriptionsService {
       'PSK-RSA',
     )
 
-    // get the owner of the DID
-    const owner = await this.nvmService.nevermined.keeper.didRegistry.getDIDOwner(did)
+    Logger.debug(
+      `DIDRegistry: ${await this.nvmService.nevermined.keeper.didRegistry.contract.getAddress()}`,
+    )
 
+    // get the owner of the DID
+    let owner = await this.nvmService.nevermined.keeper.didRegistry.getDIDOwner(did)
+    if (owner === ZeroAddress) {
+      Logger.debug(
+        `Owner not found on-chain, probably asset was registered off-chain. Getting owner from DDO.`,
+      )
+      owner = ddo.proof?.creator || ddo.publicKey[0].owner
+    }
+
+    // const didAttributes = await this.nvmService.nevermined.keeper.didRegistry.getAttributesByDid(did)
+    // const owner = didAttributes['owner']
+    // Logger.debug(`DID Attributes: ${JSON.stringify(didAttributes)}`)
+    Logger.debug(`Getting DID Owner: ${owner} for DID: ${did}`)
     return {
       numberNfts,
       contractAddress,
