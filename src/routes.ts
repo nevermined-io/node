@@ -1,4 +1,3 @@
-import { Routes } from 'nest-router'
 import { AuthModule } from './auth/auth.module'
 import { EncryptModule } from './encrypt/encrypt.module'
 import { InfoModule } from './info/info.module'
@@ -8,7 +7,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
 const exposeCompute: boolean = process.env.ENABLE_COMPUTE === 'true'
 
-export const routes: Routes = [
+export const routes = [
   { path: '/api/v1/node/services/encrypt', module: EncryptModule },
   { path: '/api/v1/node/services/oauth', module: AuthModule },
   { path: '/api/v1/node/services/subscriptions', module: SubscriptionsModule },

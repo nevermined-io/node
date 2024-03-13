@@ -1,20 +1,20 @@
-import { Module, MiddlewareConsumer, RequestMethod } from '@nestjs/common'
-import { RouterModule } from 'nest-router'
-import { routes } from './routes'
-import { ConfigModule } from './shared/config/config.module'
-import { InfoModule } from './info/info.module'
-import { HttpsRedirectMiddleware } from './common/middlewares/https-redirection/https-redirection.middleware'
-import { AuthModule } from './auth/auth.module'
-import { EncryptModule } from './encrypt/encrypt.module'
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common'
+import { RouterModule } from '@nestjs/core'
 import { AccessModule } from './access/access.module'
-import { NeverminedModule } from './shared/nevermined/nvm.module'
-import { BackendModule } from './shared/backend/backend.module'
+import { AuthModule } from './auth/auth.module'
+import { HttpsRedirectMiddleware } from './common/middlewares/https-redirection/https-redirection.middleware'
 import { ComputeModule } from './compute/compute.module'
+import { EncryptModule } from './encrypt/encrypt.module'
+import { InfoModule } from './info/info.module'
+import { routes } from './routes'
+import { BackendModule } from './shared/backend/backend.module'
+import { ConfigModule } from './shared/config/config.module'
+import { NeverminedModule } from './shared/nevermined/nvm.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
 @Module({
   imports: [
-    RouterModule.forRoutes(routes),
+    RouterModule.register(routes),
     ConfigModule,
     InfoModule,
     EncryptModule,
