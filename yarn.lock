@@ -1474,10 +1474,10 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk-dtp@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.6.2.tgz#d5704524ea2609bd78518bd22efe9bb8c9e6d21c"
-  integrity sha512-dU7Exoicufyk2RBELF6ZjGq4SAXDwIAiZuKMIGI88QdOMnYDG04lkCqYlJMbpFUoM1ReRC4WiMJZCAYlEC8ptg==
+"@nevermined-io/sdk-dtp@^0.7.0-rc5":
+  version "0.7.0-rc5"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk-dtp/-/sdk-dtp-0.7.0-rc5.tgz#60c21313c357711163126119d89b68021af57c3f"
+  integrity sha512-bwQ42SBrja3NSLgxOSrJXhs+jGkZbIE71itTfCikUL6xz+mGsfSsVeTnF/8kf2m+A+qOGvEB/pkV/3U9T1ee+w==
   dependencies:
     circomlibjs "^0.1.1"
     eciesjs "^0.3.15"
