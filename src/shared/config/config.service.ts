@@ -96,7 +96,7 @@ const DOTENV_SCHEMA = Joi.object({
   COMPUTE_PROVIDER_PASSWORD: Joi.string(),
   NEVERMINED_PROXY_URI: Joi.string(),
   ZERODEV_PROJECT_ID: Joi.string().allow(''),
-  NVM_BACKEND_URL: Joi.string(),
+  NVM_BACKEND_URL: Joi.string().allow(''),
   NVM_BACKEND_AUTH: Joi.string(),
   TRACK_BACKEND_TXS: Joi.string(),
   NVM_APP_URL: Joi.string(),
