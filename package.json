@@ -90,7 +90,7 @@
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.17.0",
-    "@types/node": "^20.11.26",
+    "@types/node": "^20.11.28",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
