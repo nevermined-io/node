@@ -93,12 +93,15 @@ export class SubscriptionsService {
         throw e
       }
     }
-    if (metadataService.attributes.main.type !== 'service') {
+    if (
+      metadataService.attributes.main.type !== 'service' &&
+      metadataService.attributes.main.type !== 'assistant'
+    ) {
       Logger.debug(
-        `[GET /subscriptions] DID ${did} DDO has type ${metadataService.attributes.main.type}: should be service`,
+        `[GET /subscriptions] DID ${did} DDO has type ${metadataService.attributes.main.type}: should be service or assistant`,
       )
       throw new BadRequestException(
-        `${did} DDO has type ${metadataService.attributes.main.type}: should be service`,
+        `${did} DDO has type ${metadataService.attributes.main.type}: should be service or assistant`,
       )
     }
 
