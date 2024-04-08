@@ -2,9 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
-  NotFoundException,
   InternalServerErrorException,
+  Logger,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -13,42 +15,40 @@ import {
   StreamableFile,
   UploadedFile,
   UseInterceptors,
-  ForbiddenException,
-  Logger,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiBadRequestResponse,
-  ApiNotFoundResponse,
-  ApiInternalServerErrorResponse,
-  ApiForbiddenResponse,
 } from '@nestjs/swagger'
-import { Request } from '../common/helpers/request.interface'
-import { Public } from '../common/decorators/auth.decorator'
-import { FileInterceptor } from '@nestjs/platform-express'
+import {
+  AgreementData,
+  DID,
+  ServiceType,
+  ValidationParams,
+  ZeroAddress,
+  generateId,
+  zeroX,
+} from '@nevermined-io/sdk'
 import crypto from 'crypto'
-import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
+import { aes_encryption_256 } from '../common/helpers/encryption.helper'
+import { Public } from '../common/decorators/auth.decorator'
+import { Request } from '../common/helpers/request.interface'
 import {
   AssetTransaction,
   BackendService,
   UserNotification,
 } from '../shared/backend/backend.service'
+import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service'
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
-import {
-  generateId,
-  ValidationParams,
-  AgreementData,
-  ServiceType,
-  DID,
-  zeroX,
-  ZeroAddress,
-} from '@nevermined-io/sdk'
-import { aes_encryption_256 } from '@nevermined-io/sdk-dtp'
 
 export enum UploadBackends {
   IPFS = 'ipfs',
