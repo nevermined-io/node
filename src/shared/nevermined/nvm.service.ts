@@ -1,39 +1,41 @@
-import { ForbiddenException, Injectable, Logger } from '@nestjs/common'
-import {
-  generateId,
-  didZeroX,
-  DDO,
-  MetaDataMain,
-  Nevermined,
-  MetaDataExternalResource,
-  InstantiableConfig,
-  EventOptions,
-  Service,
-  DDOServiceNotFoundError,
-  ServiceType,
-  generateInstantiableConfigFromConfig,
-  convertEthersV6SignerToAccountSigner,
-  ServiceCommon,
-  DDOError,
-  ReducedProfile,
-} from '@nevermined-io/sdk'
+import { HttpModuleOptions, HttpService } from '@nestjs/axios'
 import {
   BadRequestException,
+  ForbiddenException,
+  Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   StreamableFile,
 } from '@nestjs/common'
-import AWS from 'aws-sdk'
-import { default as FormData } from 'form-data'
-import { ConfigService } from '../config/config.service'
-import { decrypt, Dtp, aes_decryption_256 } from '@nevermined-io/sdk-dtp'
-import { ethers } from 'ethers'
-import { HttpModuleOptions, HttpService } from '@nestjs/axios'
-import { firstValueFrom } from 'rxjs'
-import { AxiosError } from 'axios'
-import IpfsHttpClientLite from 'ipfs-http-client-lite'
-import { UploadBackends } from 'src/access/access.controller'
+import {
+  DDO,
+  DDOError,
+  DDOServiceNotFoundError,
+  EventOptions,
+  InstantiableConfig,
+  MetaDataExternalResource,
+  MetaDataMain,
+  Nevermined,
+  ReducedProfile,
+  Service,
+  ServiceCommon,
+  ServiceType,
+  convertEthersV6SignerToAccountSigner,
+  didZeroX,
+  generateId,
+  generateInstantiableConfigFromConfig,
+} from '@nevermined-io/sdk'
 import { ZeroDevAccountSigner, ZeroDevEthersProvider } from '@zerodev/sdk'
+import AWS from 'aws-sdk'
+import { AxiosError } from 'axios'
+import { ethers } from 'ethers'
+import { default as FormData } from 'form-data'
+import IpfsHttpClientLite from 'ipfs-http-client-lite'
+import { firstValueFrom } from 'rxjs'
+import { UploadBackends } from 'src/access/access.controller'
+import { aes_decryption_256, decrypt } from '../../common/helpers/encryption.helper'
+import { ConfigService } from '../config/config.service'
 
 export enum AssetResult {
   DATA = 'data',
@@ -44,7 +46,6 @@ export enum AssetResult {
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
-  dtp: Dtp
   zerodevSigner: ZeroDevAccountSigner<'ECDSA'>
   public providerAddress: string
 
@@ -74,11 +75,6 @@ export class NeverminedService {
     }
 
     this.nevermined = await Nevermined.getInstance(config)
-    const instanceConfig = {
-      ...(await generateInstantiableConfigFromConfig(config)),
-      nevermined: this.nevermined,
-    }
-    this.dtp = await Dtp.getInstance(instanceConfig as any, this.config.cryptoConfig())
 
     // setup zerodev
     this.zerodevSigner = await this.setupZerodev()
@@ -94,10 +90,6 @@ export class NeverminedService {
 
   getNevermined() {
     return this.nevermined
-  }
-
-  getDtp() {
-    return this.dtp
   }
 
   instanceConfig(): InstantiableConfig {

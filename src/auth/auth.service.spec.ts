@@ -2,8 +2,7 @@ import { AuthService } from './auth.service'
 import { JwtService } from '@nestjs/jwt'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { Test } from '@nestjs/testing'
-import { Babysig, ServiceType, ValidationParams } from '@nevermined-io/sdk'
-import { UnauthorizedException } from '@nestjs/common'
+import { ServiceType, ValidationParams } from '@nevermined-io/sdk'
 
 describe('AuthService', () => {
   let authService: AuthService
@@ -50,11 +49,6 @@ describe('AuthService', () => {
           list: jest.fn().mockResolvedValue([]),
         },
       }),
-      getDtp: jest.fn().mockReturnValue({
-        keytransfer: {
-          verifyBabyjub: jest.fn().mockResolvedValue(true),
-        },
-      }),
     }
     jwtServiceMock = {
       sign: jest.fn().mockReturnValue('token'),
@@ -96,58 +90,6 @@ describe('AuthService', () => {
       expect(
         await nvmServiceMock.getNevermined().assets.servicePlugin.access.accept,
       ).toHaveBeenCalledWith(params)
-    })
-  })
-
-  describe('ValidateTransferProof', () => {
-    it('should throw an error if the signature is invalid', async () => {
-      nvmServiceMock.getDtp.mockReturnValue({
-        keytransfer: {
-          verifyBabyjub: jest.fn(() => Promise.resolve(false)),
-        },
-      })
-
-      const params: ValidationParams = {
-        did: '0x123',
-        agreement_id: '0x12345',
-        buyer: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-        consumer_address: '0x0123456789abcdef0123456789abcdef0123456789',
-        babysig:
-          '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' as never as Babysig,
-      }
-
-      await expect(authService.validateTransferProof(params)).rejects.toThrowError(
-        UnauthorizedException,
-      )
-      expect(nvmServiceMock.getDtp().keytransfer.verifyBabyjub).toHaveBeenCalledWith(
-        expect.any(Object),
-        BigInt('0x0123456789abcdef0123456789abcdef0123456789'),
-        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-      )
-    })
-
-    it('should not throw an error if the signature is valid', async () => {
-      nvmServiceMock.getDtp.mockReturnValue({
-        keytransfer: {
-          verifyBabyjub: jest.fn(() => Promise.resolve(true)),
-        },
-      })
-
-      const params: ValidationParams = {
-        did: '0x123',
-        agreement_id: '0x12345',
-        buyer: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-        consumer_address: '0x0123456789abcdef0123456789abcdef0123456789',
-        babysig:
-          '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' as never as Babysig,
-      }
-
-      await expect(authService.validateTransferProof(params)).resolves.not.toThrowError()
-      expect(nvmServiceMock.getDtp().keytransfer.verifyBabyjub).toHaveBeenCalledWith(
-        expect.any(Object),
-        BigInt('0x0123456789abcdef0123456789abcdef0123456789'),
-        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
-      )
     })
   })
 })

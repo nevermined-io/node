@@ -5,7 +5,7 @@ import { Logger } from '@nevermined-io/sdk'
 import { EncryptDto } from './dto/encrypt'
 import { EncryptResult } from './dto/result'
 import { ConfigService } from '../shared/config/config.service'
-import { encrypt } from '@nevermined-io/sdk-dtp'
+import { encrypt } from '../common/helpers/encryption.helper'
 
 @ApiTags('Encrypt')
 @Controller()

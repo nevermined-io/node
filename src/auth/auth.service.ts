@@ -5,8 +5,6 @@ import {
   ServiceType,
   ValidationParams,
   didZeroX,
-  zeroX,
-  BabyjubPublicKey,
   Logger,
   Babysig,
   DDO,
@@ -108,23 +106,6 @@ export class AuthService {
     }
   }
 
-  async validateTransferProof(params: ValidationParams): Promise<void> {
-    const dtp = this.nvmService.getDtp()
-    const buyerPub = new BabyjubPublicKey(
-      zeroX(params.buyer.substring(0, 64)),
-      zeroX(params.buyer.substring(64, 128)),
-    )
-    if (
-      !(await dtp.keytransfer.verifyBabyjub(
-        buyerPub,
-        BigInt(params.consumer_address),
-        params.babysig,
-      ))
-    ) {
-      throw new UnauthorizedException(`Bad signature for address ${params.consumer_address}`)
-    }
-  }
-
   async validateClaim(payload: JWTPayload): Promise<LoginDto> {
     try {
       const params: ValidationParams = {
@@ -142,8 +123,6 @@ export class AuthService {
         await this.validateOwner(params)
       } else if (payload.aud === BASE_URL + 'nft-access') {
         await this.validateAccess(params, 'nft-access')
-      } else if (payload.aud === BASE_URL + 'nft-sales-proof') {
-        await this.validateTransferProof(params)
       }
 
       const { iat: _iat, exp: _exp, ...accessTokenPayload } = payload
