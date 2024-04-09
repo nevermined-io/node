@@ -73,7 +73,7 @@ export class AuthService {
         NeverminedNFT1155Type.nft1155Credit.toString()
     if (isNft1155Credit) {
       Logger.debug(`Validating NFT1155 Credit for ${params.did}`)
-      const [from] = await nevermined.accounts.list()
+      const [from] = nevermined.accounts.list()
       const plugin = nevermined.nfts1155.servicePlugin['nft-access']
 
       try {
@@ -93,14 +93,12 @@ export class AuthService {
       nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
     try {
-      const [from] = await nevermined.accounts.list()
       const granted = await plugin.accept(params)
       if (!granted) {
-        await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+        await plugin.process(params, this.nvmService.nodeAccount) //from, { zeroDevSigner: this.nvmService.zerodevSigner })
       }
 
-      if (plugin.track)
-        await plugin.track(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+      if (plugin.track) await plugin.track(params, this.nvmService.nodeAccount) //, { zeroDevSigner: this.nvmService.zerodevSigner })
     } catch (error) {
       throw new UnauthorizedException(`Error processing request: ${error.message}`)
     }

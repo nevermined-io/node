@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
-import { HDNodeWallet, ethers } from 'ethers'
+//import { HDNodeWallet, ethers } from 'ethers'
+import ethers, { HDNodeWallet } from 'ethers'
 import NodeRSA from 'node-rsa'
 
 export interface CryptoConfig {

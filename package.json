@@ -1,14 +1,14 @@
 {
   "name": "node-ts",
-  "version": "2.4.9",
+  "version": "3.0.0-rc0",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {
     "artifacts:download": "./scripts/download-artifacts.sh",
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint ./",
-    "clean": "rm -rf ./dist/ ./doc/ ./.nyc_output",
-    "lint:fix": "yarn run lint -- --fix",
+    "clean": "rm -rf ./dist/ ./doc/ ./.nyc_output ./node_modules/permissionless",
+    "lint:fix": "eslint ./ --fix",
     "format:check": "yarn prettier --check src scripts",
     "format:fix": "yarn prettier --check src scripts -w",
     "setup:dev": "cp ./config/local.js.sample ./config/local.js && cp .env.sample .env",
@@ -79,7 +79,8 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.4.2",
-    "viem": "^2.9.15"
+    "viem": "^2.9.13",
+    "ethers": "^6.11.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.1.0",
@@ -100,7 +101,7 @@
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "aws-sdk-mock": "^5.9.0",
-    "eslint": "^9.0.0",
+    "eslint": "^8.5.7",
     "eslint-config-nevermined": "^0.2.0",
     "eslint-config-next": "^14.1.4",
     "eslint-config-prettier": "^9.1.0",

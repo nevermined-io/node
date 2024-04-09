@@ -12,6 +12,7 @@ import {
   generateId,
   Nevermined,
   NFTAttributes,
+  NvmAccount,
   NvmAppMetadata,
   SubscriptionCreditsNFTApi,
   SubscriptionNFTApi,
@@ -77,7 +78,7 @@ describe('SubscriptionsController', () => {
 
     // get a nevermined instance
     nevermined = await Nevermined.getInstance(config)
-    const [account] = await nevermined.accounts.list()
+    const [account] = nevermined.accounts.list()
     const clientAssertion = await nevermined.utils.jwt.generateClientAssertion(account)
     await nevermined.services.marketplace.login(clientAssertion)
   })
@@ -131,7 +132,7 @@ describe('SubscriptionsController', () => {
     let ddoNoNftAccess: DDO
 
     beforeAll(async () => {
-      const [account] = await nevermined.accounts.list()
+      const [account] = nevermined.accounts.list()
 
       // no 'service' type
       let assetAttributes = AssetAttributes.getInstance({
@@ -183,9 +184,12 @@ describe('SubscriptionsController', () => {
     let subscriberToken: string
     let subscriberAddress: string
     let ownerAddress: string
+    let publisher: NvmAccount
+    let subscriber: NvmAccount
+    let notSubscriber: NvmAccount
 
     beforeAll(async () => {
-      const [publisher, subscriber, notSubscriber] = await nevermined.accounts.list()
+      ;[publisher, subscriber, notSubscriber] = nevermined.accounts.list()
       subscriberAddress = subscriber.getId()
       ownerAddress = publisher.getId()
 
@@ -223,7 +227,7 @@ describe('SubscriptionsController', () => {
             nft: { duration: 1000, nftTransfer: false, amount: 1n },
           },
         ],
-        providers: [config.neverminedNodeAddress],
+        providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
@@ -253,19 +257,17 @@ describe('SubscriptionsController', () => {
             },
           },
         ],
-        providers: [config.neverminedNodeAddress],
+        providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
       ddoWebService = await nevermined.nfts721.create(nftAttributesNoContractAddress, publisher)
 
       // not a subscriber bearer token
-      let signer = await nevermined.accounts.findSigner(notSubscriber.getId())
-      notSubscriberToken = await authService.createToken({}, signer)
+      notSubscriberToken = await authService.createToken({}, notSubscriber)
 
       // subscriber bearer token
-      signer = await nevermined.accounts.findSigner(subscriber.getId())
-      subscriberToken = await authService.createToken({}, signer)
+      subscriberToken = await authService.createToken({}, subscriber)
 
       // buy subscription
       const agreementId = await nevermined.nfts721.order(ddoSubscription.id, subscriber)
@@ -346,8 +348,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow the owner to retrieve the token', async () => {
-      const signer = await nevermined.accounts.findSigner(ownerAddress)
-      const ownerToken = await authService.createToken({}, signer)
+      const ownerToken = await authService.createToken({}, publisher)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
@@ -373,9 +374,12 @@ describe('SubscriptionsController', () => {
     let subscriberAddress: string
     let ownerAddress: string
     const subscriptionCredits = 100n
+    let publisher: NvmAccount
+    let subscriber: NvmAccount
+    let notSubscriber: NvmAccount
 
     beforeAll(async () => {
-      const [publisher, subscriber, notSubscriber] = await nevermined.accounts.list()
+      ;[publisher, subscriber, notSubscriber] = nevermined.accounts.list()
       subscriberAddress = subscriber.getId()
       ownerAddress = publisher.getId()
 
@@ -408,7 +412,7 @@ describe('SubscriptionsController', () => {
             nft: { duration: 1000, nftTransfer: false, amount: subscriptionCredits },
           },
         ],
-        providers: [config.neverminedNodeAddress],
+        providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
@@ -435,19 +439,17 @@ describe('SubscriptionsController', () => {
             nft: { tokenId: ddoSubscription.shortId(), amount: 1n, nftTransfer: false },
           },
         ],
-        providers: [config.neverminedNodeAddress],
+        providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
       ddoWebService = await nevermined.nfts1155.create(nftAttributesNoContractAddress, publisher)
 
       // not a subscriber bearer token
-      let signer = await nevermined.accounts.findSigner(notSubscriber.getId())
-      notSubscriberToken = await authService.createToken({}, signer)
+      notSubscriberToken = await authService.createToken({}, notSubscriber)
 
       // subscriber bearer token
-      signer = await nevermined.accounts.findSigner(subscriber.getId())
-      subscriberToken = await authService.createToken({}, signer)
+      subscriberToken = await authService.createToken({}, subscriber)
 
       // buy subscription
       const agreementId = await nevermined.nfts1155.order(
@@ -533,8 +535,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should allow the owner to retrieve the token', async () => {
-      const signer = await nevermined.accounts.findSigner(ownerAddress)
-      const ownerToken = await authService.createToken({}, signer)
+      const ownerToken = await authService.createToken({}, publisher)
 
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)

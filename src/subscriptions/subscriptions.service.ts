@@ -360,10 +360,11 @@ export class SubscriptionsService {
       )
 
     // get current block number
-    const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
+    const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
 
     // blocks left in the subscription
-    const subscriptionBlocksLeft = subscriptionTransferBlockNumber + duration - currentBlockNumber
+    const subscriptionBlocksLeft =
+      subscriptionTransferBlockNumber + duration - Number(currentBlockNumber)
     if (subscriptionBlocksLeft <= 0) {
       throw new ForbiddenException(
         `Subscription with DID/TokenId ${tokenId} for user ${userAddress} is expired.`,

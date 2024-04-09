@@ -17,6 +17,7 @@ import {
   MetaDataExternalResource,
   MetaDataMain,
   Nevermined,
+  NvmAccount,
   ReducedProfile,
   Service,
   ServiceCommon,
@@ -26,7 +27,7 @@ import {
   generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
 import { createEcdsaKernelAccountClient } from '@zerodev/presets/zerodev'
-import { KernelSmartAccount,  } from '@zerodev/sdk'
+import { KernelSmartAccount } from '@zerodev/sdk'
 import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
 import { ethers } from 'ethers'
@@ -35,7 +36,7 @@ import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
-import {  privateKeyToAccount } from 'viem/accounts'
+import { privateKeyToAccount } from 'viem/accounts'
 import { aes_decryption_256, decrypt } from '../../common/helpers/encryption.helper'
 import { ConfigService } from '../config/config.service'
 
@@ -49,6 +50,7 @@ export enum AssetResult {
 export class NeverminedService {
   nevermined: Nevermined
   zerodevSigner: KernelSmartAccount
+  nodeAccount: NvmAccount
   public providerAddress: string
 
   constructor(
@@ -68,7 +70,7 @@ export class NeverminedService {
       )}`,
     )
 
-    const web3 = createPublicClient({transport: http(config.web3ProviderUri)})
+    const web3 = createPublicClient({ transport: http(config.web3ProviderUri) })
     try {
       await web3.getChainId()
     } catch (e) {
@@ -80,7 +82,7 @@ export class NeverminedService {
 
     // setup zerodev
     this.zerodevSigner = await this.setupZerodev()
-
+    this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
     // set provider address
     if (this.zerodevSigner) {
       this.providerAddress = this.zerodevSigner.address
@@ -114,11 +116,12 @@ export class NeverminedService {
         keyfile,
         this.config.cryptoConfig().provider_password,
       )
-      const signer = privateKeyToAccount(keyfile as `0x${string}`)
+
+      const signer = privateKeyToAccount(providerAccount.privateKey as `0x${string}`)
 
       const kernelClient = await createEcdsaKernelAccountClient({
         projectId: projectId,
-        signer
+        signer,
       })
       // const zerodevProvider = await ZeroDevEthersProvider.init('ECDSA', {
       //   projectId,
@@ -281,9 +284,9 @@ export class NeverminedService {
             didZeroX(did),
             userAddress,
             generateId(),
-            pad('0x', {size: 32}),
+            pad('0x', { size: 32 }),
             `download file ${index}`,
-            from  
+            from,
           )
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }

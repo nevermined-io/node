@@ -206,8 +206,8 @@ export class AccessController {
 
     let expiration = 0
     if (duration > 0) {
-      const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
-      expiration = currentBlockNumber + duration
+      const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
+      expiration = Number(currentBlockNumber) + duration
     }
 
     const params: ValidationParams = {
@@ -222,13 +222,14 @@ export class AccessController {
     }
 
     const plugin = nevermined.assets.servicePlugin[template]
-    const [from] = await nevermined.accounts.list()
 
     try {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
-      await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+
+      //await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+      await plugin.process(params, this.nvmService.nodeAccount)
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)

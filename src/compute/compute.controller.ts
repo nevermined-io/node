@@ -31,21 +31,24 @@ import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
 @ApiTags('Compute')
 @Controller()
 export class ComputeController {
+  private argoNamespace
+  private argoWorkflowApi
+  private getAuthorizationHeaderOption: { headers: { Authorization: string } } | any
+
   constructor(
     private computeService: ComputeService,
     private configService: ConfigService,
-  ) {}
-
-  private argoNamespace = this.configService.computeConfig().argo_namespace
-  private argoWorkflowApi = new WorkflowServiceApi({
-    basePath: this.configService.computeConfig().argo_host,
-  })
-  private getAuthorizationHeaderOption: { headers: { Authorization: string } } | any =
-    this.configService.computeConfig().argo_auth_token
+  ) {
+    this.argoNamespace = this.configService.computeConfig().argo_namespace
+    this.argoWorkflowApi = new WorkflowServiceApi({
+      basePath: this.configService.computeConfig().argo_host,
+    })
+    this.getAuthorizationHeaderOption = this.configService.computeConfig().argo_auth_token
       ? {
           headers: { Authorization: this.configService.computeConfig().argo_auth_token },
         }
       : {}
+  }
 
   @Get('list')
   @ApiOperation({
