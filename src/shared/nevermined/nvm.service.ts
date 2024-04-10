@@ -26,8 +26,9 @@ import {
   generateId,
   generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
+
 import { createEcdsaKernelAccountClient } from '@zerodev/presets/zerodev'
-import { KernelSmartAccount } from '@zerodev/sdk'
+import { KernelAccountClient, KernelSmartAccount } from '@zerodev/sdk'
 import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
 import { ethers } from 'ethers'
@@ -119,15 +120,11 @@ export class NeverminedService {
 
       const signer = privateKeyToAccount(providerAccount.privateKey as `0x${string}`)
 
-      const kernelClient = await createEcdsaKernelAccountClient({
+      const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
+        chain: this.nevermined.keeper.client.chain,
         projectId: projectId,
         signer,
       })
-      // const zerodevProvider = await ZeroDevEthersProvider.init('ECDSA', {
-      //   projectId,
-      //   owner: convertEthersV6SignerToAccountSigner(providerAccount),
-      // })
-
       return kernelClient.account
     }
   }

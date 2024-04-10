@@ -1438,15 +1438,15 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.0-rc1":
-  version "3.0.0-rc1"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.0-rc1.tgz#076133c760f14e02b7a639964cbd9cc495d19f4c"
-  integrity sha512-CFWwl+FTd6Nj5ZtPPbjYlMVE8vtD7kR2sWDKbhtIgnnPFjUomC6TMhhWkvugjBtn1dhXqqe+0GivsGzisANtUA==
+"@nevermined-io/sdk@3.0.0-rc3":
+  version "3.0.0-rc3"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.0-rc3.tgz#c1201f713e247027d6c7adacff875affc7ce81db"
+  integrity sha512-kS8oXnzq6hs6Q7e/gj1idzj4SU3LOgUJL34z5bA+EZ1l2lVUeP+qQGgNGbWuD9IkUWupXMcmr/I4vPxZoNEnkQ==
   dependencies:
     "@alchemy/aa-core" "3.6.1"
     "@apollo/client" "^3.7.16"
     "@turnkey/viem" "0.4.13"
-    "@zerodev/ecdsa-validator" "^5.1.0"
+    "@zerodev/ecdsa-validator" "^5.1.2"
     "@zerodev/presets" "^5.1.4"
     "@zerodev/sdk" "^5.1.18"
     "@zerodev/session-key" "^5.1.0"
@@ -1470,7 +1470,7 @@
     stream-http "^3.2.0"
     url "^0.11.0"
     uuid "^9.0.1"
-    viem "2.9.13"
+    viem "^2.9.13"
     whatwg-url "^13.0.0"
 
 "@next/eslint-plugin-next@14.1.4":
@@ -2380,7 +2380,7 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
-"@zerodev/ecdsa-validator@^5.1.0":
+"@zerodev/ecdsa-validator@^5.1.2":
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/@zerodev/ecdsa-validator/-/ecdsa-validator-5.1.2.tgz#0bfb9e15301fe21ca41c65cf716178fdaccb1bfc"
   integrity sha512-QGM5DKMQMqxB6LuLBo1OhQ0tSw/fbm+kmCV7IG8SPMF+yl3rYQ5gZcFs45FgeXnHyw4+dcjpstdhlHY+SmvIiw==
@@ -8404,7 +8404,16 @@ string-to-arraybuffer@^1.0.0:
     atob-lite "^2.0.0"
     is-base64 "^0.1.0"
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -8494,7 +8503,7 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -8507,6 +8516,13 @@ strip-ansi@^3.0.0:
   integrity sha512-VhumSSbBqDTP8p2ZLKj40UjBCV4+v8bUSEpUb4KjRgWk9pbqGF4REFj6KEagidb2f/M6AzC0EmFyDNGaw9OCzg==
   dependencies:
     ansi-regex "^2.0.0"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
 
 strip-ansi@^7.0.1, strip-ansi@^7.1.0:
   version "7.1.0"
@@ -9215,7 +9231,7 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-viem@2.9.13, viem@^2.8.6:
+viem@^2.8.6:
   version "2.9.13"
   resolved "https://registry.yarnpkg.com/viem/-/viem-2.9.13.tgz#3053394a0b3b60e46706951fefba6dd43ed1f50b"
   integrity sha512-TxNZOWFwr2Pc6CeY4tViFL2NRq9v86HofAPkhBgScP8DUn3EeSbQhmDXbjMZNkZvXoMqWVl0AZM81rEOlaKrbg==
@@ -9229,7 +9245,7 @@ viem@2.9.13, viem@^2.8.6:
     isows "1.0.3"
     ws "8.13.0"
 
-viem@^2.9.13:
+viem@^2.9.13, viem@^2.9.16:
   version "2.9.15"
   resolved "https://registry.yarnpkg.com/viem/-/viem-2.9.15.tgz#a176f3c3504a6785333ac0f948666854c3a29e30"
   integrity sha512-7kcmHqybc3JhpjL8gKY7YxBYpZt1//qhoTZIU5Ez9JdyRCnYMMnJu20s7wd7Gv6a3zPbq8jV8dCp94a/NLJJcA==
@@ -9407,7 +9423,7 @@ which@^2.0.1:
   dependencies:
     isexe "^2.0.0"
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -9420,6 +9436,15 @@ wrap-ansi@^6.0.1, wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
   integrity sha512-r6lPcBGxZXlIcymEu7InxDMhdW0KDxpLgoFLcguasxCaJ/SOIZwINatK9KY/tf+ZrlywOKU0UDj3ATXUBfxJXA==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
   dependencies:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"
