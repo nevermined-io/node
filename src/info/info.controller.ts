@@ -8,7 +8,7 @@ import { GetInfoDto } from './dto/get-info.dto'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { ConfigService } from '../shared/config/config.service'
-import { accountFromCredentialsFile } from 'src/common/helpers/encryption.helper'
+import { accountFromCredentialsFile } from '../common/helpers/encryption.helper'
 
 @ApiTags('Info')
 @Controller()
