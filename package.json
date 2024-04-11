@@ -81,6 +81,9 @@
     "typescript": "^5.4.2",
     "ethers": "^6.11.1"
   },
+  "peerDependencies": {
+    "viem": "^2.9.15"
+  },
   "devDependencies": {
     "@commitlint/cli": "^19.1.0",
     "@commitlint/config-conventional": "^19.1.0",

@@ -17,15 +17,8 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "composite": true,
-    "types": [],
-    "typeRoots": ["node_modules/@types"], //, "node_modules/permissionless/_types"],
-    // JavaScript support
-    "allowJs": false,
-    "checkJs": false,
-    "strictPropertyInitialization": false,
-    "strictNullChecks": false,
-    "useUnknownInCatchVariables": false,
-    "resolveJsonModule": true
+    "allowJs": true,
+    "strict": true
   },
   "include": ["next-env.d.ts", "src/**/*.ts", "./src/compute/argo-workflows-templates/*.yaml"],
   "exclude": [

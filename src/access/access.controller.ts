@@ -85,7 +85,7 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    if (!req.user.did) {
+    if (!req.user?.did) {
       throw new BadRequestException('DID not specified')
     }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
@@ -108,6 +108,9 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
+    if (!req.user?.did) {
+      throw new BadRequestException('DID not specified')
+    }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
