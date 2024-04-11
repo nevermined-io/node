@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "composite": true,
     "allowJs": true,
-    "strict": true
+    "strict": true,
+    "strictPropertyInitialization": false
   },
   "include": ["next-env.d.ts", "src/**/*.ts", "./src/compute/argo-workflows-templates/*.yaml"],
   "exclude": [

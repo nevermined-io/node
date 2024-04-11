@@ -108,7 +108,7 @@ export class NeverminedService {
   }
 
   web3ProviderUri(): string {
-    return this.config.nvm().web3ProviderUri
+    return this.config.nvm().web3ProviderUri || ''
   }
 
   private async setupZerodev(): Promise<KernelSmartAccount> {
@@ -116,8 +116,8 @@ export class NeverminedService {
     if (projectId && projectId !== '') {
       const keyfile = this.config.cryptoConfig().provider_key
       const providerAccount = accountFromCredentialsFile(
-        keyfile,
-        this.config.cryptoConfig().provider_password,
+        keyfile as string,
+        this.config.cryptoConfig().provider_password as string,
       )
 
       const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient(
@@ -134,7 +134,7 @@ export class NeverminedService {
   async getAssetUrl(
     did: string,
     index: number,
-  ): Promise<{ url: string; content_type: string; dtp: boolean; name?: string }> {
+  ): Promise<{ url: string; content_type: string | undefined; dtp: boolean; name?: string }> {
     // get url for DID
     let asset: DDO
     try {
@@ -145,13 +145,13 @@ export class NeverminedService {
       throw new BadRequestException(`No such DID ${did}`)
     }
     const service = asset.findServiceByType('metadata')
-    const file_attributes = service.attributes.main.files[index]
-    const content_type = file_attributes.contentType
-    const name = file_attributes.name
+    const file_attributes = service.attributes.main.files?.[index]
+    const content_type = file_attributes?.contentType
+    const name = file_attributes?.name
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
       const filelist: MetaDataExternalResource = await this.decrypt(
-        service.attributes.encryptedFiles,
+        service.attributes.encryptedFiles ?? '',
         'PSK-RSA',
       )
 
@@ -172,7 +172,9 @@ export class NeverminedService {
    * @returns The decrypted JSON object
    */
   async decrypt(encryptedJson: string, encryptionMethod: string): Promise<any> {
-    return JSON.parse(await decrypt(this.config.cryptoConfig(), encryptedJson, encryptionMethod))
+    return JSON.parse(
+      (await decrypt(this.config.cryptoConfig(), encryptedJson, encryptionMethod)) as string,
+    )
   }
 
   async downloadAsset(
@@ -223,8 +225,8 @@ export class NeverminedService {
           method: 'POST',
           responseType: 'arraybuffer',
           auth: {
-            username: ipfsProjectId,
-            password: ipfsProjectSecret,
+            username: ipfsProjectId!,
+            password: ipfsProjectSecret!,
           },
           params: {
             arg: cid,
@@ -290,7 +292,7 @@ export class NeverminedService {
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }
       } catch (error) {
-        Logger.warn(`Unable to register on-chain provenance: ${error.toString()}`)
+        Logger.warn(`Unable to register on-chain provenance: ${(error as Error).toString()}`)
       }
 
       res.set({
@@ -305,7 +307,7 @@ export class NeverminedService {
         throw e
       } else {
         Logger.error(e)
-        throw new InternalServerErrorException(e.toString())
+        throw new InternalServerErrorException((e as Error).toString())
       }
     }
   }
@@ -320,7 +322,7 @@ export class NeverminedService {
       Logger.debug(`Bucket ${bucketName} exists on S3`)
       return true
     } catch (error) {
-      if (error.statusCode === 404) {
+      if ((error as any).statusCode === 404) {
         Logger.debug(`Bucket ${bucketName} does NOT exists on S3`)
         return false
       }
@@ -348,7 +350,7 @@ export class NeverminedService {
   async uploadS3(file: Buffer, filename: string): Promise<string> {
     Logger.debug(`Uploading to S3 ${filename}`)
     filename = filename || 'data'
-    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME')
+    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME') as string
     try {
       const s3 = new AWS.S3({
         accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
@@ -375,7 +377,7 @@ export class NeverminedService {
       })
       return url
     } catch (e) {
-      Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
+      Logger.error(`Uploading ${filename}: AWS error ${(e as any).response}`)
       throw new InternalServerErrorException(e)
     }
   }
@@ -445,6 +447,8 @@ export class NeverminedService {
       return await this.uploadFilecoin(data, fileName)
     } else if (backend === 'ipfs') {
       return await this.uploadIPFS(data, fileName)
+    } else {
+      throw new BadRequestException(`Backend ${backend} not supported`)
     }
   }
 
@@ -460,7 +464,7 @@ export class NeverminedService {
   }
 
   private isDTP(main: MetaDataMain): boolean {
-    return main.files && main.files.some((f) => f.encryption === 'dtp')
+    return main.files?.some((f) => f.encryption === 'dtp') ?? false
   }
 
   /**

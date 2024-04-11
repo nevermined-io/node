@@ -48,9 +48,9 @@ export class InfoController {
     const key = new NodeRSA(rsa_key_file)
 
     const baby = this.config.getProviderBabyjub()
-    const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
-    const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
-    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER')
+    const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE') as boolean
+    const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER') as string
+    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER') as string
 
     const providerURL = new URL(this.nvmService.web3ProviderUri())
 

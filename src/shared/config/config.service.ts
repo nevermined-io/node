@@ -31,10 +31,10 @@ export interface ComputeConfig {
 }
 
 export interface SubscriptionsConfig {
-  jwtSecret: Uint8Array
-  neverminedProxyUri: string
-  defaultExpiryTime: string
-  averageBlockTime: number
+  jwtSecret: Uint8Array | undefined
+  neverminedProxyUri: string | undefined
+  defaultExpiryTime: string | undefined
+  averageBlockTime: number | undefined
 }
 
 export interface BackendConfig {
@@ -154,29 +154,27 @@ export class ConfigService {
   constructor() {
     this.envConfig = this.validateInput(configProfile)
     this.crypto = {
-      provider_password: this.get('PROVIDER_PASSWORD'),
-      provider_key: readFileSync(this.get('PROVIDER_KEYFILE')).toString(),
-      provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE')).toString(),
-      provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE')).toString(),
-      zerodevProjectId: this.get('ZERODEV_PROJECT_ID'),
+      provider_password: this.get('PROVIDER_PASSWORD') || '',
+      provider_key: readFileSync(this.get('PROVIDER_KEYFILE') || '').toString(),
+      provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE') || '').toString(),
+      provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE') || '').toString(),
+      zerodevProjectId: this.get('ZERODEV_PROJECT_ID') || '',
     }
     this.compute = {
-      enable_compute: this.get('ENABLE_COMPUTE'),
-      argo_host: this.get('ARGO_HOST'),
-      argo_namespace: this.get('ARGO_NAMESPACE'),
-      argo_auth_token: this.get('ARGO_AUTH_TOKEN'),
-      compute_provider_keyfile: this.get('COMPUTE_PROVIDER_KEYFILE'),
+      enable_compute: this.get('ENABLE_COMPUTE') === 'true',
+      argo_host: this.get('ARGO_HOST') || '',
+      argo_namespace: this.get('ARGO_NAMESPACE') || '',
+      argo_auth_token: this.get('ARGO_AUTH_TOKEN') || '',
+      compute_provider_keyfile: this.get('COMPUTE_PROVIDER_KEYFILE') || '',
       compute_provider_key:
-        this.get('COMPUTE_PROVIDER_KEYFILE') &&
-        readFileSync(this.get('COMPUTE_PROVIDER_KEYFILE')).toString(),
-      compute_provider_password: this.get('COMPUTE_PROVIDER_PASSWORD'),
+        (this.get('COMPUTE_PROVIDER_KEYFILE') || '') &&
+        readFileSync(this.get('COMPUTE_PROVIDER_KEYFILE') || '').toString(),
+      compute_provider_password: this.get('COMPUTE_PROVIDER_PASSWORD') || '',
     }
 
     this.subscriptions = {
       jwtSecret: Uint8Array.from(
-        this.get<string>('JWT_SUBSCRIPTION_SECRET_KEY')
-          .split('')
-          .map((x) => parseInt(x)),
+        (this.get<string>('JWT_SUBSCRIPTION_SECRET_KEY') || '').split('').map((x) => parseInt(x)),
       ),
       neverminedProxyUri: this.get<string>('NEVERMINED_PROXY_URI'),
       defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
@@ -185,9 +183,9 @@ export class ConfigService {
     this.backend = {
       isNVMBackendEnabled: this.get<string>('NVM_BACKEND_URL') !== '',
       trackBackendTxs: this.get<string>('TRACK_BACKEND_TXS') === 'true',
-      backendUrl: this.get<string>('NVM_BACKEND_URL'),
-      backendAuth: this.get<string>('NVM_BACKEND_AUTH'),
-      appUrl: this.get<string>('NVM_APP_URL'),
+      backendUrl: this.get<string>('NVM_BACKEND_URL') || '',
+      backendAuth: this.get<string>('NVM_BACKEND_AUTH') || '',
+      appUrl: this.get<string>('NVM_APP_URL') || '',
     }
   }
 

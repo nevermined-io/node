@@ -44,16 +44,16 @@ export class ComputeService {
       startedAt: 'null',
       finishedAt: 'null',
       status: 'null',
-      did: undefined,
+      did: '',
       pods: [],
     }
-    const pods = []
+    const pods: any[] = []
 
     // Transform from pairs of id:object to array of objects
     const nodesPairs = responseBody.status.nodes
 
     if (nodesPairs) {
-      const nodesArray = []
+      const nodesArray: any[] = []
       for (const i in nodesPairs) {
         nodesArray.push(nodesPairs[i])
       }
@@ -143,17 +143,18 @@ export class ComputeService {
     const workflow = metadata.attributes.main.workflow
 
     // TODO: Currently this only supports one stage
-    const transformationDid = workflow.stages[0].transformation.id
+    const transformationDid = workflow?.stages[0].transformation.id
     Logger.debug(`Resolving transformation Did ${transformationDid}`)
 
-    const transformationDdo: DDO =
-      await this.nvmService.nevermined.assets.resolve(transformationDid)
+    const transformationDdo: DDO = await this.nvmService.nevermined.assets.resolve(
+      transformationDid as string,
+    )
     const transformationMetadata = transformationDdo.findServiceByType('metadata')
 
     // get args and container
-    const args = transformationMetadata.attributes.main.algorithm.entrypoint
-    const image = transformationMetadata.attributes.main.algorithm.requirements.container.image
-    const tag = transformationMetadata.attributes.main.algorithm.requirements.container.tag
+    const args = transformationMetadata.attributes.main.algorithm?.entrypoint
+    const image = transformationMetadata.attributes.main.algorithm?.requirements.container.image
+    const tag = transformationMetadata.attributes.main.algorithm?.requirements.container.tag
 
     Logger.debug(`transformation args: ${args}`)
     Logger.debug(`transformation container: ${image}`)
@@ -186,11 +187,11 @@ export class ComputeService {
       },
       {
         name: 'web3_provider_url',
-        value: this.configService.nvm().web3ProviderUri,
+        value: this.configService.nvm().web3ProviderUri as string,
       },
       {
         name: 'node_address',
-        value: this.configService.nvm().neverminedNodeAddress,
+        value: this.configService.nvm().neverminedNodeAddress as string,
       },
       {
         name: 'node_url',
@@ -210,7 +211,7 @@ export class ComputeService {
       },
       {
         name: 'transformation_arguments',
-        value: args,
+        value: args as string,
       },
       {
         name: 'artifacts_folder',

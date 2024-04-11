@@ -5,13 +5,7 @@ import * as fs from 'fs'
 import ethers, { HDNodeWallet, Wallet } from 'ethers'
 import NodeRSA from 'node-rsa'
 import { privateKeyToAccount } from 'viem/accounts'
-
-export interface CryptoConfig {
-  provider_key: string
-  provider_password: string
-  provider_rsa_public: string
-  provider_rsa_private: string
-}
+import { CryptoConfig } from 'src/shared/config/config.service'
 
 const get_aes_private_key = (passphrase: string) => {
   const salt = Buffer.from('this is a salt')
@@ -94,7 +88,7 @@ export const encrypt = async (
   config: CryptoConfig,
   cipherText: string,
   method: string,
-): Promise<{ publicKey: string; result: string }> => {
+): Promise<{ publicKey: string; result: string } | undefined> => {
   if (method === 'PSK-ECDSA') {
     const wallet = ethers.Wallet.fromEncryptedJsonSync(
       config.provider_key,

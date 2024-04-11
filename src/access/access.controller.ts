@@ -164,7 +164,7 @@ export class AccessController {
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
 
-    let did: DID
+    let did
     try {
       // If we get DID from the request, we use it
       if (transferData.did) {
@@ -263,7 +263,7 @@ export class AccessController {
         Logger.debug(`Asset transaction: ${JSON.stringify(assetTx)}`)
       }
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${e.message}`)
+      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${(e as Error).message}`)
     }
 
     let link
@@ -274,7 +274,9 @@ export class AccessController {
     }
 
     try {
-      const profile = await this.nvmService.getUserProfileFromAddress(params.consumer_address)
+      const profile = await this.nvmService.getUserProfileFromAddress(
+        params.consumer_address as string,
+      )
       this.nvmService
       const subscriberNotification: UserNotification = {
         notificationType: 'SubscriptionReceived',
@@ -292,7 +294,9 @@ export class AccessController {
         await this.backendService.sendMintingNotification(subscriberNotification)
       Logger.log(`Sending notification with result: ${subsNotifResult}`)
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+      Logger.warn(
+        `[${did.getDid()}] Failed to send subscriber notificaiton ${(e as Error).message}`,
+      )
     }
 
     try {
@@ -312,7 +316,9 @@ export class AccessController {
         await this.backendService.sendMintingNotification(publisherNotification)
       Logger.log(`Sending notification with result: ${pubNotifResult}`)
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+      Logger.warn(
+        `[${did.getDid()}] Failed to send subscriber notificaiton ${(e as Error).message}`,
+      )
     }
 
     return 'success'
@@ -356,7 +362,7 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    if (!req.user.did) {
+    if (!req.user?.did) {
       throw new BadRequestException('DID not specified')
     }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
@@ -415,8 +421,8 @@ export class AccessController {
       url = await this.nvmService.uploadToBackend(backend, data, fileName)
       return { url }
     } catch (error) {
-      Logger.error(`Error processing upload: ${error.message}`)
-      throw new InternalServerErrorException(error.message)
+      Logger.error(`Error processing upload: ${(error as Error).message}`)
+      throw new InternalServerErrorException((error as Error).message)
     }
   }
 }

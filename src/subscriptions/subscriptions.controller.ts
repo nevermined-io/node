@@ -47,7 +47,7 @@ export class SubscriptionsController {
         subscriptionData.ercType,
         subscriptionData.numberNfts,
         req.user.address,
-        subscriptionData.tokenId,
+        subscriptionData.tokenId as string,
       )
 
       if (!isValid) {
@@ -74,7 +74,7 @@ export class SubscriptionsController {
     // get access token
     const accessToken = await this.subscriptionService.generateToken(
       did,
-      subscriptionData.tokenId,
+      subscriptionData.tokenId as string,
       req.user.address,
       subscriptionData.endpoints,
       expiryTime,

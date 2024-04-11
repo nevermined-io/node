@@ -12,6 +12,6 @@ export class RolesGuard implements CanActivate {
       return true
     }
     const request = context.switchToHttp().getRequest<Request<unknown>>()
-    return request.user?.roles?.some((role) => roles.some((r) => r === role))
+    return request.user?.roles?.some((role) => roles.some((r) => r === role)) ?? false
   }
 }

@@ -30,25 +30,25 @@ export class AuthService {
     Logger.debug(`Validating owner for ${params.did}`)
 
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
-      params.consumer_address,
+      params.consumer_address!,
       params.did,
     )
     if (!granted) {
       Logger.debug(`User not granted yet, checking balance`)
       try {
-        const service = ddo.findServiceByReference(params.service_index) as ServiceNFTAccess
+        const service = ddo.findServiceByReference(params.service_index!) as ServiceNFTAccess
 
         const balance =
           service.attributes.main.ercType == 721
-            ? await nevermined.nfts721.balanceOf(params.consumer_address)
+            ? await nevermined.nfts721.balanceOf(params.consumer_address!)
             : await nevermined.nfts1155.balance(
                 DDO.getTokenIdFromService(service),
-                params.consumer_address,
+                params.consumer_address!,
               )
 
         if (
           !NFTServiceAttributes.isCreditsBalanceEnough(
-            service.attributes.main.nftAttributes,
+            service.attributes.main.nftAttributes!,
             balance,
           )
         )
@@ -100,7 +100,7 @@ export class AuthService {
 
       if (plugin.track) await plugin.track(params, this.nvmService.nodeAccount) //, { zeroDevSigner: this.nvmService.zerodevSigner })
     } catch (error) {
-      throw new UnauthorizedException(`Error processing request: ${error.message}`)
+      throw new UnauthorizedException(`Error processing request: ${(error as Error).message}`)
     }
   }
 
@@ -109,7 +109,7 @@ export class AuthService {
       const params: ValidationParams = {
         consumer_address: payload.iss,
         did: didZeroX(payload.did as string),
-        agreement_id: payload.sub,
+        agreement_id: payload.sub!,
         buyer: payload.buyer as string,
         babysig: payload.babysig as Babysig,
         service_index: payload.service_index as number,
