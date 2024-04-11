@@ -383,7 +383,7 @@ export class AccessController {
   async doUpload(
     @Body() uploadData: UploadDto,
     @Param('backend') backend: UploadBackends,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file,
   ): Promise<UploadResult> {
     let data: Buffer
     let fileName: string
