@@ -30,14 +30,16 @@ import { createEcdsaKernelAccountClient } from '@zerodev/presets/zerodev'
 import { KernelSmartAccount } from '@zerodev/sdk'
 import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
-import { ethers } from 'ethers'
 import { default as FormData } from 'form-data'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
-import { privateKeyToAccount } from 'viem/accounts'
-import { aes_decryption_256, decrypt } from '../../common/helpers/encryption.helper'
+import {
+  accountFromCredentialsFile,
+  aes_decryption_256,
+  decrypt,
+} from '../../common/helpers/encryption.helper'
 import { ConfigService } from '../config/config.service'
 
 export enum AssetResult {
@@ -112,14 +114,14 @@ export class NeverminedService {
     const projectId = this.config.cryptoConfig().zerodevProjectId
     if (projectId && projectId !== '') {
       const keyfile = this.config.cryptoConfig().provider_key
-      const providerAccount = ethers.Wallet.fromEncryptedJsonSync(
+      const providerAccount = accountFromCredentialsFile(
         keyfile,
         this.config.cryptoConfig().provider_password,
       )
 
-      const signer = privateKeyToAccount(providerAccount.privateKey as `0x${string}`)
-
+      const signer = providerAccount.getAccountSigner()
       const kernelClient = await createEcdsaKernelAccountClient({
+        chain: this.nevermined.client.chain,
         projectId: projectId,
         signer,
       })

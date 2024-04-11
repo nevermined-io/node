@@ -6,7 +6,7 @@ import { EncryptController } from './encrypt.controller'
 import request from 'supertest'
 import { ConfigModule } from '../shared/config/config.module'
 import { ConfigService } from '../shared/config/config.service'
-import { decrypt } from '../common/helpers/encryption.helper'
+import { accountFromCredentialsFile, decrypt } from '../common/helpers/encryption.helper'
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument */
 
@@ -45,5 +45,16 @@ describe('Info', () => {
     expect(response.body.method).toBe('PSK-RSA')
     const result = response.body.hash
     expect(await decrypt(config.cryptoConfig(), result, 'PSK-RSA')).toBe('msg')
+  })
+
+  it('load NvmAccount from credentials file', async () => {
+    const account = await accountFromCredentialsFile(
+      process.env.PROVIDER_KEYFILE,
+      process.env.PROVIDER_PASSWORD,
+    )
+    expect(account).toBeDefined()
+    console.log(account.getAddress())
+    expect(account.getAddress()).toBeDefined()
+    expect(account.getType()).toBe('local')
   })
 })

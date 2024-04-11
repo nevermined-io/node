@@ -1,8 +1,10 @@
+import { NvmAccount } from '@nevermined-io/sdk/dist/node/models/NvmAccount'
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
-//import { HDNodeWallet, ethers } from 'ethers'
-import ethers, { HDNodeWallet } from 'ethers'
+import * as fs from 'fs'
+import ethers, { HDNodeWallet, Wallet } from 'ethers'
 import NodeRSA from 'node-rsa'
+import { privateKeyToAccount } from 'viem/accounts'
 
 export interface CryptoConfig {
   provider_key: string
@@ -77,13 +79,24 @@ export const aes_decryption_256 = (encrypted, password) => {
   return unpad(decrypted)
 }
 
+export const accountFromCredentialsFile = (
+  keyFilePath: string,
+  keyFilePassword: string,
+): NvmAccount => {
+  const data = fs.readFileSync(keyFilePath)
+
+  const wallet = Wallet.fromEncryptedJsonSync(data.toString(), keyFilePassword)
+  const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+  return NvmAccount.fromAccount(account)
+}
+
 export const encrypt = async (
   config: CryptoConfig,
   cipherText: string,
   method: string,
 ): Promise<{ publicKey: string; result: string }> => {
   if (method === 'PSK-ECDSA') {
-    const wallet = await ethers.Wallet.fromEncryptedJson(
+    const wallet = ethers.Wallet.fromEncryptedJsonSync(
       config.provider_key,
       config.provider_password,
     )
