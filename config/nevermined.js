@@ -1,7 +1,8 @@
 const LogLevel = require('@nevermined-io/sdk').LogLevel
 const ethers = require('ethers').ethers
-const { NeverminedOptions } = require('@nevermined-io/sdk')
-const fs = require('fs')
+const NvmAccount = require('@nevermined-io/sdk').NvmAccount
+const privateKeyToAccount = require('viem/accounts').privateKeyToAccount
+fs = require('fs')
 
 const configBase = {
   chainId: process.env['NETWORK_ID'] || 1337,
@@ -22,6 +23,10 @@ configBase.accounts = []
 if (process.env.PROVIDER_KEYFILE) {
   const str = fs.readFileSync(process.env.PROVIDER_KEYFILE).toString()
   configBase.accounts = [ethers.Wallet.fromEncryptedJsonSync(str, process.env.PROVIDER_PASSWORD)]
+  // const ethersWallet = [ethers.Wallet.fromEncryptedJsonSync(str, process.env.PROVIDER_PASSWORD)]
+  // ethersWallet.map((wallet) => {
+  //   configBase.accounts.push(NvmAccount.fromAccount(privateKeyToAccount(wallet.privateKey)))
+  // })
 }
 
 const config = configBase

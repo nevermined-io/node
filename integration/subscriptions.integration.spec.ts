@@ -315,7 +315,7 @@ describe('SubscriptionsController', () => {
 
       const { accessToken } = response.body
       const { jwtSecret } = configService.subscriptionsConfig()
-      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret!)
 
       expect(payload.did).toEqual(ddoWebService.id)
       expect(payload.owner).toEqual(ownerAddress)

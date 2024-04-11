@@ -34,7 +34,6 @@ import {
   ValidationParams,
   ZeroAddress,
   generateId,
-  zeroX,
 } from '@nevermined-io/sdk'
 import crypto from 'crypto'
 import { aes_encryption_256 } from '../common/helpers/encryption.helper'
@@ -151,11 +150,14 @@ export class AccessController {
 
     // Check the agreement exists on-chain
     try {
-      const templateId: string = await nevermined.keeper.agreementStoreManager.call(
-        'getAgreementTemplate',
-        [zeroX(transferData.agreementId)],
+      const agreementData = await nevermined.keeper.agreementStoreManager.getAgreement(
+        transferData.agreementId,
       )
-      if (templateId.toLowerCase() === ZeroAddress) {
+      // const templateId: string = await nevermined.keeper.agreementStoreManager.call(
+      //   'getAgreementTemplate',
+      //   [zeroX(transferData.agreementId)],
+      // )
+      if (agreementData.templateId.toLowerCase() === ZeroAddress) {
         throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
       }
     } catch (e) {
