@@ -49,8 +49,8 @@ describe('Info', () => {
 
   it('load NvmAccount from credentials file', async () => {
     const account = await accountFromCredentialsFile(
-      process.env.PROVIDER_KEYFILE,
-      process.env.PROVIDER_PASSWORD,
+      process.env.PROVIDER_KEYFILE as string,
+      process.env.PROVIDER_PASSWORD as string,
     )
     expect(account).toBeDefined()
     console.log(account.getAddress())
