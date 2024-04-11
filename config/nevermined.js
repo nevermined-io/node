@@ -4,6 +4,7 @@ const { NeverminedOptions } = require('@nevermined-io/sdk')
 const fs = require('fs')
 
 const configBase = {
+  chainId: process.env['NETWORK_ID'] || 1337,
   web3ProviderUri: process.env['WEB3_PROVIDER_URL'] || 'http://contracts.nevermined.localnet',
   marketplaceUri: process.env['MARKETPLACE_URI'] || 'http://marketplace.nevermined.localnet',
   neverminedNodeUri: process.env['NODE_URI'] || 'http://localhost:8030',
