@@ -91,11 +91,11 @@ export class NeverminedService {
       this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
       this.providerAddress = this.zerodevSigner.address
     } else {
-      const provider = await accountFromCredentialsData(
+      this.nodeAccount = await accountFromCredentialsData(
         this.config.cryptoConfig().provider_key as string,
         this.config.cryptoConfig().provider_password as string,
       )
-      this.providerAddress = provider.getAccountSigner()
+      this.providerAddress = this.nodeAccount.getId()
     }
   }
 

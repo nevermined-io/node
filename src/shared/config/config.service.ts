@@ -61,7 +61,7 @@ const DOTENV_SCHEMA = Joi.object({
   // Used to calculate expiry time of subscriptions in milliseconds
   NETWORK_AVERAGE_BLOCK_TIME: Joi.number().default(2100),
   server: Joi.object({
-    port: Joi.number().default(3000),
+    port: Joi.number().default(8030),
   }),
   security: Joi.object({
     enableHttpsRedirect: Joi.bool().default(false),

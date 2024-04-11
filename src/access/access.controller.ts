@@ -153,10 +153,6 @@ export class AccessController {
       const agreementData = await nevermined.keeper.agreementStoreManager.getAgreement(
         transferData.agreementId,
       )
-      // const templateId: string = await nevermined.keeper.agreementStoreManager.call(
-      //   'getAgreementTemplate',
-      //   [zeroX(transferData.agreementId)],
-      // )
       if (agreementData.templateId.toLowerCase() === ZeroAddress) {
         throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
       }
@@ -233,7 +229,6 @@ export class AccessController {
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
 
-      //await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
       await plugin.process(params, this.nvmService.nodeAccount)
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {

@@ -184,7 +184,7 @@ export class SubscriptionsService {
     )
 
     Logger.debug(
-      `DIDRegistry: ${await this.nvmService.nevermined.keeper.didRegistry.contract.getAddress()}`,
+      `DIDRegistry: ${await this.nvmService.nevermined.keeper.didRegistry.contract.address}`,
     )
 
     // get the owner of the DID

@@ -23,10 +23,6 @@ configBase.accounts = []
 if (process.env.PROVIDER_KEYFILE) {
   const str = fs.readFileSync(process.env.PROVIDER_KEYFILE).toString()
   configBase.accounts = [ethers.Wallet.fromEncryptedJsonSync(str, process.env.PROVIDER_PASSWORD)]
-  // const ethersWallet = [ethers.Wallet.fromEncryptedJsonSync(str, process.env.PROVIDER_PASSWORD)]
-  // ethersWallet.map((wallet) => {
-  //   configBase.accounts.push(NvmAccount.fromAccount(privateKeyToAccount(wallet.privateKey)))
-  // })
 }
 
 const config = configBase
