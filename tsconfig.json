@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "moduleResolution": "node",
-    "module": "ES2022",
+    "module": "CommonJS",
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
