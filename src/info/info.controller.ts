@@ -8,7 +8,7 @@ import { GetInfoDto } from './dto/get-info.dto'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { ConfigService } from '../shared/config/config.service'
-import { accountFromCredentialsFile } from 'src/common/helpers/encryption.helper'
+import { accountFromCredentialsFile } from '../common/helpers/encryption.helper'
 
 @ApiTags('Info')
 @Controller()
@@ -65,6 +65,7 @@ export class InfoController {
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
       'keeper-url': `${providerURL.protocol}//${providerURL.host}`,
+      'chain-id': await nevermined.client.public.getChainId(),
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
       'circuits-folder': circuitDir,

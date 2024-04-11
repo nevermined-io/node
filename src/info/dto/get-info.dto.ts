@@ -19,6 +19,7 @@ export class GetInfoDto {
   docs: string
   network: string
   'keeper-url': string
+  'chain-id': number
   'provenance-enabled': boolean
   'artifacts-folder': string
   'circuits-folder': string
