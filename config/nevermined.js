@@ -1,7 +1,5 @@
 const LogLevel = require('@nevermined-io/sdk').LogLevel
 const ethers = require('ethers').ethers
-const NvmAccount = require('@nevermined-io/sdk').NvmAccount
-const privateKeyToAccount = require('viem/accounts').privateKeyToAccount
 fs = require('fs')
 
 const configBase = {

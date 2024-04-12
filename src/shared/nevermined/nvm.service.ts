@@ -84,8 +84,12 @@ export class NeverminedService {
 
     this.nevermined = await Nevermined.getInstance(config)
 
+    const projectId = this.config.cryptoConfig().zerodevProjectId
+
     // setup zerodev
-    this.zerodevSigner = await this.setupZerodev()
+    if (projectId && projectId !== '') {
+      this.zerodevSigner = await this.setupZerodev(projectId)
+    }
     // set provider address
     if (this.zerodevSigner) {
       this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
@@ -115,23 +119,18 @@ export class NeverminedService {
     return this.config.nvm().web3ProviderUri || ''
   }
 
-  private async setupZerodev(): Promise<KernelSmartAccount> {
-    const projectId = this.config.cryptoConfig().zerodevProjectId
-    if (projectId && projectId !== '') {
-      const keyfile = this.config.cryptoConfig().provider_key
-      const providerAccount = await accountFromCredentialsFile(
-        keyfile as string,
-        this.config.cryptoConfig().provider_password as string,
-      )
-      const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient(
-        {
-          chain: this.nevermined.keeper.client.chain,
-          projectId: projectId,
-          signer: providerAccount.getZeroDevSigner(),
-        },
-      )
-      return kernelClient.account
-    }
+  private async setupZerodev(projectId: string): Promise<KernelSmartAccount> {
+    const keyfile = this.config.cryptoConfig().provider_key
+    const providerAccount = await accountFromCredentialsFile(
+      keyfile as string,
+      this.config.cryptoConfig().provider_password as string,
+    )
+    const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
+      chain: this.nevermined.keeper.client.chain,
+      projectId: projectId,
+      signer: providerAccount.getZeroDevSigner(),
+    })
+    return kernelClient.account
   }
 
   async getAssetUrl(
