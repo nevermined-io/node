@@ -52,7 +52,7 @@ const bootstrap = async () => {
 
   SwaggerModule.setup('api/v1/docs', app, document)
 
-  await app.listen(PORT || 3000)
+  await app.listen(PORT || 8030)
   Logger.log({
     message: `server version ${packageJson.version} started!`,
     port: PORT,

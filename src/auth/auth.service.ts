@@ -1,19 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { LoginDto } from './dto/login.dto'
+import { JWTPayload } from '@nevermined-io/passport-nevermined'
 import {
+  Babysig,
+  DDO,
+  NFTServiceAttributes,
+  NeverminedNFT1155Type,
+  ServiceNFTAccess,
   ServiceType,
   ValidationParams,
   didZeroX,
-  Logger,
-  Babysig,
-  DDO,
-  NeverminedNFT1155Type,
-  ServiceNFTAccess,
-  NFTServiceAttributes,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import { JWTPayload } from '@nevermined-io/passport-nevermined'
+import { LoginDto } from './dto/login.dto'
 
 const BASE_URL = '/api/v1/node/services/'
 

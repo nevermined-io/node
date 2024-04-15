@@ -4,8 +4,8 @@ import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
 import * as fs from 'fs'
 import ethers, { HDNodeWallet, Wallet } from 'ethers'
 import NodeRSA from 'node-rsa'
-import { privateKeyToAccount } from 'viem/accounts'
 import { CryptoConfig } from 'src/shared/config/config.service'
+import { privateKeyToAccount } from 'viem/accounts'
 
 const get_aes_private_key = (passphrase: string) => {
   const salt = Buffer.from('this is a salt')
@@ -73,15 +73,32 @@ export const aes_decryption_256 = (encrypted, password) => {
   return unpad(decrypted)
 }
 
-export const accountFromCredentialsFile = (
+export const accountFromCredentialsFile = async (
   keyFilePath: string,
   keyFilePassword: string,
-): NvmAccount => {
-  const data = fs.readFileSync(keyFilePath)
+): Promise<NvmAccount> => {
+  try {
+    const data = fs.readFileSync(keyFilePath)
 
-  const wallet = Wallet.fromEncryptedJsonSync(data.toString(), keyFilePassword)
-  const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
-  return NvmAccount.fromAccount(account)
+    const wallet = Wallet.fromEncryptedJsonSync(data.toString(), keyFilePassword)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    return NvmAccount.fromAccount(account)
+  } catch (e) {
+    throw new Error(`Error loading account from credentials file ${keyFilePath}`)
+  }
+}
+
+export const accountFromCredentialsData = async (
+  keyFileJson: string,
+  keyFilePassword: string,
+): Promise<NvmAccount> => {
+  try {
+    const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    return NvmAccount.fromAccount(account)
+  } catch (e) {
+    throw new Error(`Error loading account from credentials file ${keyFileJson}`)
+  }
 }
 
 export const encrypt = async (

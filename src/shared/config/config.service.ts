@@ -31,10 +31,10 @@ export interface ComputeConfig {
 }
 
 export interface SubscriptionsConfig {
-  jwtSecret: Uint8Array | undefined
-  neverminedProxyUri: string | undefined
-  defaultExpiryTime: string | undefined
-  averageBlockTime: number | undefined
+  jwtSecret: Uint8Array
+  neverminedProxyUri: string
+  defaultExpiryTime: string
+  averageBlockTime: number
 }
 
 export interface BackendConfig {
@@ -61,7 +61,7 @@ const DOTENV_SCHEMA = Joi.object({
   // Used to calculate expiry time of subscriptions in milliseconds
   NETWORK_AVERAGE_BLOCK_TIME: Joi.number().default(2100),
   server: Joi.object({
-    port: Joi.number().default(3000),
+    port: Joi.number().default(8030),
   }),
   security: Joi.object({
     enableHttpsRedirect: Joi.bool().default(false),
@@ -176,9 +176,9 @@ export class ConfigService {
       jwtSecret: Uint8Array.from(
         (this.get<string>('JWT_SUBSCRIPTION_SECRET_KEY') || '').split('').map((x) => parseInt(x)),
       ),
-      neverminedProxyUri: this.get<string>('NEVERMINED_PROXY_URI'),
-      defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME'),
-      averageBlockTime: this.get<number>('NETWORK_AVERAGE_BLOCK_TIME'),
+      neverminedProxyUri: this.get<string>('NEVERMINED_PROXY_URI') || '',
+      defaultExpiryTime: this.get<string>('SUBSCRIPTION_DEFAULT_EXPIRY_TIME') || '',
+      averageBlockTime: this.get<number>('NETWORK_AVERAGE_BLOCK_TIME') || 0,
     }
     this.backend = {
       isNVMBackendEnabled: this.get<string>('NVM_BACKEND_URL') !== '',

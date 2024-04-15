@@ -1,44 +1,39 @@
-import request from 'supertest'
 import { INestApplication } from '@nestjs/common'
+import { Reflector } from '@nestjs/core'
+import { JwtModule } from '@nestjs/jwt'
+import { PassportModule } from '@nestjs/passport'
 import { Test, TestingModule } from '@nestjs/testing'
-import { ConfigModule } from '../src/shared/config/config.module'
-import { NeverminedModule } from '../src/shared/nevermined/nvm.module'
-import { SubscriptionsController } from '../src/subscriptions/subscriptions.controller'
-import { SubscriptionsService } from '../src/subscriptions/subscriptions.service'
 import {
   AssetAttributes,
+  ContractHandler,
   DDO,
-  didPrefixed,
-  generateId,
-  Nevermined,
   NFTAttributes,
+  Nevermined,
   NvmAccount,
   NvmAppMetadata,
   SubscriptionCreditsNFTApi,
   SubscriptionNFTApi,
+  didPrefixed,
+  generateId,
 } from '@nevermined-io/sdk'
-import { JwtAuthGuard } from '../src/common/guards/auth/jwt-auth.guard'
-import { Reflector } from '@nestjs/core'
-import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
-import { AuthService } from '../src/auth/auth.service.mock'
-import { PassportModule } from '@nestjs/passport'
-import { JwtModule } from '@nestjs/jwt'
 import * as jose from 'jose'
+import request from 'supertest'
+import { AuthService } from '../src/auth/auth.service.mock'
+import { JwtAuthGuard } from '../src/common/guards/auth/jwt-auth.guard'
+import { JwtStrategy } from '../src/common/strategies/jwt.strategy'
+import { ConfigModule } from '../src/shared/config/config.module'
+import { NeverminedModule } from '../src/shared/nevermined/nvm.module'
+import { SubscriptionsController } from '../src/subscriptions/subscriptions.controller'
+import { SubscriptionsService } from '../src/subscriptions/subscriptions.service'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { config } from './config'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { getMetadata } from './utils'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import NFT721SubscriptionUpgradeableABI from './resources/NFT721SubscriptionUpgradeable.json'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import NFT1155SubscriptionUpgradeableABI from './resources/NFT1155SubscriptionUpgradeable.json'
-import { NeverminedService } from '../src/shared/nevermined/nvm.service'
 import { ConfigService } from '../src/shared/config/config.service'
+import { NeverminedService } from '../src/shared/nevermined/nvm.service'
+import { getMetadata } from './utils'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
@@ -193,10 +188,13 @@ describe('SubscriptionsController', () => {
       subscriberAddress = subscriber.getId()
       ownerAddress = publisher.getId()
 
-      // deploy contract
+      const contractABI = await ContractHandler.getABIArtifact(
+        'NFT721SubscriptionUpgradeable',
+        './integration/resources/',
+      )
       const subscriptionNFT = await SubscriptionNFTApi.deployInstance(
         config,
-        NFT721SubscriptionUpgradeableABI,
+        contractABI,
         publisher,
         [
           publisher.getId(),
@@ -205,8 +203,10 @@ describe('SubscriptionsController', () => {
           '',
           '',
           0,
+          nevermined.keeper.nvmConfig.address,
         ],
       )
+
       await nevermined.contracts.loadNft721Api(subscriptionNFT)
       await subscriptionNFT.grantOperatorRole(
         nevermined.keeper.conditions.transferNft721Condition.address,
@@ -315,7 +315,7 @@ describe('SubscriptionsController', () => {
 
       const { accessToken } = response.body
       const { jwtSecret } = configService.subscriptionsConfig()
-      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret!)
 
       expect(payload.did).toEqual(ddoWebService.id)
       expect(payload.owner).toEqual(ownerAddress)
@@ -383,20 +383,24 @@ describe('SubscriptionsController', () => {
       subscriberAddress = subscriber.getId()
       ownerAddress = publisher.getId()
 
-      // deploy contract
+      const contractABI = await ContractHandler.getABIArtifact(
+        'NFT1155SubscriptionUpgradeable',
+        './integration/resources/',
+      )
       const subscriptionNFT = await SubscriptionCreditsNFTApi.deployInstance(
         config,
-        NFT1155SubscriptionUpgradeableABI,
+        contractABI,
         publisher,
         [
           publisher.getId(),
           nevermined.keeper.didRegistry.address,
-          'Credits NFT',
+          'Credits Subscription NFT',
           'CRED',
           '',
           nevermined.keeper.nvmConfig.address,
         ],
       )
+
       await nevermined.contracts.loadNft1155Api(subscriptionNFT)
       await subscriptionNFT.grantOperatorRole(
         nevermined.keeper.conditions.transferNftCondition.address,

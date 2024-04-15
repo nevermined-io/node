@@ -37,6 +37,7 @@ import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
 import {
+  accountFromCredentialsData,
   accountFromCredentialsFile,
   aes_decryption_256,
   decrypt,
@@ -83,15 +84,22 @@ export class NeverminedService {
 
     this.nevermined = await Nevermined.getInstance(config)
 
+    const projectId = this.config.cryptoConfig().zerodevProjectId
+
     // setup zerodev
-    this.zerodevSigner = await this.setupZerodev()
-    this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
+    if (projectId && projectId !== '') {
+      this.zerodevSigner = await this.setupZerodev(projectId)
+    }
     // set provider address
     if (this.zerodevSigner) {
+      this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
       this.providerAddress = this.zerodevSigner.address
     } else {
-      const [provider] = await this.nevermined.accounts.list()
-      this.providerAddress = provider.getId()
+      this.nodeAccount = await accountFromCredentialsData(
+        this.config.cryptoConfig().provider_key as string,
+        this.config.cryptoConfig().provider_password as string,
+      )
+      this.providerAddress = this.nodeAccount.getId()
     }
   }
 
@@ -111,24 +119,18 @@ export class NeverminedService {
     return this.config.nvm().web3ProviderUri || ''
   }
 
-  private async setupZerodev(): Promise<KernelSmartAccount> {
-    const projectId = this.config.cryptoConfig().zerodevProjectId
-    if (projectId && projectId !== '') {
-      const keyfile = this.config.cryptoConfig().provider_key
-      const providerAccount = accountFromCredentialsFile(
-        keyfile as string,
-        this.config.cryptoConfig().provider_password as string,
-      )
-
-      const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient(
-        {
-          chain: this.nevermined.keeper.client.chain,
-          projectId: projectId,
-          signer: providerAccount,
-        },
-      )
-      return kernelClient.account
-    }
+  private async setupZerodev(projectId: string): Promise<KernelSmartAccount> {
+    const keyfile = this.config.cryptoConfig().provider_key
+    const providerAccount = await accountFromCredentialsFile(
+      keyfile as string,
+      this.config.cryptoConfig().provider_password as string,
+    )
+    const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
+      chain: this.nevermined.keeper.client.chain,
+      projectId: projectId,
+      signer: providerAccount.getZeroDevSigner(),
+    })
+    return kernelClient.account
   }
 
   async getAssetUrl(
