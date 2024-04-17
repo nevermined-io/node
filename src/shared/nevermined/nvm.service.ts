@@ -123,7 +123,7 @@ export class NeverminedService {
     const providerAccount = await accountFromCredentialsData(
       keyfile as string,
       this.config.cryptoConfig().provider_password as string,
-      true
+      true,
     )
     const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
       chain: this.nevermined.keeper.client.chain,

@@ -17,7 +17,6 @@ export const getMetadata = (nonce: string | number = Math.random(), name = 'test
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-
 export async function mineBlocks(
   nevermined: Nevermined,
   account: NvmAccount,

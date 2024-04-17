@@ -364,11 +364,18 @@ export class SubscriptionsService {
         ercType,
       )
 
-
-    console.log('subscriptionTransferBlockNumber', subscriptionTransferBlockNumber, duration, currentBlockNumber, Number(currentBlockNumber))
+    console.log(
+      'subscriptionTransferBlockNumber',
+      subscriptionTransferBlockNumber,
+      duration,
+      currentBlockNumber,
+      Number(currentBlockNumber),
+    )
     // blocks left in the subscription
     const subscriptionBlocksLeft =
       subscriptionTransferBlockNumber + duration - Number(currentBlockNumber)
+    console.log('subscriptionBlocksLeft', subscriptionBlocksLeft)
+
     if (subscriptionBlocksLeft <= 0) {
       throw new ForbiddenException(
         `Subscription with DID/TokenId ${tokenId} for user ${userAddress} is expired.`,
@@ -377,6 +384,7 @@ export class SubscriptionsService {
 
     // calculate the number of seconds left in the subscription
     const expiryTime = Math.floor((subscriptionBlocksLeft * this.averageBlockTime) / 1000)
+
     return `${expiryTime} secs`
   }
 

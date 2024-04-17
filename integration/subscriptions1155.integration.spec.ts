@@ -10,8 +10,7 @@ import {
   NFTAttributes,
   Nevermined,
   NvmAccount,
-  NvmAppMetadata,
-  SubscriptionNFTApi,
+  SubscriptionCreditsNFTApi,
   didPrefixed,
   generateId,
 } from '@nevermined-io/sdk'
@@ -130,12 +129,12 @@ describe('SubscriptionsController', () => {
 
       // no 'service' type
       let assetAttributes = AssetAttributes.getInstance({
-        metadata: getMetadata(Math.random(), 'subscription 721 test aaa'),
+        metadata: getMetadata(Math.random(), 'Subscription Metadata 1155 aaa'),
       })
       ddoWrongType = await nevermined.assets.create(assetAttributes, account)
 
       // no nft-access service
-      const metadata = getMetadata(Math.random(), 'subscription 721 test bbb')
+      const metadata = getMetadata(Math.random(), 'Subscription Metadata 1155 bbb')
       metadata.main.type = 'service'
       metadata.main.webService = {
         endpoints: [{ GET: 'https://example.com' }],
@@ -171,13 +170,14 @@ describe('SubscriptionsController', () => {
     })
   })
 
-  describe('GET /subscriptions should validate the subscription (721)', () => {
+  describe('GET /subscriptions should validate the subscription (1155)', () => {
     let ddoWebService: DDO
     let ddoSubscription: DDO
     let notSubscriberToken: string
     let subscriberToken: string
     let subscriberAddress: string
     let ownerAddress: string
+    const subscriptionCredits = 100n
     let publisher: NvmAccount
     let subscriber: NvmAccount
     let notSubscriber: NvmAccount
@@ -188,52 +188,46 @@ describe('SubscriptionsController', () => {
       ownerAddress = publisher.getId()
 
       const contractABI = await ContractHandler.getABIArtifact(
-        'NFT721SubscriptionUpgradeable',
+        'NFT1155SubscriptionUpgradeable',
         './integration/resources/',
       )
-      const subscriptionNFT = await SubscriptionNFTApi.deployInstance(
+      const subscriptionNFT = await SubscriptionCreditsNFTApi.deployInstance(
         config,
         contractABI,
         publisher,
         [
           publisher.getId(),
           nevermined.keeper.didRegistry.address,
-          'Subscription Service NFT',
+          'Credits Subscription NFT',
+          'CRED',
           '',
-          '',
-          0,
           nevermined.keeper.nvmConfig.address,
         ],
       )
 
-      await nevermined.contracts.loadNft721Api(subscriptionNFT)
+      await nevermined.contracts.loadNft1155Api(subscriptionNFT)
       await subscriptionNFT.grantOperatorRole(
-        nevermined.keeper.conditions.transferNft721Condition.address,
+        nevermined.keeper.conditions.transferNftCondition.address,
         publisher,
       )
 
-      const subscriptionMetadata = NvmAppMetadata.getTimeSubscriptionMetadataTemplate(
-        'NVM App Time only Node Subscription test 721',
-        'Nevermined',
-        'hours',
-      )
       // get the subscription ddo
-      const nftAttributesSubscription = NFTAttributes.getSubscriptionInstance({
-        metadata: subscriptionMetadata,
+      const nftAttributesSubscription = NFTAttributes.getCreditsSubscriptionInstance({
+        metadata: getMetadata(Math.random(), 'Subscription NFT1155'),
         services: [
           {
             serviceType: 'nft-sales',
-            nft: { duration: 1000, nftTransfer: false, amount: 1n },
+            nft: { duration: 1000, nftTransfer: false, amount: subscriptionCredits },
           },
         ],
         providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
-      ddoSubscription = await nevermined.nfts721.create(nftAttributesSubscription, publisher)
+      ddoSubscription = await nevermined.nfts1155.create(nftAttributesSubscription, publisher)
 
       // ddo web service
-      const serviceMetadata = getMetadata(Math.random(), 'Subscription Metadata 721 ccc')
+      const serviceMetadata = getMetadata(Math.random(), 'Service Metadata')
       serviceMetadata.main.type = 'service'
       serviceMetadata.main.webService = {
         endpoints: [{ GET: 'https://example.com' }],
@@ -245,22 +239,19 @@ describe('SubscriptionsController', () => {
           headers: [{ Authorization: 'Bearer test' }],
         },
       }
-      const nftAttributesNoContractAddress = NFTAttributes.getNFT721Instance({
+      const nftAttributesNoContractAddress = NFTAttributes.getCreditsSubscriptionInstance({
         metadata: serviceMetadata,
         services: [
           {
             serviceType: 'nft-access',
-            nft: {
-              tokenId: ddoSubscription.shortId(),
-              nftTransfer: false,
-            },
+            nft: { tokenId: ddoSubscription.shortId(), amount: 1n, nftTransfer: false },
           },
         ],
         providers: config.neverminedNodeAddress ? [config.neverminedNodeAddress] : [],
         nftContractAddress: subscriptionNFT.address,
         preMint: false,
       })
-      ddoWebService = await nevermined.nfts721.create(nftAttributesNoContractAddress, publisher)
+      ddoWebService = await nevermined.nfts1155.create(nftAttributesNoContractAddress, publisher)
 
       // not a subscriber bearer token
       notSubscriberToken = await authService.createToken({}, notSubscriber)
@@ -269,13 +260,19 @@ describe('SubscriptionsController', () => {
       subscriberToken = await authService.createToken({}, subscriber)
 
       // buy subscription
-      const agreementId = await nevermined.nfts721.order(ddoSubscription.id, subscriber)
-      await nevermined.nfts721.claim(
+      const agreementId = await nevermined.nfts1155.order(
+        ddoSubscription.id,
+        subscriptionCredits,
+        subscriber,
+      )
+      await nevermined.nfts1155.claim(
         agreementId,
         publisher.getId(),
         subscriber.getId(),
+        subscriptionCredits,
         ddoSubscription.id,
       )
+      console.log('Transfer done in block: ', await nevermined.client.public.getBlockNumber())
     })
 
     it('should not allow subscriptions the user does not own', async () => {
@@ -288,11 +285,15 @@ describe('SubscriptionsController', () => {
     })
 
     it('should not allow expired subscription', async () => {
+      console.log('--------------------------')
+      // await mineBlocks(nevermined, subscriber, 10)
       jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1)
+
       const response = await request(app.getHttpServer())
         .get(`/${ddoWebService.id}`)
         .set('Authorization', `Bearer ${subscriberToken}`)
 
+      console.log('++++++++++++++++++++++++++')
       expect(response.statusCode).toEqual(403)
       expect(response.text).toMatch(/is expired/)
     })
@@ -313,7 +314,7 @@ describe('SubscriptionsController', () => {
 
       const { accessToken } = response.body
       const { jwtSecret } = configService.subscriptionsConfig()
-      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret!)
+      const { payload } = await jose.jwtDecrypt(accessToken, jwtSecret)
 
       expect(payload.did).toEqual(ddoWebService.id)
       expect(payload.owner).toEqual(ownerAddress)
@@ -333,7 +334,7 @@ describe('SubscriptionsController', () => {
     it('should throw 403 if no event is found', async () => {
       jest
         .spyOn(
-          neverminedService.nevermined.keeper.conditions.transferNft721Condition.events,
+          neverminedService.nevermined.keeper.conditions.transferNftCondition.events,
           'getPastEvents',
         )
         .mockResolvedValue([])

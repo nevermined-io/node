@@ -96,10 +96,9 @@ export const accountFromCredentialsData = async (
   try {
     const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
     const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
-    if(isZeroDev) { 
+    if (isZeroDev) {
       return NvmAccount.fromZeroDevSigner(account)
-    }
-    else {
+    } else {
       return NvmAccount.fromAccount(account)
     }
   } catch (e) {
