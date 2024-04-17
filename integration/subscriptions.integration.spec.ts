@@ -33,7 +33,7 @@ import { config } from './config'
 // @ts-ignore
 import { ConfigService } from '../src/shared/config/config.service'
 import { NeverminedService } from '../src/shared/nevermined/nvm.service'
-import { getMetadata, mineBlocks } from './utils'
+import { getMetadata } from './utils'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
