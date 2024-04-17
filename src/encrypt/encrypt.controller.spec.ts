@@ -53,7 +53,6 @@ describe('Info', () => {
       process.env.PROVIDER_PASSWORD as string,
     )
     expect(account).toBeDefined()
-    console.log(account.getAddress())
     expect(account.getAddress()).toBeDefined()
     expect(account.getType()).toBe('local')
   })
