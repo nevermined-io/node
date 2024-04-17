@@ -1,8 +1,8 @@
 import { NvmAccount } from '@nevermined-io/sdk/dist/node/models/NvmAccount'
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
-import * as fs from 'fs'
 import ethers, { HDNodeWallet, Wallet } from 'ethers'
+import * as fs from 'fs'
 import NodeRSA from 'node-rsa'
 import { CryptoConfig } from 'src/shared/config/config.service'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -91,11 +91,17 @@ export const accountFromCredentialsFile = async (
 export const accountFromCredentialsData = async (
   keyFileJson: string,
   keyFilePassword: string,
+  isZeroDev = false,
 ): Promise<NvmAccount> => {
   try {
     const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
     const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
-    return NvmAccount.fromAccount(account)
+    if(isZeroDev) { 
+      return NvmAccount.fromZeroDevSigner(account)
+    }
+    else {
+      return NvmAccount.fromAccount(account)
+    }
   } catch (e) {
     throw new Error(`Error loading account from credentials file ${keyFileJson}`)
   }

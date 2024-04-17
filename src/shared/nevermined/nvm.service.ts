@@ -38,7 +38,6 @@ import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
 import {
   accountFromCredentialsData,
-  accountFromCredentialsFile,
   aes_decryption_256,
   decrypt,
 } from '../../common/helpers/encryption.helper'
@@ -121,15 +120,17 @@ export class NeverminedService {
 
   private async setupZerodev(projectId: string): Promise<KernelSmartAccount> {
     const keyfile = this.config.cryptoConfig().provider_key
-    const providerAccount = await accountFromCredentialsFile(
+    const providerAccount = await accountFromCredentialsData(
       keyfile as string,
       this.config.cryptoConfig().provider_password as string,
+      true
     )
     const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
       chain: this.nevermined.keeper.client.chain,
       projectId: projectId,
       signer: providerAccount.getZeroDevSigner(),
     })
+    Logger.debug('Zero dev initialized with:', kernelClient.account.address)
     return kernelClient.account
   }
 
