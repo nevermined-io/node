@@ -353,6 +353,9 @@ export class SubscriptionsService {
       return this.defaultExpiryTime
     }
 
+    // get current block number
+    const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
+
     // get nft transfer block number
     const subscriptionTransferBlockNumber =
       await this.nvmService.getSubscriptionTransferBlockNumber(
@@ -361,9 +364,8 @@ export class SubscriptionsService {
         ercType,
       )
 
-    // get current block number
-    const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
 
+    console.log('subscriptionTransferBlockNumber', subscriptionTransferBlockNumber, duration, currentBlockNumber, Number(currentBlockNumber))
     // blocks left in the subscription
     const subscriptionBlocksLeft =
       subscriptionTransferBlockNumber + duration - Number(currentBlockNumber)

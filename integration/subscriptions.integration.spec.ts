@@ -33,7 +33,7 @@ import { config } from './config'
 // @ts-ignore
 import { ConfigService } from '../src/shared/config/config.service'
 import { NeverminedService } from '../src/shared/nevermined/nvm.service'
-import { getMetadata } from './utils'
+import { getMetadata, mineBlocks } from './utils'
 
 describe('SubscriptionsController', () => {
   let app: INestApplication
@@ -480,6 +480,7 @@ describe('SubscriptionsController', () => {
     })
 
     it('should not allow expired subscription', async () => {
+      // await mineBlocks(nevermined, subscriber, 10)
       jest.spyOn(neverminedService, 'getDuration').mockImplementationOnce(async () => 1)
 
       const response = await request(app.getHttpServer())
