@@ -1440,18 +1440,18 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.0-rc7":
-  version "3.0.0-rc7"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.0-rc7.tgz#1583d165806e2f89a65110b2a9b52164ddea2e5f"
-  integrity sha512-wVgE5gOScjtyYMTOnn0urnOgObDweEsQUebXt+9dskQ7MwdnMXWLpz0zHfqd4RX/YtILKzaK0/GvvS3hJARWfw==
+"@nevermined-io/sdk@3.0.0-rc8":
+  version "3.0.0-rc8"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.0-rc8.tgz#585feb5a4aeee328cf4f2c6242abcb63ab559998"
+  integrity sha512-Ks87x5jnPISCHeL05QUXFwAL3JVrgoKJW7Lb1mX/OZbTWBi0GSUj0iNhdpr4R5dP60mDsZBEoa66xj8MflWH4A==
   dependencies:
     "@alchemy/aa-core" "3.6.1"
     "@apollo/client" "^3.7.16"
     "@turnkey/viem" "0.4.14"
-    "@zerodev/ecdsa-validator" "5.2.2"
-    "@zerodev/presets" "^5.2.1"
-    "@zerodev/sdk" "5.2.3"
-    "@zerodev/session-key" "^5.2.1"
+    "@zerodev/ecdsa-validator" "5.2.3"
+    "@zerodev/presets" "^5.2.2"
+    "@zerodev/sdk" "5.2.5"
+    "@zerodev/session-key" "^5.2.2"
     assert "^2.0.0"
     cross-fetch "^4.0.0"
     crypto-browserify "^3.12.0"
@@ -1472,7 +1472,7 @@
     stream-http "^3.2.0"
     url "^0.11.0"
     uuid "^9.0.1"
-    viem "^2.9.20"
+    viem "^2.9.21"
     whatwg-url "^13.0.0"
 
 "@next/eslint-plugin-next@14.2.2":
@@ -2370,24 +2370,24 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
-"@zerodev/ecdsa-validator@5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@zerodev/ecdsa-validator/-/ecdsa-validator-5.2.2.tgz#95e7dde6b07255eae50b1aa948a5b2f4e56f9793"
-  integrity sha512-K/vYejUbIESwaiF2eelaTXqKJeyU/KwSTbf1Z/WqlmCr7cf20O4YxNcogSqEInXpk5B2qSr/F7nZDA2Iz6wVsg==
+"@zerodev/ecdsa-validator@5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@zerodev/ecdsa-validator/-/ecdsa-validator-5.2.3.tgz#19f55620c2254df53677662ce0715172675f28ed"
+  integrity sha512-zeJjYhOW5EWK6XnctPt3iVnrqmrHfb81p/fJKaY4yQnL2ZYPrH37ZgtY1z5COETPCDTm65+jPfc1Zn/dziyAXQ==
 
-"@zerodev/presets@^5.2.1":
+"@zerodev/presets@^5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@zerodev/presets/-/presets-5.2.2.tgz#3b3919407bf110414fef18297b0ed91a69827802"
   integrity sha512-2b2j5mGVE1GckUIqhOnSbEbFw4jEd7S/A1Yd2WisyS6fQBmrR5QfWIYKoBOIjXYhSFj0qbtNqtl1KFNDELRiMQ==
 
-"@zerodev/sdk@5.2.3":
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/@zerodev/sdk/-/sdk-5.2.3.tgz#86febb6de91839f61e7eac30c11c55aa16cd3109"
-  integrity sha512-8A1tVOgR67GnT0CGnYZOkMtroUnIq9T5JgBZBqc6X8O9IsVhPChMGVvT3k2fCHo1eUXEjOZDxdKrtcX7YYQFcw==
+"@zerodev/sdk@5.2.5":
+  version "5.2.5"
+  resolved "https://registry.yarnpkg.com/@zerodev/sdk/-/sdk-5.2.5.tgz#8a0b8e5347fa8b8ef1af7247c5bfc16c23b161ff"
+  integrity sha512-3qKiFLzU5dfiFYQk0ZymrEivcE5oaRa0SRjl3sJeqlYXNg4uqcy5h3b3PSiJiCzjCPBkGG1VScINVxenWtGZRg==
   dependencies:
     semver "^7.6.0"
 
-"@zerodev/session-key@^5.2.1":
+"@zerodev/session-key@^5.2.2":
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/@zerodev/session-key/-/session-key-5.2.2.tgz#170f4f7d1163a661acd32d6a179f0d6b45c376a6"
   integrity sha512-jHUjoRdzdP6DH8qIsSICLDMD+FgvBwZFQQ1ipgG33oK8696pFI4qjphMBQGA3kEqVzL0syKiO7eIUV8FlwD1mQ==
@@ -9256,7 +9256,7 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
-viem@^2.8.6, viem@^2.9.20:
+viem@^2.8.6, viem@^2.9.21:
   version "2.9.21"
   resolved "https://registry.yarnpkg.com/viem/-/viem-2.9.21.tgz#a7dd3d4c827088e5336e5a6b35ec0283d2938595"
   integrity sha512-8GtxPjPGpiN5cmr19zSX9mb1LX/eON3MPxxAd3QmyUFn69Rp566zlREOqE7zM35y5yX59fXwnz6O3X7e9+C9zg==
