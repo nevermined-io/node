@@ -33,6 +33,7 @@ import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
 import { default as FormData } from 'form-data'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
+import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
@@ -52,7 +53,7 @@ export enum AssetResult {
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
-  zerodevSigner: KernelSmartAccount
+  zerodevSigner: KernelSmartAccount<any, any, any>
   nodeAccount: NvmAccount
   public providerAddress: string
 
@@ -118,7 +119,7 @@ export class NeverminedService {
     return this.config.nvm().web3ProviderUri || ''
   }
 
-  private async setupZerodev(projectId: string): Promise<KernelSmartAccount> {
+  private async setupZerodev(projectId: string): Promise<KernelSmartAccount<any, any, any>> {
     const keyfile = this.config.cryptoConfig().provider_key
     const providerAccount = await accountFromCredentialsData(
       keyfile as string,
@@ -129,6 +130,8 @@ export class NeverminedService {
       chain: this.nevermined.keeper.client.chain,
       projectId: projectId,
       signer: providerAccount.getZeroDevSigner(),
+      paymaster: 'SPONSOR',
+      entryPointAddress: ENTRYPOINT_ADDRESS_V07,
     })
     Logger.debug('Zero dev initialized with:', kernelClient.account.address)
     return kernelClient.account

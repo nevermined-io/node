@@ -6,3 +6,7 @@ declare module 'permissionless/accounts' {
     TAddress extends Address = Address,
   > {}
 }
+
+declare module 'permissionless/types' {
+  export type EntryPoint = string
+}

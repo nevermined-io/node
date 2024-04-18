@@ -106,7 +106,7 @@ export class AuthService {
   async validateClaim(payload: JWTPayload): Promise<LoginDto> {
     try {
       const params: ValidationParams = {
-        consumer_address: payload.iss,
+        consumer_address: payload.iss as string,
         did: didZeroX(payload.did as string),
         agreement_id: payload.sub!,
         buyer: payload.buyer as string,
