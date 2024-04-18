@@ -202,7 +202,7 @@ describe('SubscriptionsController', () => {
           'CRED',
           '',
           nevermined.keeper.nvmConfig.address,
-        ],
+        ] as any,
       )
 
       await nevermined.contracts.loadNft1155Api(subscriptionNFT)
