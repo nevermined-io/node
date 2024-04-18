@@ -84,7 +84,11 @@ describe('AuthService', () => {
 
   describe('validateAccess', () => {
     it('should validate the access and return true if the service is granted', async () => {
-      const params: ValidationParams = { did: '0x123', agreement_id: '0x12345' }
+      const params: ValidationParams = {
+        did: '0x123',
+        agreement_id: '0x12345',
+        consumer_address: '0x456',
+      }
       const service: ServiceType = 'access'
       await authService.validateAccess(params, service)
       expect(
