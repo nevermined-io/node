@@ -1,9 +1,11 @@
+import { createKernelClient } from '@nevermined-io/sdk'
 import { NvmAccount } from '@nevermined-io/sdk/dist/node/models/NvmAccount'
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
 import ethers, { HDNodeWallet, Wallet } from 'ethers'
 import * as fs from 'fs'
 import NodeRSA from 'node-rsa'
+import { ENTRYPOINT_ADDRESS_V06 } from 'permissionless'
 import { CryptoConfig } from 'src/shared/config/config.service'
 import { privateKeyToAccount } from 'viem/accounts'
 
@@ -92,12 +94,20 @@ export const accountFromCredentialsData = async (
   keyFileJson: string,
   keyFilePassword: string,
   isZeroDev = false,
+  chainId?: number,
+  zerodevProjectId?: string,
 ): Promise<NvmAccount> => {
   try {
     const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
     const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
-    if (isZeroDev) {
-      return NvmAccount.fromZeroDevSigner(account)
+    if (isZeroDev && chainId && zerodevProjectId) {
+      const kernelClient = await createKernelClient(
+        account,
+        chainId,
+        ENTRYPOINT_ADDRESS_V06,
+        zerodevProjectId,
+      )
+      return NvmAccount.fromZeroDevSigner(kernelClient)
     } else {
       return NvmAccount.fromAccount(account)
     }

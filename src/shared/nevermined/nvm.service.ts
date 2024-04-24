@@ -27,13 +27,10 @@ import {
   generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
 
-import { createEcdsaKernelAccountClient } from '@zerodev/presets/zerodev'
-import { KernelAccountClient, KernelSmartAccount } from '@zerodev/sdk'
 import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
 import { default as FormData } from 'form-data'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
-import { ENTRYPOINT_ADDRESS_V07 } from 'permissionless'
 import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
 import { createPublicClient, http, pad } from 'viem'
@@ -53,7 +50,7 @@ export enum AssetResult {
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
-  zerodevSigner: KernelSmartAccount<any, any, any>
+  zerodevSigner: NvmAccount
   nodeAccount: NvmAccount
   public providerAddress: string
 
@@ -88,18 +85,20 @@ export class NeverminedService {
 
     // setup zerodev
     if (projectId && projectId !== '') {
+      Logger.log('Setting up zerodev')
       this.zerodevSigner = await this.setupZerodev(projectId)
     }
     // set provider address
     if (this.zerodevSigner) {
-      this.nodeAccount = await NvmAccount.fromZeroDevSigner(this.zerodevSigner)
-      this.providerAddress = this.zerodevSigner.address
+      this.nodeAccount = this.zerodevSigner.getAccountSigner()
+      this.providerAddress = this.zerodevSigner.getId()
     } else {
       this.nodeAccount = await accountFromCredentialsData(
         this.config.cryptoConfig().provider_key as string,
         this.config.cryptoConfig().provider_password as string,
       )
       this.providerAddress = this.nodeAccount.getId()
+      Logger.debug('Starting without zerodev with address:', this.nodeAccount.getId())
     }
   }
 
@@ -119,22 +118,17 @@ export class NeverminedService {
     return this.config.nvm().web3ProviderUri || ''
   }
 
-  private async setupZerodev(projectId: string): Promise<KernelSmartAccount<any, any, any>> {
+  private async setupZerodev(projectId: string): Promise<NvmAccount> {
     const keyfile = this.config.cryptoConfig().provider_key
     const providerAccount = await accountFromCredentialsData(
       keyfile as string,
       this.config.cryptoConfig().provider_password as string,
       true,
+      this.config.nvm().chainId,
+      projectId,
     )
-    const kernelClient: KernelAccountClient<any, any, any> = await createEcdsaKernelAccountClient({
-      chain: this.nevermined.keeper.client.chain,
-      projectId: projectId,
-      signer: providerAccount.getZeroDevSigner(),
-      paymaster: 'SPONSOR',
-      entryPointAddress: ENTRYPOINT_ADDRESS_V07,
-    })
-    Logger.debug('Zero dev initialized with:', kernelClient.account.address)
-    return kernelClient.account
+    Logger.debug(`Zero dev initialized with: ${providerAccount.getAddress()}`)
+    return providerAccount
   }
 
   async getAssetUrl(
