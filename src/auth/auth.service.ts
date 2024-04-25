@@ -94,10 +94,10 @@ export class AuthService {
     try {
       const granted = await plugin.accept(params)
       if (!granted) {
-        await plugin.process(params, this.nvmService.nodeAccount) //from, { zeroDevSigner: this.nvmService.zerodevSigner })
+        await plugin.process(params, this.nvmService.nodeAccount)
       }
 
-      if (plugin.track) await plugin.track(params, this.nvmService.nodeAccount) //, { zeroDevSigner: this.nvmService.zerodevSigner })
+      if (plugin.track) await plugin.track(params, this.nvmService.nodeAccount)
     } catch (error) {
       throw new UnauthorizedException(`Error processing request: ${(error as Error).message}`)
     }
