@@ -72,7 +72,7 @@ export class AuthService {
         NeverminedNFT1155Type.nft1155Credit.toString()
     if (isNft1155Credit) {
       Logger.debug(`Validating NFT1155 Credit for ${params.did}`)
-      const [from] = nevermined.accounts.list()
+      const from = this.nvmService.nodeAccount
       const plugin = nevermined.nfts1155.servicePlugin['nft-access']
 
       try {

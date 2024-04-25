@@ -278,7 +278,7 @@ export class NeverminedService {
 
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
-          const [from] = await this.nevermined.accounts.list()
+          const from = this.nodeAccount
           const provId = generateId()
           await this.nevermined.provenance.used(
             provId,
