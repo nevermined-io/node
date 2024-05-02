@@ -5,10 +5,9 @@
     "moduleResolution": "node",
     "paths": {
       "@/": ["./src/"],
-      "permissionless/*": ["src/permissionless.d.ts"],
-      "@zerodev/sdk/*": ["src/permissionless.d.ts"]
+      "permissionless/*": ["src/permissionless.d.ts"]
     },
-    "typeRoots": ["node_modules/@types", "src/permissionless.d.ts"]
+    "typeRoots": ["node_modules/@types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.factory.ts", "**/*.seed.ts", "**/*.mock.ts"]
