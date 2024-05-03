@@ -1,11 +1,11 @@
 import { BadRequestException, Body, Controller, Post } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags, ApiBadRequestResponse } from '@nestjs/swagger'
-import { Public } from '../common/decorators/auth.decorator'
+import { ApiBadRequestResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Logger } from '@nevermined-io/sdk'
+import { Public } from '../common/decorators/auth.decorator'
+import { encrypt } from '../common/helpers/encryption.helper'
+import { ConfigService } from '../shared/config/config.service'
 import { EncryptDto } from './dto/encrypt'
 import { EncryptResult } from './dto/result'
-import { ConfigService } from '../shared/config/config.service'
-import { encrypt } from '../common/helpers/encryption.helper'
 
 @ApiTags('Encrypt')
 @Controller()
@@ -33,15 +33,19 @@ export class EncryptController {
       Logger.error(`Unknown encryption method ${encryptData.method}`)
       throw new BadRequestException('Only PSK-ECDSA or PSK-RSA encryption allowed')
     }
-    const { result, publicKey } = await encrypt(
+    const encription = await encrypt(
       this.config.cryptoConfig(),
       encryptData.message,
       encryptData.method,
     )
+    if (!encription) {
+      Logger.error('Error encrypting')
+      throw new BadRequestException('Error encrypting')
+    }
     return {
-      'public-key': publicKey,
+      'public-key': encription.publicKey,
       method: encryptData.method,
-      hash: result,
+      hash: encription.result,
     }
   }
 }

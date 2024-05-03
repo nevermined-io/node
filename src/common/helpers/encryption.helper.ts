@@ -1,14 +1,12 @@
+import { createKernelClient } from '@nevermined-io/sdk'
+import { NvmAccount } from '@nevermined-io/sdk'
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
-import { HDNodeWallet, ethers } from 'ethers'
+import ethers, { HDNodeWallet, Wallet } from 'ethers'
+import * as fs from 'fs'
 import NodeRSA from 'node-rsa'
-
-export interface CryptoConfig {
-  provider_key: string
-  provider_password: string
-  provider_rsa_public: string
-  provider_rsa_private: string
-}
+import { CryptoConfig } from 'src/shared/config/config.service'
+import { privateKeyToAccount } from 'viem/accounts'
 
 const get_aes_private_key = (passphrase: string) => {
   const salt = Buffer.from('this is a salt')
@@ -76,13 +74,49 @@ export const aes_decryption_256 = (encrypted, password) => {
   return unpad(decrypted)
 }
 
+export const accountFromCredentialsFile = async (
+  keyFilePath: string,
+  keyFilePassword: string,
+): Promise<NvmAccount> => {
+  try {
+    const data = fs.readFileSync(keyFilePath)
+
+    const wallet = Wallet.fromEncryptedJsonSync(data.toString(), keyFilePassword)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    return NvmAccount.fromAccount(account)
+  } catch (e) {
+    throw new Error(`Error loading account from credentials file ${keyFilePath}`)
+  }
+}
+
+export const accountFromCredentialsData = async (
+  keyFileJson: string,
+  keyFilePassword: string,
+  isZeroDev = false,
+  chainId?: number,
+  zerodevProjectId?: string,
+): Promise<NvmAccount> => {
+  try {
+    const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    if (isZeroDev && chainId && zerodevProjectId) {
+      const kernelClient = await createKernelClient(account, chainId, zerodevProjectId)
+      return NvmAccount.fromZeroDevSigner(kernelClient)
+    } else {
+      return NvmAccount.fromAccount(account)
+    }
+  } catch (e) {
+    throw new Error(`Error loading account from credentials file ${keyFileJson}`)
+  }
+}
+
 export const encrypt = async (
   config: CryptoConfig,
   cipherText: string,
   method: string,
-): Promise<{ publicKey: string; result: string }> => {
+): Promise<{ publicKey: string; result: string } | undefined> => {
   if (method === 'PSK-ECDSA') {
-    const wallet = await ethers.Wallet.fromEncryptedJson(
+    const wallet = ethers.Wallet.fromEncryptedJsonSync(
       config.provider_key,
       config.provider_password,
     )

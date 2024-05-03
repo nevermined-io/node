@@ -14,6 +14,12 @@ const config: Config = {
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
   restoreMocks: true,
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/*',
+    '<rootDir>/config/*',
+    '<rootDir>/dist/*',
+    '<rootDir>/.yalc/*',
+  ],
 }
 
 export default config

@@ -34,7 +34,6 @@ import {
   ValidationParams,
   ZeroAddress,
   generateId,
-  zeroX,
 } from '@nevermined-io/sdk'
 import crypto from 'crypto'
 import { aes_encryption_256 } from '../common/helpers/encryption.helper'
@@ -85,7 +84,7 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    if (!req.user.did) {
+    if (!req.user?.did) {
       throw new BadRequestException('DID not specified')
     }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
@@ -108,6 +107,9 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
+    if (!req.user?.did) {
+      throw new BadRequestException('DID not specified')
+    }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
   }
 
@@ -148,11 +150,10 @@ export class AccessController {
 
     // Check the agreement exists on-chain
     try {
-      const templateId: string = await nevermined.keeper.agreementStoreManager.call(
-        'getAgreementTemplate',
-        [zeroX(transferData.agreementId)],
+      const agreementData = await nevermined.keeper.agreementStoreManager.getAgreement(
+        transferData.agreementId,
       )
-      if (templateId.toLowerCase() === ZeroAddress) {
+      if (agreementData.templateId.toLowerCase() === ZeroAddress) {
         throw new NotFoundException(`Agreement ${transferData.agreementId} not found on-chain`)
       }
     } catch (e) {
@@ -161,7 +162,7 @@ export class AccessController {
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
 
-    let did: DID
+    let did
     try {
       // If we get DID from the request, we use it
       if (transferData.did) {
@@ -206,8 +207,8 @@ export class AccessController {
 
     let expiration = 0
     if (duration > 0) {
-      const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
-      expiration = currentBlockNumber + duration
+      const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
+      expiration = Number(currentBlockNumber) + duration
     }
 
     const params: ValidationParams = {
@@ -222,13 +223,13 @@ export class AccessController {
     }
 
     const plugin = nevermined.assets.servicePlugin[template]
-    const [from] = await nevermined.accounts.list()
 
     try {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
-      await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+
+      await plugin.process(params, this.nvmService.nodeAccount)
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
@@ -259,7 +260,7 @@ export class AccessController {
         Logger.debug(`Asset transaction: ${JSON.stringify(assetTx)}`)
       }
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${e.message}`)
+      Logger.warn(`[${did.getDid()}] Failed to track transfer NFT ${(e as Error).message}`)
     }
 
     let link
@@ -270,7 +271,9 @@ export class AccessController {
     }
 
     try {
-      const profile = await this.nvmService.getUserProfileFromAddress(params.consumer_address)
+      const profile = await this.nvmService.getUserProfileFromAddress(
+        params.consumer_address as string,
+      )
       this.nvmService
       const subscriberNotification: UserNotification = {
         notificationType: 'SubscriptionReceived',
@@ -288,7 +291,9 @@ export class AccessController {
         await this.backendService.sendMintingNotification(subscriberNotification)
       Logger.log(`Sending notification with result: ${subsNotifResult}`)
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+      Logger.warn(
+        `[${did.getDid()}] Failed to send subscriber notificaiton ${(e as Error).message}`,
+      )
     }
 
     try {
@@ -308,7 +313,9 @@ export class AccessController {
         await this.backendService.sendMintingNotification(publisherNotification)
       Logger.log(`Sending notification with result: ${pubNotifResult}`)
     } catch (e) {
-      Logger.warn(`[${did.getDid()}] Failed to send subscriber notificaiton ${e.message}`)
+      Logger.warn(
+        `[${did.getDid()}] Failed to send subscriber notificaiton ${(e as Error).message}`,
+      )
     }
 
     return 'success'
@@ -352,7 +359,7 @@ export class AccessController {
     @Param('index') index: number,
     @Query('result') result: AssetResult,
   ): Promise<StreamableFile | string> {
-    if (!req.user.did) {
+    if (!req.user?.did) {
       throw new BadRequestException('DID not specified')
     }
     return await this.nvmService.downloadAsset(req.user.did, index, res, req.user.address, result)
@@ -382,7 +389,7 @@ export class AccessController {
   async doUpload(
     @Body() uploadData: UploadDto,
     @Param('backend') backend: UploadBackends,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file,
   ): Promise<UploadResult> {
     let data: Buffer
     let fileName: string
@@ -411,8 +418,8 @@ export class AccessController {
       url = await this.nvmService.uploadToBackend(backend, data, fileName)
       return { url }
     } catch (error) {
-      Logger.error(`Error processing upload: ${error.message}`)
-      throw new InternalServerErrorException(error.message)
+      Logger.error(`Error processing upload: ${(error as Error).message}`)
+      throw new InternalServerErrorException((error as Error).message)
     }
   }
 }

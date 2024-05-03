@@ -12,10 +12,11 @@ import {
   SubscriptionType,
   ZeroAddress,
   didPrefixed,
+  ERCType,
 } from '@nevermined-io/sdk'
-import { NeverminedService } from '../shared/nevermined/nvm.service'
 import * as jose from 'jose'
 import { ConfigService } from '../shared/config/config.service'
+import { NeverminedService } from '../shared/nevermined/nvm.service'
 
 export interface SubscriptionData {
   numberNfts: number
@@ -43,10 +44,10 @@ export class SubscriptionsService {
     private nvmService: NeverminedService,
     private config: ConfigService,
   ) {
-    this.jwtSecret = this.config.subscriptionsConfig().jwtSecret
-    this.neverminedProxyUri = this.config.subscriptionsConfig().neverminedProxyUri
-    this.defaultExpiryTime = this.config.subscriptionsConfig().defaultExpiryTime
-    this.averageBlockTime = this.config.subscriptionsConfig().averageBlockTime
+    this.jwtSecret = this.config.subscriptionsConfig().jwtSecret as Uint8Array
+    this.neverminedProxyUri = this.config.subscriptionsConfig().neverminedProxyUri as string
+    this.defaultExpiryTime = this.config.subscriptionsConfig().defaultExpiryTime as string
+    this.averageBlockTime = this.config.subscriptionsConfig().averageBlockTime as number
   }
 
   /**
@@ -147,7 +148,8 @@ export class SubscriptionsService {
       const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(didPrefixed(tokenId))
       const subscriptionMetadata = subscriptionDDO.findServiceByType('metadata')
 
-      subscriptionType = subscriptionMetadata.attributes.main.subscription?.subscriptionType
+      subscriptionType = subscriptionMetadata.attributes.main.subscription
+        ?.subscriptionType as SubscriptionType
       if (subscriptionType === SubscriptionType.Credits) {
         minCreditsRequired = nftAccessService.attributes.main.nftAttributes?.minCreditsRequired
           ? nftAccessService.attributes.main.nftAttributes?.minCreditsRequired
@@ -170,19 +172,19 @@ export class SubscriptionsService {
     }
 
     // get the web-service endpoints
-    const ercType = metadataService.attributes.main.ercType
-    const endpoints = metadataService.attributes.main.webService.endpoints.flatMap((e) =>
+    const ercType = metadataService.attributes.main.ercType as ERCType
+    const endpoints = metadataService.attributes.main.webService?.endpoints?.flatMap((e) =>
       Object.values(e),
-    )
+    ) as string[]
 
     // decrypt the headers
     const headers = await this.nvmService.decrypt(
-      metadataService.attributes.main.webService.encryptedAttributes,
+      metadataService.attributes.main.webService?.encryptedAttributes as string,
       'PSK-RSA',
     )
 
     Logger.debug(
-      `DIDRegistry: ${await this.nvmService.nevermined.keeper.didRegistry.contract.getAddress()}`,
+      `DIDRegistry: ${await this.nvmService.nevermined.keeper.didRegistry.contract.address}`,
     )
 
     // get the owner of the DID
@@ -230,7 +232,7 @@ export class SubscriptionsService {
     ercType: number,
     numberNfts: number,
     userAddress: string,
-    tokenId?: string,
+    tokenId: string,
   ): Promise<boolean> {
     const balance =
       ercType === 721
@@ -351,6 +353,9 @@ export class SubscriptionsService {
       return this.defaultExpiryTime
     }
 
+    // get current block number
+    const currentBlockNumber = await this.nvmService.nevermined.client.public.getBlockNumber()
+
     // get nft transfer block number
     const subscriptionTransferBlockNumber =
       await this.nvmService.getSubscriptionTransferBlockNumber(
@@ -359,11 +364,10 @@ export class SubscriptionsService {
         ercType,
       )
 
-    // get current block number
-    const currentBlockNumber = await this.nvmService.nevermined.web3.getBlockNumber()
-
     // blocks left in the subscription
-    const subscriptionBlocksLeft = subscriptionTransferBlockNumber + duration - currentBlockNumber
+    const subscriptionBlocksLeft =
+      subscriptionTransferBlockNumber + duration - Number(currentBlockNumber)
+
     if (subscriptionBlocksLeft <= 0) {
       throw new ForbiddenException(
         `Subscription with DID/TokenId ${tokenId} for user ${userAddress} is expired.`,
@@ -372,6 +376,7 @@ export class SubscriptionsService {
 
     // calculate the number of seconds left in the subscription
     const expiryTime = Math.floor((subscriptionBlocksLeft * this.averageBlockTime) / 1000)
+
     return `${expiryTime} secs`
   }
 

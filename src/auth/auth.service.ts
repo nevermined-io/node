@@ -1,19 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common'
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { LoginDto } from './dto/login.dto'
+import { JWTPayload } from '@nevermined-io/passport-nevermined'
 import {
+  Babysig,
+  DDO,
+  NFTServiceAttributes,
+  NeverminedNFT1155Type,
+  ServiceNFTAccess,
   ServiceType,
   ValidationParams,
   didZeroX,
-  Logger,
-  Babysig,
-  DDO,
-  NeverminedNFT1155Type,
-  ServiceNFTAccess,
-  NFTServiceAttributes,
 } from '@nevermined-io/sdk'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
-import { JWTPayload } from '@nevermined-io/passport-nevermined'
+import { LoginDto } from './dto/login.dto'
 
 const BASE_URL = '/api/v1/node/services/'
 
@@ -30,25 +29,25 @@ export class AuthService {
     Logger.debug(`Validating owner for ${params.did}`)
 
     const granted = await nevermined.keeper.conditions.accessCondition.checkPermissions(
-      params.consumer_address,
+      params.consumer_address!,
       params.did,
     )
     if (!granted) {
       Logger.debug(`User not granted yet, checking balance`)
       try {
-        const service = ddo.findServiceByReference(params.service_index) as ServiceNFTAccess
+        const service = ddo.findServiceByReference(params.service_index!) as ServiceNFTAccess
 
         const balance =
           service.attributes.main.ercType == 721
-            ? await nevermined.nfts721.balanceOf(params.consumer_address)
+            ? await nevermined.nfts721.balanceOf(params.consumer_address!)
             : await nevermined.nfts1155.balance(
                 DDO.getTokenIdFromService(service),
-                params.consumer_address,
+                params.consumer_address!,
               )
 
         if (
           !NFTServiceAttributes.isCreditsBalanceEnough(
-            service.attributes.main.nftAttributes,
+            service.attributes.main.nftAttributes!,
             balance,
           )
         )
@@ -73,7 +72,7 @@ export class AuthService {
         NeverminedNFT1155Type.nft1155Credit.toString()
     if (isNft1155Credit) {
       Logger.debug(`Validating NFT1155 Credit for ${params.did}`)
-      const [from] = await nevermined.accounts.list()
+      const from = this.nvmService.nodeAccount
       const plugin = nevermined.nfts1155.servicePlugin['nft-access']
 
       try {
@@ -93,25 +92,23 @@ export class AuthService {
       nevermined.assets.servicePlugin[service] || nevermined.nfts1155.servicePlugin[service]
 
     try {
-      const [from] = await nevermined.accounts.list()
       const granted = await plugin.accept(params)
       if (!granted) {
-        await plugin.process(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+        await plugin.process(params, this.nvmService.nodeAccount)
       }
 
-      if (plugin.track)
-        await plugin.track(params, from, { zeroDevSigner: this.nvmService.zerodevSigner })
+      if (plugin.track) await plugin.track(params, this.nvmService.nodeAccount)
     } catch (error) {
-      throw new UnauthorizedException(`Error processing request: ${error.message}`)
+      throw new UnauthorizedException(`Error processing request: ${(error as Error).message}`)
     }
   }
 
   async validateClaim(payload: JWTPayload): Promise<LoginDto> {
     try {
       const params: ValidationParams = {
-        consumer_address: payload.iss,
+        consumer_address: payload.iss as string,
         did: didZeroX(payload.did as string),
-        agreement_id: payload.sub,
+        agreement_id: payload.sub!,
         buyer: payload.buyer as string,
         babysig: payload.babysig as Babysig,
         service_index: payload.service_index as number,

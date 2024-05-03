@@ -5,10 +5,10 @@ import path from 'path'
 import { Public } from '../common/decorators/auth.decorator'
 import { Request } from '../common/helpers/request.interface'
 import { GetInfoDto } from './dto/get-info.dto'
-import { ethers } from 'ethers'
 import NodeRSA from 'node-rsa'
 import { NeverminedService } from '../shared/nevermined/nvm.service'
 import { ConfigService } from '../shared/config/config.service'
+import { accountFromCredentialsData } from '../common/helpers/encryption.helper'
 
 @ApiTags('Info')
 @Controller()
@@ -40,15 +40,17 @@ export class InfoController {
 
     const provider_key_file = this.config.cryptoConfig().provider_key
     const provider_password = this.config.cryptoConfig().provider_password
-    const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
+    // const wallet = await ethers.Wallet.fromEncryptedJson(provider_key_file, provider_password)
+    const account = await accountFromCredentialsData(provider_key_file, provider_password)
+    const viemAccount = account.getAccountSigner()
 
     const rsa_key_file = this.config.cryptoConfig().provider_rsa_public
     const key = new NodeRSA(rsa_key_file)
 
     const baby = this.config.getProviderBabyjub()
-    const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE')
-    const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER')
-    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER')
+    const provenanceEnabled = this.config.get<boolean>('ENABLE_PROVENANCE') as boolean
+    const artifactDir = this.config.get<string>('ARTIFACTS_FOLDER') as string
+    const circuitDir = this.config.get<string>('CIRCUITS_FOLDER') as string
 
     const providerURL = new URL(this.nvmService.web3ProviderUri())
 
@@ -63,6 +65,7 @@ export class InfoController {
       docs: `${pathEndpoint}api/v1/docs`,
       network: await nevermined.keeper.getNetworkName(),
       'keeper-url': `${providerURL.protocol}//${providerURL.host}`,
+      'chain-id': await nevermined.client.public.getChainId(),
       'provenance-enabled': provenanceEnabled,
       'artifacts-folder': artifactDir,
       'circuits-folder': circuitDir,
@@ -70,7 +73,7 @@ export class InfoController {
       'external-contracts': [],
       'keeper-version': nevermined.keeper.didRegistry.version,
       'provider-address': this.nvmService.providerAddress,
-      'ecdsa-public-key': wallet.signingKey.publicKey,
+      'ecdsa-public-key': viemAccount.publicKey,
       'rsa-public-key': key.exportKey('public'),
       'babyjub-public-key': {
         x: baby.x,

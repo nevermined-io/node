@@ -17,24 +17,28 @@ import {
   MetaDataExternalResource,
   MetaDataMain,
   Nevermined,
+  NvmAccount,
   ReducedProfile,
   Service,
   ServiceCommon,
   ServiceType,
-  convertEthersV6SignerToAccountSigner,
   didZeroX,
   generateId,
   generateInstantiableConfigFromConfig,
 } from '@nevermined-io/sdk'
-import { ZeroDevAccountSigner, ZeroDevEthersProvider } from '@zerodev/sdk'
+
 import AWS from 'aws-sdk'
 import { AxiosError } from 'axios'
-import { ethers } from 'ethers'
 import { default as FormData } from 'form-data'
 import IpfsHttpClientLite from 'ipfs-http-client-lite'
 import { firstValueFrom } from 'rxjs'
 import { UploadBackends } from 'src/access/access.controller'
-import { aes_decryption_256, decrypt } from '../../common/helpers/encryption.helper'
+import { createPublicClient, http, pad } from 'viem'
+import {
+  accountFromCredentialsData,
+  aes_decryption_256,
+  decrypt,
+} from '../../common/helpers/encryption.helper'
 import { ConfigService } from '../config/config.service'
 
 export enum AssetResult {
@@ -46,7 +50,8 @@ export enum AssetResult {
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
-  zerodevSigner: ZeroDevAccountSigner<'ECDSA'>
+  zerodevSigner: NvmAccount
+  nodeAccount: NvmAccount
   public providerAddress: string
 
   constructor(
@@ -66,9 +71,9 @@ export class NeverminedService {
       )}`,
     )
 
-    const web3 = new ethers.JsonRpcProvider(config.web3ProviderUri)
+    const web3 = createPublicClient({ transport: http(config.web3ProviderUri) })
     try {
-      await web3.getNetwork()
+      await web3.getChainId()
     } catch (e) {
       Logger.error(e)
       throw new Error(`Invalid web3 provider for uri: ${config.web3ProviderUri}`)
@@ -76,15 +81,24 @@ export class NeverminedService {
 
     this.nevermined = await Nevermined.getInstance(config)
 
-    // setup zerodev
-    this.zerodevSigner = await this.setupZerodev()
+    const projectId = this.config.cryptoConfig().zerodevProjectId
 
+    // setup zerodev
+    if (projectId && projectId !== '') {
+      Logger.log('Setting up zerodev')
+      this.zerodevSigner = await this.setupZerodev(projectId)
+    }
     // set provider address
     if (this.zerodevSigner) {
-      this.providerAddress = await this.zerodevSigner.getAddress()
+      this.nodeAccount = this.zerodevSigner.getAccountSigner()
+      this.providerAddress = this.zerodevSigner.getId()
     } else {
-      const [provider] = await this.nevermined.accounts.list()
-      this.providerAddress = provider.getId()
+      this.nodeAccount = await accountFromCredentialsData(
+        this.config.cryptoConfig().provider_key as string,
+        this.config.cryptoConfig().provider_password as string,
+      )
+      this.providerAddress = this.nodeAccount.getId()
+      Logger.debug('Starting without zerodev with address:', this.nodeAccount.getId())
     }
   }
 
@@ -101,30 +115,26 @@ export class NeverminedService {
   }
 
   web3ProviderUri(): string {
-    return this.config.nvm().web3ProviderUri
+    return this.config.nvm().web3ProviderUri || ''
   }
 
-  private async setupZerodev(): Promise<ZeroDevAccountSigner<'ECDSA'>> {
-    const projectId = this.config.cryptoConfig().zerodevProjectId
-    if (projectId && projectId !== '') {
-      const keyfile = this.config.cryptoConfig().provider_key
-      const providerAccount = ethers.Wallet.fromEncryptedJsonSync(
-        keyfile,
-        this.config.cryptoConfig().provider_password,
-      )
-      const zerodevProvider = await ZeroDevEthersProvider.init('ECDSA', {
-        projectId,
-        owner: convertEthersV6SignerToAccountSigner(providerAccount),
-      })
-
-      return zerodevProvider.getAccountSigner()
-    }
+  private async setupZerodev(projectId: string): Promise<NvmAccount> {
+    const keyfile = this.config.cryptoConfig().provider_key
+    const providerAccount = await accountFromCredentialsData(
+      keyfile as string,
+      this.config.cryptoConfig().provider_password as string,
+      true,
+      this.config.nvm().chainId,
+      projectId,
+    )
+    Logger.debug(`Zero dev initialized with: ${providerAccount.getAddress()}`)
+    return providerAccount
   }
 
   async getAssetUrl(
     did: string,
     index: number,
-  ): Promise<{ url: string; content_type: string; dtp: boolean; name?: string }> {
+  ): Promise<{ url: string; content_type: string | undefined; dtp: boolean; name?: string }> {
     // get url for DID
     let asset: DDO
     try {
@@ -135,13 +145,13 @@ export class NeverminedService {
       throw new BadRequestException(`No such DID ${did}`)
     }
     const service = asset.findServiceByType('metadata')
-    const file_attributes = service.attributes.main.files[index]
-    const content_type = file_attributes.contentType
-    const name = file_attributes.name
+    const file_attributes = service.attributes.main.files?.[index]
+    const content_type = file_attributes?.contentType
+    const name = file_attributes?.name
     const auth_method = asset.findServiceByType('authorization').service || 'RSAES-OAEP'
     if (auth_method === 'RSAES-OAEP') {
       const filelist: MetaDataExternalResource = await this.decrypt(
-        service.attributes.encryptedFiles,
+        service.attributes.encryptedFiles ?? '',
         'PSK-RSA',
       )
 
@@ -162,7 +172,9 @@ export class NeverminedService {
    * @returns The decrypted JSON object
    */
   async decrypt(encryptedJson: string, encryptionMethod: string): Promise<any> {
-    return JSON.parse(await decrypt(this.config.cryptoConfig(), encryptedJson, encryptionMethod))
+    return JSON.parse(
+      (await decrypt(this.config.cryptoConfig(), encryptedJson, encryptionMethod)) as string,
+    )
   }
 
   async downloadAsset(
@@ -213,8 +225,8 @@ export class NeverminedService {
           method: 'POST',
           responseType: 'arraybuffer',
           auth: {
-            username: ipfsProjectId,
-            password: ipfsProjectSecret,
+            username: ipfsProjectId!,
+            password: ipfsProjectSecret!,
           },
           params: {
             arg: cid,
@@ -266,22 +278,21 @@ export class NeverminedService {
 
       try {
         if (this.config.get<boolean>('ENABLE_PROVENANCE')) {
-          const [from] = await this.nevermined.accounts.list()
+          const from = this.nodeAccount
           const provId = generateId()
           await this.nevermined.provenance.used(
             provId,
             didZeroX(did),
             userAddress,
             generateId(),
-            ethers.zeroPadValue('0x', 32),
+            pad('0x', { size: 32 }),
             `download file ${index}`,
             from,
-            { zeroDevSigner: this.zerodevSigner },
           )
           Logger.debug(`Provenance: USED event Id (${provId}) for DID ${did} registered`)
         }
       } catch (error) {
-        Logger.warn(`Unable to register on-chain provenance: ${error.toString()}`)
+        Logger.warn(`Unable to register on-chain provenance: ${(error as Error).toString()}`)
       }
 
       res.set({
@@ -296,7 +307,7 @@ export class NeverminedService {
         throw e
       } else {
         Logger.error(e)
-        throw new InternalServerErrorException(e.toString())
+        throw new InternalServerErrorException((e as Error).toString())
       }
     }
   }
@@ -311,7 +322,7 @@ export class NeverminedService {
       Logger.debug(`Bucket ${bucketName} exists on S3`)
       return true
     } catch (error) {
-      if (error.statusCode === 404) {
+      if ((error as any).statusCode === 404) {
         Logger.debug(`Bucket ${bucketName} does NOT exists on S3`)
         return false
       }
@@ -339,7 +350,7 @@ export class NeverminedService {
   async uploadS3(file: Buffer, filename: string): Promise<string> {
     Logger.debug(`Uploading to S3 ${filename}`)
     filename = filename || 'data'
-    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME')
+    const bucketName: string = this.config.get('AWS_S3_BUCKET_NAME') as string
     try {
       const s3 = new AWS.S3({
         accessKeyId: this.config.get('AWS_S3_ACCESS_KEY_ID'),
@@ -366,7 +377,7 @@ export class NeverminedService {
       })
       return url
     } catch (e) {
-      Logger.error(`Uploading ${filename}: AWS error ${e.response}`)
+      Logger.error(`Uploading ${filename}: AWS error ${(e as any).response}`)
       throw new InternalServerErrorException(e)
     }
   }
@@ -436,6 +447,8 @@ export class NeverminedService {
       return await this.uploadFilecoin(data, fileName)
     } else if (backend === 'ipfs') {
       return await this.uploadIPFS(data, fileName)
+    } else {
+      throw new BadRequestException(`Backend ${backend} not supported`)
     }
   }
 
@@ -451,7 +464,7 @@ export class NeverminedService {
   }
 
   private isDTP(main: MetaDataMain): boolean {
-    return main.files && main.files.some((f) => f.encryption === 'dtp')
+    return main.files?.some((f) => f.encryption === 'dtp') ?? false
   }
 
   /**

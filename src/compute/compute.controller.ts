@@ -1,51 +1,54 @@
 import {
   Body,
   Controller,
-  Get,
-  Param,
-  Post,
   Delete,
-  NotFoundException,
+  Get,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
+  Param,
+  Post,
 } from '@nestjs/common'
 import {
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
   ApiBearerAuth,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger'
+import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
 import { Public } from '../common/decorators/auth.decorator'
+import { ConfigService } from '../shared/config/config.service'
 import { ComputeService } from './compute.service'
 import { ExecuteWorkflowDto } from './dto/executeWorkflowDto'
-import { WorkflowListResultDto } from './dto/workflowListResultDto'
 import { ExecuteWorkflowResultDto } from './dto/executeWorkflowResultDto'
+import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
 import { StatusWorkflowResultDto } from './dto/statusWorkflowResultDto'
 import { StopWorkflowResultDto } from './dto/stopWorkflowResultDto'
-import { LogsWorkflowResultDto } from './dto/logsWorkflowResultDto'
-import { ConfigService } from '../shared/config/config.service'
-import { WorkflowServiceApi } from '@nevermined-io/argo-workflows-api'
+import { WorkflowListResultDto } from './dto/workflowListResultDto'
 
 @ApiTags('Compute')
 @Controller()
 export class ComputeController {
+  private argoNamespace
+  private argoWorkflowApi
+  private getAuthorizationHeaderOption: { headers: { Authorization: string } } | any
+
   constructor(
     private computeService: ComputeService,
     private configService: ConfigService,
-  ) {}
-
-  private argoNamespace = this.configService.computeConfig().argo_namespace
-  private argoWorkflowApi = new WorkflowServiceApi({
-    basePath: this.configService.computeConfig().argo_host,
-  })
-  private getAuthorizationHeaderOption: { headers: { Authorization: string } } | any =
-    this.configService.computeConfig().argo_auth_token
+  ) {
+    this.argoNamespace = this.configService.computeConfig().argo_namespace
+    this.argoWorkflowApi = new WorkflowServiceApi({
+      basePath: this.configService.computeConfig().argo_host,
+    })
+    this.getAuthorizationHeaderOption = this.configService.computeConfig().argo_auth_token
       ? {
           headers: { Authorization: this.configService.computeConfig().argo_auth_token },
         }
       : {}
+  }
 
   @Get('list')
   @ApiOperation({
@@ -81,7 +84,7 @@ export class ComputeController {
         undefined,
         this.getAuthorizationHeaderOption,
       )
-      const result = []
+      const result: any[] = []
 
       if (response.data.items) {
         response.data.items.forEach((element) => {
