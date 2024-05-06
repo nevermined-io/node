@@ -90,7 +90,7 @@ export class NeverminedService {
     }
     // set provider address
     if (this.zerodevSigner) {
-      this.nodeAccount = this.zerodevSigner.getAccountSigner()
+      this.nodeAccount = this.zerodevSigner
       this.providerAddress = this.zerodevSigner.getId()
     } else {
       this.nodeAccount = await accountFromCredentialsData(
