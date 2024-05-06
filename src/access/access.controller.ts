@@ -228,6 +228,7 @@ export class AccessController {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
+      Logger.debug(`Sending with NodeAccount: ${JSON.stringify(this.nvmService.nodeAccount)}`)
 
       await plugin.process(params, this.nvmService.nodeAccount)
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
