@@ -6,7 +6,7 @@ import ethers, { HDNodeWallet, Wallet } from 'ethers'
 import * as fs from 'fs'
 import NodeRSA from 'node-rsa'
 import { CryptoConfig } from 'src/shared/config/config.service'
-import { privateKeyToAccount } from 'viem/accounts'
+import { Account, privateKeyToAccount } from 'viem/accounts'
 
 const get_aes_private_key = (passphrase: string) => {
   const salt = Buffer.from('this is a salt')
@@ -82,7 +82,7 @@ export const accountFromCredentialsFile = async (
     const data = fs.readFileSync(keyFilePath)
 
     const wallet = Wallet.fromEncryptedJsonSync(data.toString(), keyFilePassword)
-    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`) as Account
     return NvmAccount.fromAccount(account)
   } catch (e) {
     throw new Error(`Error loading account from credentials file ${keyFilePath}`)
@@ -98,7 +98,7 @@ export const accountFromCredentialsData = async (
 ): Promise<NvmAccount> => {
   try {
     const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
-    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
+    const account = privateKeyToAccount(wallet.privateKey as `0x${string}`) as Account
     if (isZeroDev && chainId && zerodevProjectId) {
       const kernelClient = await createKernelClient(account, chainId, zerodevProjectId)
       return NvmAccount.fromZeroDevSigner(kernelClient)

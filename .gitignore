@@ -403,3 +403,4 @@ circuits
 *.tgz
 .yalc*
 .env*
+accounts/provider-staging.json
