@@ -1435,10 +1435,10 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.4":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.4.tgz#cc743d5b7f5789feed08fb34ac0003d76b15193e"
-  integrity sha512-dJlZd1dHSX391VbW8AqbV4UJ09oyLbgWD3SBUE0LawJFs2Qopiz2yoC5lhup4e5PORzDyRfGWLOpLf08O4UoYw==
+"@nevermined-io/sdk@3.0.6":
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.6.tgz#6c92c0445d5e759fa71d56b0227d3a6e37b22fe5"
+  integrity sha512-G6FBOAaYbCjQukNcoQ/H/7Bb1NnmKgoRCj4PfB1KpIKNZ1whH0XHYPZbo1MVHwU+ikjnr1swWEMf4IKK+Zwd1g==
   dependencies:
     "@alchemy/aa-core" "3.12.1"
     "@apollo/client" "^3.7.16"
@@ -7650,9 +7650,9 @@ pbkdf2@^3.0.3, pbkdf2@^3.1.2:
     sha.js "^2.4.8"
 
 permissionless@^0.1.22:
-  version "0.1.22"
-  resolved "https://registry.yarnpkg.com/permissionless/-/permissionless-0.1.22.tgz#9668b8719a6d819677fb479731a09fc15a99595a"
-  integrity sha512-C+1l3dkYKOicCilPXLbm5JfnLOKK+Efprg69SG+WRsNjuXHi4zSdQgex/7lF5hh4WvcaWRRMm1NCA523XlwCJw==
+  version "0.1.29"
+  resolved "https://registry.yarnpkg.com/permissionless/-/permissionless-0.1.29.tgz#185faa51d106422670b6c92cfca861f889e9de8d"
+  integrity sha512-jKkgl3G2b4hv5DvX2U8v0OI3JfX+nEzj9a6zsrcXuJaLZdS14td4tExnlmBY93nUN6lRC6NfPZjdLbi8Dkzz7w==
 
 picocolors@^1.0.0:
   version "1.0.0"
