@@ -1435,17 +1435,17 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.6-rc0":
-  version "3.0.6-rc0"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.6-rc0.tgz#ff6247976383a63c25c4b96bfc432b4a48477f1b"
-  integrity sha512-QR9D87uRNP82KJNfMGG7TaUdKxZ7HosvNeMSRsFYm/H+puwCmkNIiF0+TBh8hSl3meT9vNEEm73Q5cff6/CUNA==
+"@nevermined-io/sdk@3.0.6-rc1":
+  version "3.0.6-rc1"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.6-rc1.tgz#1bce9c16f4439058b61dbffed030fc5c3dba5219"
+  integrity sha512-ZmhhStHQheUBz/20V7gp6xpn+rttp565UHTgXGwFMCXfM8z9QaqwqB2YXU0V7UopmXmul3UQWN+DX1UDv/svHQ==
   dependencies:
     "@alchemy/aa-core" "3.12.1"
     "@apollo/client" "^3.7.16"
     "@turnkey/viem" "0.4.16"
     "@zerodev/ecdsa-validator" "5.2.3"
-    "@zerodev/permissions" "5.2.7-alpha-1"
     "@zerodev/sdk" "5.2.11"
+    "@zerodev/session-key" "^5.3.0"
     assert "^2.0.0"
     cross-fetch "^4.0.0"
     crypto-browserify "^3.12.0"
@@ -1461,7 +1461,7 @@
     node-fetch "^2.6.1"
     os-browserify "^0.3.0"
     path-browserify "^1.0.1"
-    permissionless "0.1.28"
+    permissionless "^0.1.22"
     pluralize "^8.0.0"
     save-file "^2.3.1"
     stream-browserify "^3.0.0"
@@ -1621,18 +1621,6 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
   integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
-
-"@simplewebauthn/browser@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-9.0.1.tgz#46a12c2bcefcb199f7fcb6a7e883531cd6efde17"
-  integrity sha512-wD2WpbkaEP4170s13/HUxPcAV5y4ZXaKo1TfNklS5zDefPinIgXOpgz1kpEvobAsaLPa2KeH7AKKX/od1mrBJw==
-  dependencies:
-    "@simplewebauthn/types" "^9.0.1"
-
-"@simplewebauthn/types@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/types/-/types-9.0.1.tgz#3a68d50e63d8821cf2067de3324c68d5e8120d0c"
-  integrity sha512-tGSRP1QvsAvsJmnOlRQyw/mvK9gnPtjEc5fg2+m8n+QUa+D7rvrKkOYyfpy42GTs90X3RDOnqJgfHt+qO67/+w==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
@@ -2414,20 +2402,19 @@
   resolved "https://registry.yarnpkg.com/@zerodev/ecdsa-validator/-/ecdsa-validator-5.2.3.tgz#19f55620c2254df53677662ce0715172675f28ed"
   integrity sha512-zeJjYhOW5EWK6XnctPt3iVnrqmrHfb81p/fJKaY4yQnL2ZYPrH37ZgtY1z5COETPCDTm65+jPfc1Zn/dziyAXQ==
 
-"@zerodev/permissions@5.2.7-alpha-1":
-  version "5.2.7-alpha-1"
-  resolved "https://registry.yarnpkg.com/@zerodev/permissions/-/permissions-5.2.7-alpha-1.tgz#d46f6c4a315338c1fa4876edc55a9332c83755ac"
-  integrity sha512-WOirS5rL2kzSPejqCSlJwJnV8OpQEwT/k9lAEyE5Fp+Ia4tajZn+NMj8R5v9VG8xi4e6oposf4h/aqqLjjrcSg==
-  dependencies:
-    "@simplewebauthn/browser" "^9.0.1"
-    merkletreejs "^0.3.11"
-
 "@zerodev/sdk@5.2.11":
   version "5.2.11"
   resolved "https://registry.yarnpkg.com/@zerodev/sdk/-/sdk-5.2.11.tgz#56841b9416889f0fb1fd9beb461f6c6d6a6c802e"
   integrity sha512-42wl3vW+CPQTghOnAlVAwEiT7Aa+cb89EztY5NCX03jGHj64D38ZIRytZkIu4pleGGFHL7B29af6RYzGJPO0NQ==
   dependencies:
     semver "^7.6.0"
+
+"@zerodev/session-key@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@zerodev/session-key/-/session-key-5.3.0.tgz#d347134a359d06ec03f6bb8378345d5d2d3f4c22"
+  integrity sha512-HZAFuhUiiG2bx8fqBW1LujH7Rn8zdbraipOoFXh55tDTyA3GX6M4RgiqzZPRoHMYfCYImE6ETBj0a97PjsBRHQ==
+  dependencies:
+    merkletreejs "^0.3.11"
 
 JSONStream@^1.3.5:
   version "1.3.5"
@@ -7662,10 +7649,10 @@ pbkdf2@^3.0.3, pbkdf2@^3.1.2:
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
 
-permissionless@0.1.28:
-  version "0.1.28"
-  resolved "https://registry.yarnpkg.com/permissionless/-/permissionless-0.1.28.tgz#3609b7ee431866eb45821707593651991da65355"
-  integrity sha512-JjE4IofN2B1pqB4L7g/9G325pKXCGuPHfpc390jtVvk4CjnIIVQN1NwO97eb+bAYty+1aoBgYsw6ezxH1WmgWA==
+permissionless@^0.1.22:
+  version "0.1.29"
+  resolved "https://registry.yarnpkg.com/permissionless/-/permissionless-0.1.29.tgz#185faa51d106422670b6c92cfca861f889e9de8d"
+  integrity sha512-jKkgl3G2b4hv5DvX2U8v0OI3JfX+nEzj9a6zsrcXuJaLZdS14td4tExnlmBY93nUN6lRC6NfPZjdLbi8Dkzz7w==
 
 picocolors@^1.0.0:
   version "1.0.0"
