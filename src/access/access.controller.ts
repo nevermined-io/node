@@ -27,14 +27,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
-import {
-  AgreementData,
-  DID,
-  ServiceType,
-  ValidationParams,
-  ZeroAddress,
-  generateId,
-} from '@nevermined-io/sdk'
+import { DID, ServiceType, ValidationParams, ZeroAddress, generateId } from '@nevermined-io/sdk'
 import crypto from 'crypto'
 import { aes_encryption_256 } from '../common/helpers/encryption.helper'
 import { Public } from '../common/decorators/auth.decorator'
@@ -148,9 +141,10 @@ export class AccessController {
     Logger.debug(`Transferring NFT with agreement ${transferData.agreementId}`)
     const nevermined = this.nvmService.getNevermined()
 
-    // Check the agreement exists on-chain
+    // Check the agreement exists
+    let agreementData
     try {
-      const agreementData = await nevermined.keeper.agreementStoreManager.getAgreement(
+      agreementData = await nevermined.keeper.agreementStoreManager.getAgreement(
         transferData.agreementId,
       )
       if (agreementData.templateId.toLowerCase() === ZeroAddress) {
@@ -162,36 +156,17 @@ export class AccessController {
       throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
     }
 
+    let subscriptionDDO
     let did
     try {
-      // If we get DID from the request, we use it
-      if (transferData.did) {
-        did = DID.parse(transferData.did)
-      }
+      did = DID.parse(agreementData.did)
+      subscriptionDDO = await this.nvmService.nevermined.assets.resolve(did.getDid())
     } catch (e) {
-      Logger.debug(`Unable to parse DID from the HTTP parameter: ${transferData.did}`)
+      Logger.error(`Error resolving DID: ${did.getDid()}`)
+      Logger.error((e as Error).toString())
+      throw new NotFoundException(`Error resolving DID: ${did.getDid()}`)
     }
 
-    if (!did) {
-      // If we don't have a DID, we get it from the events
-      let agreement: AgreementData
-      try {
-        agreement = await nevermined.keeper.agreementStoreManager.getAgreement(
-          transferData.agreementId,
-        )
-        did = DID.parse(agreement.did)
-      } catch (e) {
-        Logger.error(`Error resolving agreement ${transferData.agreementId}`)
-        Logger.error((e as Error).toString())
-        throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
-      }
-      if (!agreement) {
-        Logger.error(`Agreement ${transferData.agreementId} not found`)
-        throw new NotFoundException(`Agreement ${transferData.agreementId} not found`)
-      }
-    }
-
-    const subscriptionDDO = await this.nvmService.nevermined.assets.resolve(did.getDid())
     const serviceReference =
       transferData.serviceIndex && transferData.serviceIndex >= 0
         ? transferData.serviceIndex
