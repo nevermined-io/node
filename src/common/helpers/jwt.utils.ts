@@ -1,11 +1,11 @@
 import { Logger } from '@nestjs/common'
-import { ethers } from 'ethers'
 import * as jose from 'jose'
+import { getChecksumAddress, isValidAddress } from '@nevermined-io/sdk'
 
 export interface ClientAssertion {
   client_assertion_type: string
   client_assertion: string
-  nevermined_api_key?: string
+  nvm_key_hash?: string
 }
 
 export interface Eip712Data {
@@ -54,12 +54,12 @@ export const parseJwt = async (jwt: string): Promise<JWTPayload> => {
     throw new JwtEthVerifyError('Payload: "iss" field is required')
   }
 
-  const isValidAddress = ethers.isAddress(parsedPayload.iss)
-  if (!isValidAddress) {
+  const isValid = isValidAddress(parsedPayload.iss)
+  if (!isValid) {
     Logger.error('Payload: "iss" field must be a valid ethereum address')
     throw new JwtEthVerifyError('Payload: "iss" field must be a valid ethereum address')
   }
-  const isChecksumAddress = ethers.getAddress(parsedPayload.iss) === parsedPayload.iss
+  const isChecksumAddress = getChecksumAddress(parsedPayload.iss) === parsedPayload.iss
   if (!isChecksumAddress) {
     Logger.error('Payload: "iss" field must be a checksum address')
     throw new JwtEthVerifyError('Payload: "iss" field must be a checksum address')
