@@ -8,10 +8,12 @@ import { ConfigModule } from '../shared/config/config.module'
 import { ConfigService } from '../shared/config/config.service'
 import { NeverminedModule } from '../shared/nevermined/nvm.module'
 import { NeverminedStrategy } from './nvm.strategy'
+import { BackendModule } from '../shared/backend/backend.module'
 
 @Module({
   imports: [
     ConfigModule,
+    BackendModule,
     NeverminedModule,
     PassportModule,
     JwtModule.registerAsync({

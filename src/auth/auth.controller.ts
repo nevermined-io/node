@@ -4,6 +4,7 @@ import { Public } from '../common/decorators/auth.decorator'
 import { AuthService } from './auth.service'
 import { LoginDto } from './dto/login.dto'
 import { NeverminedGuard } from './nvm.guard'
+import { SessionKeyAuthGuard } from '../common/guards/auth/session-key.guard'
 
 @ApiTags('Auth')
 @Controller()
@@ -28,5 +29,25 @@ export class AuthController {
   @Public()
   token(@Req() req): Promise<LoginDto> {
     return this.authService.validateClaim(req.user)
+  }
+
+  @Post('nvmApiKey')
+  @ApiOperation({
+    description: 'Login using a sessionKey',
+    summary: 'Public',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The access_token',
+    type: LoginDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized access',
+  })
+  @UseGuards(SessionKeyAuthGuard)
+  @Public()
+  sessionKey(@Req() req): Promise<LoginDto> {
+    return this.authService.validateClaim(req.payload)
   }
 }
