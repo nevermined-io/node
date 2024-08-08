@@ -404,3 +404,5 @@ circuits
 .yalc*
 .env*
 accounts/provider-staging.json
+accounts/rsa_priv_key-staging.pem
+accounts/rsa_pub_key-staging.pem

@@ -3,6 +3,7 @@ import { InternalServerErrorException } from '@nestjs/common'
 import { ConfigService } from '../config/config.service'
 import { firstValueFrom } from 'rxjs'
 import { HttpModuleOptions, HttpService } from '@nestjs/axios'
+import { NvmApiKey } from '@nevermined-io/sdk'
 
 export interface AssetTransaction {
   assetDid: string
@@ -116,5 +117,31 @@ export class BackendService {
     }
 
     return true
+  }
+
+  public async validateApiKey(apiKeyHash: string): Promise<NvmApiKey> {
+    if (!this.isNVMBackendEnabled) {
+      Logger.warn('Backend is disabled by config')
+      throw new InternalServerErrorException('Backend is disabled by config')
+    }
+
+    const requestConfig: HttpModuleOptions = {
+      url: `${this.backendUrl}/api/v1/api-keys/validate`,
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKeyHash}`,
+        'Content-Type': 'application/json',
+      },
+    }
+
+    const response = await firstValueFrom(this.httpService.request(requestConfig))
+    const obj = response.data
+
+    if (obj.error) {
+      Logger.error('Backend returned an error message:', obj.error)
+      throw new InternalServerErrorException(obj.error)
+    }
+
+    return obj
   }
 }

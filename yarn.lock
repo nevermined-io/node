@@ -1435,17 +1435,17 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.14":
-  version "3.0.14"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.14.tgz#9391c18347779d5ab883cc876e3224a641c6367b"
-  integrity sha512-CUMU0d8OoydI6573OET6jgZIhlGXi4oy7jCUhVUuP+er1KZ2FbG88wmtT0UqzOFJo4TJJ7+YDmVEHYel0fjQ+w==
+"@nevermined-io/sdk@3.0.24":
+  version "3.0.24"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.24.tgz#42e45cd113411aa94c33c50525c8d3929fbb6c1c"
+  integrity sha512-0Pf0l6vZ23gCRKfbgSJkq8c+xRd41s3n4wM74N9SdCTeb9etnUZW38Kq/wn1wKjFnu+Rykt/r/wp/9ZRXH74GQ==
   dependencies:
     "@alchemy/aa-core" "3.12.1"
     "@apollo/client" "^3.7.16"
     "@turnkey/viem" "0.4.16"
     "@zerodev/ecdsa-validator" "5.2.3"
     "@zerodev/sdk" "5.2.11"
-    "@zerodev/session-key" "^5.3.0"
+    "@zerodev/session-key" "5.3.0"
     assert "^2.0.0"
     cross-fetch "^4.0.0"
     crypto-browserify "^3.12.0"
@@ -1469,6 +1469,7 @@
     url "^0.11.0"
     uuid "^9.0.1"
     viem "2.9.31"
+    vm-browserify "^1.1.2"
     whatwg-url "^14.0.0"
 
 "@next/eslint-plugin-next@14.2.3":
@@ -2409,7 +2410,7 @@
   dependencies:
     semver "^7.6.0"
 
-"@zerodev/session-key@^5.3.0":
+"@zerodev/session-key@5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@zerodev/session-key/-/session-key-5.3.0.tgz#d347134a359d06ec03f6bb8378345d5d2d3f4c22"
   integrity sha512-HZAFuhUiiG2bx8fqBW1LujH7Rn8zdbraipOoFXh55tDTyA3GX6M4RgiqzZPRoHMYfCYImE6ETBj0a97PjsBRHQ==
@@ -4681,9 +4682,9 @@ ethers@5.7.2, ethers@^5.6.5:
     "@ethersproject/wordlists" "5.7.0"
 
 ethers@^6.12.1:
-  version "6.12.1"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.12.1.tgz#517ff6d66d4fd5433e38e903051da3e57c87ff37"
-  integrity sha512-j6wcVoZf06nqEcBbDWkKg8Fp895SS96dSnTCjiXT+8vt2o02raTn4Lo9ERUuIVU5bAjoPYeA+7ytQFexFmLuVw==
+  version "6.13.2"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-6.13.2.tgz#4b67d4b49e69b59893931a032560999e5e4419fe"
+  integrity sha512-9VkriTTed+/27BGuY1s0hf441kqwHJ1wtN2edksEtiRvXx+soxRX3iSXTfFqq2+YwrOqbDoTHjIhQnjJRlzKmg==
   dependencies:
     "@adraffy/ens-normalize" "1.10.1"
     "@noble/curves" "1.2.0"
@@ -4691,7 +4692,7 @@ ethers@^6.12.1:
     "@types/node" "18.15.13"
     aes-js "4.0.0-beta.5"
     tslib "2.4.0"
-    ws "8.5.0"
+    ws "8.17.1"
 
 ethjs-unit@0.1.6:
   version "0.1.6"
@@ -9402,6 +9403,11 @@ viem@2.9.31:
     isows "1.0.3"
     ws "8.13.0"
 
+vm-browserify@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/vm-browserify/-/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
+  integrity sha512-2ham8XPWTONajOR0ohOKOHXkm3+gaBmGut3SRuu75xLd/RRaY6vqgh8NBYYk7+RW3u5AtzPQZG8F10LHkl0lAQ==
+
 walker@^1.0.8:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/walker/-/walker-1.0.8.tgz#bd498db477afe573dc04185f011d3ab8a8d7653f"
@@ -9646,10 +9652,10 @@ ws@8.13.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
   integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
-ws@8.5.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-8.5.0.tgz#bfb4be96600757fe5382de12c670dab984a1ed4f"
-  integrity sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg==
+ws@8.17.1:
+  version "8.17.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.17.1.tgz#9293da530bb548febc95371d90f9c878727d919b"
+  integrity sha512-6XQFvXTkbfUOZOKKILFG1PDK2NDQs4azKQl26T0YS5CxqWLgXajbPZ+h4gZekJyRqFU8pvnbAbbs/3TgRPy+GQ==
 
 xml2js@0.6.2:
   version "0.6.2"
