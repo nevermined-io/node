@@ -27,6 +27,7 @@ NETWORKS_MAP=(
   ["optimism"]="10"
   ["gnosis"]="100"
   ["matic"]="137"
+  ["peaq"]="3338"
   ["base"]="8453"
   ["chiado"]="10200"
   ["arbitrum-one"]="42161"
