@@ -1435,10 +1435,10 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.28":
-  version "3.0.28"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.28.tgz#85c78bd3e51bb4fe19f892fbe1e54ae701664caa"
-  integrity sha512-X9uutc0mb8q6qmh528fHxD8phCxyvpfIXAnelsSmD6qc5lxp9Fb6b6CKc4++kcl9cLR+MKRLQbcKBJ7gJZO1GA==
+"@nevermined-io/sdk@3.0.29":
+  version "3.0.29"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.29.tgz#576b5cf91af25a6bfdde21ecdcbe35d41c0b4979"
+  integrity sha512-eYo4jYvi5SJ1i1TTYe55fsiAWcuetSRVNC60K8h8vQa+st73I7qwEU+HmAZ5lFWivExWLQHHOG2w3dqoPjpPwQ==
   dependencies:
     "@alchemy/aa-core" "3.12.1"
     "@apollo/client" "^3.7.16"
