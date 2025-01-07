@@ -232,6 +232,7 @@ export class AccessController {
       )
 
       const result = await plugin.process(params, this.nvmService.nodeAccount)
+      Logger.debug(`[${did.getDid()}] Transfer NFT result: ${JSON.stringify(result)}`)
       txs = result || {}
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
@@ -254,7 +255,7 @@ export class AccessController {
           price: (Number(assetPrice) / 100).toString(),
           currency: 'USDC',
           paymentType: 'Crypto',
-          txHash: txs.toString(),
+          txHash: JSON.stringify(txs),
           metadata: '',
         }
 
