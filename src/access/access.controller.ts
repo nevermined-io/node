@@ -232,8 +232,14 @@ export class AccessController {
       )
 
       const result = await plugin.process(params, this.nvmService.nodeAccount)
-      Logger.debug(`[${did.getDid()}] Transfer NFT result: ${JSON.stringify(result)}`)
-      txs = result || {}
+      Logger.debug(`Result of processing: ${result}`)
+      Logger.debug(`Result of stringify: ${JSON.stringify(result)}`)
+      const processedResult = {
+        TransferNFTCondition: result!.TransferNFTCondition.transactionHash,
+        EscrowPaymentCondition: result!.EscrowPaymentCondition.transactionHash,
+      }
+
+      txs = processedResult
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
