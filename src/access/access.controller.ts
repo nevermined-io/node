@@ -224,12 +224,22 @@ export class AccessController {
 
     const plugin = nevermined.assets.servicePlugin[template]
 
+    let txs = {}
+
     try {
       Logger.debug(
         `[${did.getDid()}] Fulfilling transfer NFT with agreement ${transferData.agreementId}`,
       )
 
-      await plugin.process(params, this.nvmService.nodeAccount)
+      const result = await plugin.process(params, this.nvmService.nodeAccount)
+      Logger.debug(`Result of processing: ${result}`)
+      Logger.debug(`Result of stringify: ${JSON.stringify(result)}`)
+      const processedResult = {
+        TransferNFTCondition: result!.TransferNFTCondition.transactionHash,
+        EscrowPaymentCondition: result!.EscrowPaymentCondition.transactionHash,
+      }
+
+      txs = processedResult
       Logger.debug(`NFT Transferred to ${transferData.nftReceiver}`)
     } catch (e) {
       Logger.error(`Failed to transfer NFT ${e}`)
@@ -251,7 +261,7 @@ export class AccessController {
           price: (Number(assetPrice) / 100).toString(),
           currency: 'USDC',
           paymentType: 'Crypto',
-          txHash: '0x0',
+          txHash: JSON.stringify(txs),
           metadata: '',
         }
 
