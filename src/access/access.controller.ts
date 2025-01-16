@@ -234,9 +234,11 @@ export class AccessController {
       const result = await plugin.process(params, this.nvmService.nodeAccount)
       Logger.debug(`Result of processing: ${result}`)
       Logger.debug(`Result of stringify: ${JSON.stringify(result)}`)
+
       const processedResult = {
-        TransferNFTCondition: result!.TransferNFTCondition.transactionHash,
-        EscrowPaymentCondition: result!.EscrowPaymentCondition.transactionHash,
+        TransferNFTCondition: result?.TransferNFTCondition?.transactionHash || '0x',
+        TransferNFT721Condition: result?.TransferNFT721Condition?.transactionHash || '0x',
+        EscrowPaymentCondition: result?.EscrowPaymentCondition?.transactionHash || '0x',
       }
 
       txs = processedResult
