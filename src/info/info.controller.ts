@@ -73,7 +73,7 @@ export class InfoController {
       'external-contracts': [],
       'keeper-version': nevermined.keeper.didRegistry.version,
       'provider-address': this.nvmService.providerAddress,
-      'ecdsa-public-key': viemAccount.publicKey,
+      'ecdsa-public-key': viemAccount?.publicKey,
       'rsa-public-key': key.exportKey('public'),
       'babyjub-public-key': {
         x: baby.x,
