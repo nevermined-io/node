@@ -1432,18 +1432,16 @@
     jose "^4.11.2"
     passport-strategy "^1.0.0"
 
-"@nevermined-io/sdk@3.0.47-rc2":
-  version "3.0.47-rc2"
-  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.47-rc2.tgz#063ad7009d56df89aa2d0ddc76b37ae31a389b2f"
-  integrity sha512-VPAVFcJbJOhD4xIjlY0+xjA1DAgGW1RiQYsdILAjF4bo1h2Jg7naYbEMDlpDMBNYxyIMxA9j9QWQXpg7bL/KHA==
+"@nevermined-io/sdk@3.0.47":
+  version "3.0.47"
+  resolved "https://registry.yarnpkg.com/@nevermined-io/sdk/-/sdk-3.0.47.tgz#7d9005a4394451919486da77ab2c905fbc5f738a"
+  integrity sha512-fgAmqh8ZN3jeBgYZ1CyN1vA/p2qwgK5zcmoBLxrB7eNeCbbMx7enwp/p0CpyLRnP3M/mk5zxUG58D8l/PFloYA==
   dependencies:
     "@apollo/client" "^3.7.16"
     "@turnkey/viem" "0.4.16"
     "@zerodev/ecdsa-validator" "^5.4.1"
-    "@zerodev/permissions" "^5.5.1"
     "@zerodev/sdk" "^5.4.9"
     "@zerodev/session-key" "^5.5.0"
-    "@zerodev/webauthn-key" "^5.4.1"
     assert "^2.0.0"
     cross-fetch "^4.0.0"
     crypto-browserify "^3.12.0"
@@ -1670,30 +1668,6 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@sideway/pinpoint/-/pinpoint-2.0.0.tgz#cff8ffadc372ad29fd3f78277aeb29e632cc70df"
   integrity sha512-RNiOoTPkptFtSVzQevY/yWtZwf/RxyVnPy/OcA9HBM3MlGDnBEYL5B41H0MTn0Uec8Hi+2qUtTfG2WWZBmMejQ==
-
-"@simplewebauthn/browser@^8.3.4":
-  version "8.3.7"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-8.3.7.tgz#f1f8b74f135390888d8cb99ee13614a5d228d68b"
-  integrity sha512-ZtRf+pUEgOCvjrYsbMsJfiHOdKcrSZt2zrAnIIpfmA06r0FxBovFYq0rJ171soZbe13KmWzAoLKjSxVW7KxCdQ==
-  dependencies:
-    "@simplewebauthn/typescript-types" "^8.3.4"
-
-"@simplewebauthn/browser@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/browser/-/browser-9.0.1.tgz#46a12c2bcefcb199f7fcb6a7e883531cd6efde17"
-  integrity sha512-wD2WpbkaEP4170s13/HUxPcAV5y4ZXaKo1TfNklS5zDefPinIgXOpgz1kpEvobAsaLPa2KeH7AKKX/od1mrBJw==
-  dependencies:
-    "@simplewebauthn/types" "^9.0.1"
-
-"@simplewebauthn/types@^9.0.1":
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/types/-/types-9.0.1.tgz#3a68d50e63d8821cf2067de3324c68d5e8120d0c"
-  integrity sha512-tGSRP1QvsAvsJmnOlRQyw/mvK9gnPtjEc5fg2+m8n+QUa+D7rvrKkOYyfpy42GTs90X3RDOnqJgfHt+qO67/+w==
-
-"@simplewebauthn/typescript-types@^8.3.4":
-  version "8.3.4"
-  resolved "https://registry.yarnpkg.com/@simplewebauthn/typescript-types/-/typescript-types-8.3.4.tgz#bd7793653e25f7e4e57215776db57873dfa7d883"
-  integrity sha512-38xtca0OqfRVNloKBrFB5LEM6PN5vzFbJG6rAutPVrtGHFYxPdiV3btYWq0eAZAZmP+dqFPYJxJWeJrGfmYHng==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
@@ -2569,14 +2543,6 @@
   resolved "https://registry.yarnpkg.com/@zerodev/ecdsa-validator/-/ecdsa-validator-5.4.2.tgz#07f49b2c524995e0287921259dce1f6500d6a5ff"
   integrity sha512-ElWt8jd69c4ybtFsaWMQY/MVB/izrDufqYIBDe4wEcwO9GgiVLUIJ4Y5mgoRDUvu7nw2tf1L/RpGXYqVPQPCPg==
 
-"@zerodev/permissions@^5.5.1":
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/@zerodev/permissions/-/permissions-5.5.1.tgz#7bbf25cf8138a72388362dedbaa5388ba6207e87"
-  integrity sha512-g/NdfGP9bgac5hVda0sqBsRRb8GdIwwPvHODnYDNtE8wXREMpzwoCWinXH8tJsNjk7+8xLWRQZfHlJQmCgMvJA==
-  dependencies:
-    "@simplewebauthn/browser" "^9.0.1"
-    merkletreejs "^0.3.11"
-
 "@zerodev/sdk@^5.4.9":
   version "5.4.12"
   resolved "https://registry.yarnpkg.com/@zerodev/sdk/-/sdk-5.4.12.tgz#137f17a4b9dd8e298c89fac836185c33a6438ba1"
@@ -2590,14 +2556,6 @@
   integrity sha512-mx9L/3F4u+1edvHMZo9fnuMXEu6x96WC1otC2NuGokOm8OsgBY0jWUwb/AqlUPKpbodnZAuj69ufns5C0ea/xw==
   dependencies:
     merkletreejs "^0.3.11"
-
-"@zerodev/webauthn-key@^5.4.1":
-  version "5.4.1"
-  resolved "https://registry.yarnpkg.com/@zerodev/webauthn-key/-/webauthn-key-5.4.1.tgz#ab0382d2097d13696d45c3b7d7becbdf33d4ede3"
-  integrity sha512-9uq7kJgr0oF3xt64ymzv4JCjjwkUxgs5CWj3s6jD1b67pmUBNqwY1n1nvUp0HOFYwQRRB2E5w2NPL645FIlRJw==
-  dependencies:
-    "@noble/curves" "^1.3.0"
-    "@simplewebauthn/browser" "^8.3.4"
 
 JSONStream@^1.3.5:
   version "1.3.5"
