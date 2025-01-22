@@ -277,9 +277,9 @@ export class AccessController {
 
     let link
     try {
-      link = new URL(`/subscriptions/${did.getDid()}`, this.backendService.appUrl).toString()
+      link = new URL(`/plan/${did.getDid()}`, this.backendService.appUrl).toString()
     } catch (e) {
-      link = `https://nevermined.app/subscriptions/${did.getDid()}`
+      link = `https://nevermined.app/plan/${did.getDid()}`
     }
 
     try {
