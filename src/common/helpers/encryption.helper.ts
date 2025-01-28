@@ -1,4 +1,3 @@
-import { createKernelClient } from '@nevermined-io/sdk'
 import { NvmAccount } from '@nevermined-io/sdk'
 import crypto from 'crypto'
 import { decrypt as ec_decrypt, encrypt as ec_encrypt } from 'eciesjs'
@@ -92,19 +91,11 @@ export const accountFromCredentialsFile = async (
 export const accountFromCredentialsData = async (
   keyFileJson: string,
   keyFilePassword: string,
-  isZeroDev = false,
-  chainId?: number,
-  zerodevProjectId?: string,
 ): Promise<NvmAccount> => {
   try {
     const wallet = Wallet.fromEncryptedJsonSync(keyFileJson, keyFilePassword)
     const account = privateKeyToAccount(wallet.privateKey as `0x${string}`)
-    if (isZeroDev && chainId && zerodevProjectId) {
-      const kernelClient = await createKernelClient(account, chainId, zerodevProjectId)
-      return NvmAccount.fromZeroDevSigner(kernelClient)
-    } else {
-      return NvmAccount.fromAccount(account)
-    }
+    return NvmAccount.fromAccount(account)
   } catch (e) {
     throw new Error(`Error loading account from credentials file ${keyFileJson}`)
   }
