@@ -80,7 +80,7 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "viem": "^2.22.40"
+    "viem": "^2.22.16"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
