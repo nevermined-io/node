@@ -50,7 +50,6 @@ export enum AssetResult {
 @Injectable()
 export class NeverminedService {
   nevermined: Nevermined
-  zerodevSigner: NvmAccount
   nodeAccount: NvmAccount
   public providerAddress: string
 
@@ -80,26 +79,12 @@ export class NeverminedService {
     }
 
     this.nevermined = await Nevermined.getInstance(config)
-
-    const projectId = this.config.cryptoConfig().zerodevProjectId
-
-    // setup zerodev
-    if (projectId && projectId !== '') {
-      Logger.log('Setting up zerodev')
-      this.zerodevSigner = await this.setupZerodev(projectId)
-    }
-    // set provider address
-    if (this.zerodevSigner) {
-      this.nodeAccount = this.zerodevSigner
-      this.providerAddress = this.zerodevSigner.getId()
-    } else {
-      this.nodeAccount = await accountFromCredentialsData(
-        this.config.cryptoConfig().provider_key as string,
-        this.config.cryptoConfig().provider_password as string,
-      )
-      this.providerAddress = this.nodeAccount.getId()
-      Logger.debug('Starting without zerodev with address:', this.nodeAccount.getId())
-    }
+    this.nodeAccount = await accountFromCredentialsData(
+      this.config.cryptoConfig().provider_key as string,
+      this.config.cryptoConfig().provider_password as string,
+    )
+    this.providerAddress = this.nodeAccount.getId()
+    Logger.debug('Starting with address:', this.nodeAccount.getId())
   }
 
   getNevermined() {
@@ -116,19 +101,6 @@ export class NeverminedService {
 
   web3ProviderUri(): string {
     return this.config.nvm().web3ProviderUri || ''
-  }
-
-  private async setupZerodev(projectId: string): Promise<NvmAccount> {
-    const keyfile = this.config.cryptoConfig().provider_key
-    const providerAccount = await accountFromCredentialsData(
-      keyfile as string,
-      this.config.cryptoConfig().provider_password as string,
-      true,
-      this.config.nvm().chainId,
-      projectId,
-    )
-    Logger.debug(`Zero dev initialized with: ${providerAccount.getAddress()}`)
-    return providerAccount
   }
 
   async getAssetUrl(

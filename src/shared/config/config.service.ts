@@ -17,7 +17,6 @@ export interface CryptoConfig {
   provider_password: string
   provider_rsa_public: string
   provider_rsa_private: string
-  zerodevProjectId: string
 }
 
 export interface ComputeConfig {
@@ -158,7 +157,6 @@ export class ConfigService {
       provider_key: readFileSync(this.get('PROVIDER_KEYFILE') || '').toString(),
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE') || '').toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE') || '').toString(),
-      zerodevProjectId: this.get('ZERODEV_PROJECT_ID') || '',
     }
     this.compute = {
       enable_compute: this.get('ENABLE_COMPUTE') === 'true',
