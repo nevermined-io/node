@@ -4,8 +4,7 @@
     "noUnusedLocals": true,
     "moduleResolution": "node",
     "paths": {
-      "@/": ["./src/"],
-      "permissionless/*": ["src/permissionless.d.ts"]
+      "@/": ["./src/"]
     },
     "typeRoots": ["node_modules/@types"]
   },
