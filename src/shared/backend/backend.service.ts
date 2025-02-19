@@ -26,6 +26,7 @@ export interface UserNotification {
   title: string
   body: string
   link: string
+  did?: string
 }
 
 @Injectable()

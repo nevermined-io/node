@@ -1,6 +1,6 @@
 {
   "name": "node-ts",
-  "version": "3.0.17",
+  "version": "3.0.18",
   "description": "Nevermined Node",
   "main": "main.ts",
   "scripts": {

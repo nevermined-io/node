@@ -318,6 +318,7 @@ export class AccessController {
         title: 'Subscription Purchased',
         body: `A user has purchased your subscription`,
         link,
+        did: did.getDid(),
       }
       Logger.log(`Publisher Notification: ${JSON.stringify(publisherNotification)}`)
 
