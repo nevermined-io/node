@@ -9,6 +9,7 @@ import {
   StreamableFile,
 } from '@nestjs/common'
 import {
+  AssetPrice,
   DDO,
   DDOError,
   DDOServiceNotFoundError,
@@ -472,10 +473,10 @@ export class NeverminedService {
     return Number(duration) || 0
   }
 
-  public getAssetPrice(service: ServiceCommon): bigint {
+  public getAssetPrice(service: ServiceCommon): AssetPrice {
     const assetPrice = DDO.getAssetPriceFromService(service)
 
-    if (assetPrice) return assetPrice.getTotalPrice()
+    if (assetPrice) return assetPrice
     throw new DDOError(`No price found for asset ${service.index}`)
   }
 

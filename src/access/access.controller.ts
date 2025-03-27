@@ -48,6 +48,7 @@ import { AssetResult, NeverminedService } from '../shared/nevermined/nvm.service
 import { TransferDto } from './dto/transfer'
 import { UploadDto } from './dto/upload'
 import { UploadResult } from './dto/upload-result'
+import { formatUnits } from 'viem'
 
 export enum UploadBackends {
   IPFS = 'ipfs',
@@ -254,14 +255,31 @@ export class AccessController {
       if (!this.backendService.isBackendEnabled()) {
         Logger.log(`NVM Backend not enabled, skipping tracking transaction in the database`)
       } else {
-        const assetPrice = this.nvmService.getAssetPrice(service) / 10n ** BigInt(4)
+        const assetPrice = this.nvmService.getAssetPrice(service).getTotalPrice()
+        const erc20TokenAddress =
+          this.nvmService.getAssetPrice(service)?.getTokenAddress() ||
+          this.nvmService.getNevermined().utils.token.getAddress()
+
+        let currency: string
+        let decimals: number
+        if (erc20TokenAddress === ZeroAddress) {
+          currency = 'ETH'
+          decimals = 18
+        } else {
+          const erc20 = await this.nvmService.getNevermined().contracts.loadErc20(erc20TokenAddress)
+          currency = await erc20.symbol()
+          decimals = await erc20.decimals()
+        }
+
+        const priceHighestDenomination = +formatUnits(assetPrice, decimals)
+
         const assetTx: AssetTransaction = {
           assetDid: did.getDid(),
           assetOwner: subscriptionDDO.proof.creator,
           assetConsumer: transferData.nftReceiver,
           txType: 'Mint',
-          price: (Number(assetPrice) / 100).toString(),
-          currency: 'USDC',
+          price: priceHighestDenomination.toString(),
+          currency: currency,
           paymentType: 'Crypto',
           txHash: JSON.stringify(txs),
           metadata: '',
