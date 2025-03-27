@@ -254,14 +254,21 @@ export class AccessController {
       if (!this.backendService.isBackendEnabled()) {
         Logger.log(`NVM Backend not enabled, skipping tracking transaction in the database`)
       } else {
-        const assetPrice = this.nvmService.getAssetPrice(service) / 10n ** BigInt(4)
+        const assetPrice = this.nvmService.getAssetPrice(service).getTotalPrice() / 10n ** BigInt(4)
+        const erc20TokenAddress =
+          this.nvmService.getAssetPrice(service)?.getTokenAddress() ||
+          this.nvmService.getNevermined().utils.token.getAddress()
+
+        const currency = await (
+          await this.nvmService.getNevermined().contracts.loadErc20(erc20TokenAddress)
+        ).symbol()
         const assetTx: AssetTransaction = {
           assetDid: did.getDid(),
           assetOwner: subscriptionDDO.proof.creator,
           assetConsumer: transferData.nftReceiver,
           txType: 'Mint',
           price: (Number(assetPrice) / 100).toString(),
-          currency: 'USDC',
+          currency: currency,
           paymentType: 'Crypto',
           txHash: JSON.stringify(txs),
           metadata: '',
