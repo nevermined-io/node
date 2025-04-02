@@ -37,7 +37,7 @@ jobs:
           ./scripts/wait-nevermined.sh
       - name: Start node
         env:
-          PROVIDER_KEYFILE: accounts/provider.json
+          PROVIDER_KEYFILE: ${{ secrets.PROVIDER_KEYFILE }}
           RSA_PRIVKEY_FILE: accounts/rsa_priv_key.pem
           RSA_PUBKEY_FILE: accounts/rsa_pub_key.pem
           PROVIDER_BABYJUB_SECRET: ${{ secrets.PROVIDER_BABYJUB_SECRET }}
