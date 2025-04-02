@@ -14,7 +14,7 @@ const bootstrap = async () => {
   console.log(process.env.NODE_ENV)
   const app = await NestFactory.create<NestExpressApplication>(ApplicationModule, {
     cors: true,
-    logger: ['error', 'log', 'warn', 'debug'],
+    logger: ['error', 'log', 'warn'],
   })
 
   // http middleware logger

@@ -61,15 +61,6 @@ export class NeverminedService {
   // TODO: handle configuration properly
   async onModuleInit() {
     const config = this.config.nvm()
-    Logger.debug(
-      `Starting NeverminedService with config:\n${JSON.stringify(
-        config,
-        (k, v) => {
-          return typeof v === 'undefined' ? null : v
-        },
-        2,
-      )}`,
-    )
 
     const web3 = createPublicClient({ transport: http(config.web3ProviderUri) })
     try {
