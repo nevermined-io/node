@@ -37,6 +37,7 @@ jobs:
         env:
           IPFS_PROJECT_ID: ${{ secrets.IPFS_PROJECT_ID }}
           IPFS_PROJECT_SECRET: ${{ secrets.IPFS_PROJECT_SECRET }}
+          PROVIDER_KEYFILE: ${{ secrets.PROVIDER_KEYFILE }}
         run: |
           yarn setup:dev
           yarn start &
