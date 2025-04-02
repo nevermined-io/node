@@ -154,7 +154,7 @@ export class ConfigService {
     this.envConfig = this.validateInput(configProfile)
     this.crypto = {
       provider_password: this.get('PROVIDER_PASSWORD') || '',
-      provider_key: readFileSync(this.get('PROVIDER_KEYFILE') || '').toString(),
+      provider_key: this.get('PROVIDER_KEYFILE') || '',
       provider_rsa_public: readFileSync(this.get('RSA_PUBKEY_FILE') || '').toString(),
       provider_rsa_private: readFileSync(this.get('RSA_PRIVKEY_FILE') || '').toString(),
     }
