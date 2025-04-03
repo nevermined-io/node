@@ -51,11 +51,11 @@ export class BackendService {
       this.isNVMBackendEnabled = this.config.backendConfig().isNVMBackendEnabled
       this.appUrl = this.config.backendConfig().appUrl
 
-      Logger.log(`Backend Config: `)
-      Logger.log(`Is Backend Enabled: ${this.isNVMBackendEnabled}`)
-      Logger.log(this.trackBackendTxs)
-      Logger.log(this.backendUrl)
-      Logger.log(this.backendAuth)
+      Logger.debug(`Backend Config: `)
+      Logger.debug(`Is Backend Enabled: ${this.isNVMBackendEnabled}`)
+      Logger.debug(this.trackBackendTxs)
+      Logger.debug(this.backendUrl)
+      Logger.debug(this.backendAuth)
     } catch (e) {
       Logger.warn(e)
     }
